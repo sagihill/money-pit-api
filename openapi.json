@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "description": "API Service endpoints",
     "contact": {
-      "email": "sidhant@panda.fyi",
-      "name": "Sidhant Panda"
+      "email": "sagi.hillel@gmail.com",
+      "name": "Sagi Hillel"
     }
   },
   "servers": [
@@ -16,30 +16,30 @@
   ],
   "tags": [
     {
-      "name": "book",
-      "description": "Books APIs"
+      "name": "user",
+      "description": "Users APIs"
     }
   ],
   "paths": {
-    "/book/add": {
+    "/user/add": {
       "post": {
-        "tags": ["book"],
-        "summary": "Add a book to the database",
-        "operationId": "book-add",
+        "tags": ["user"],
+        "summary": "Add a user to the database",
+        "operationId": "user-add",
         "requestBody": {
           "description": "New user signing up",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DraftBookSchema"
+                "$ref": "#/components/schemas/UserSchema"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Book was added",
+            "description": "User was added",
             "content": {
               "application/json": {
                 "schema": {
@@ -71,66 +71,30 @@
         }
       }
     },
-    "/book/all": {
-      "get": {
-        "tags": ["book"],
-        "summary": "Get all books in database",
-        "operationId": "book-get-all",
-        "responses": {
-          "200": {
-            "description": "Search results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "books": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/BookSchema"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerErrorSchema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/book/id/{bookId}": {
+    "/user/id/{userId}": {
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "bookId",
+            "name": "userId",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "ID of book to retrieve"
+            "description": "ID of user to retrieve"
           }
         ],
-        "tags": ["book"],
-        "summary": "Retrieve a book by ID",
-        "operationId": "book-get",
+        "tags": ["user"],
+        "summary": "Retrieve a user by ID",
+        "operationId": "user-get",
         "responses": {
           "200": {
-            "description": "Book details",
+            "description": "User details",
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
-                    "book": {
+                    "user": {
                       "$ref": "#/components/schemas/BookSchema"
                     }
                   }
@@ -139,7 +103,7 @@
             }
           },
           "404": {
-            "description": "Book not found",
+            "description": "User not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -154,23 +118,23 @@
         "parameters": [
           {
             "in": "path",
-            "name": "bookId",
+            "name": "userId",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "ID of book to remove"
+            "description": "ID of user to remove"
           }
         ],
-        "tags": ["book"],
-        "summary": "Remove a book by ID",
-        "operationId": "book-remove",
+        "tags": ["user"],
+        "summary": "Remove a user by ID",
+        "operationId": "user-remove",
         "responses": {
           "204": {
-            "description": "Book removed"
+            "description": "User removed"
           },
           "404": {
-            "description": "Book not found",
+            "description": "User not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -180,57 +144,32 @@
             }
           }
         }
-      }
-    },
-    "/book/search": {
-      "get": {
-        "tags": ["book"],
-        "summary": "Search books by name or author",
-        "operationId": "book-search",
+      },
+      "edit": {
         "parameters": [
           {
-            "in": "query",
-            "name": "name",
+            "in": "path",
+            "name": "userId",
             "schema": {
-              "type": "string",
-              "default": "hitchhiker"
+              "type": "string"
             },
-            "description": "String containing full name or partial name of the book"
-          },
-          {
-            "in": "query",
-            "name": "author",
-            "schema": {
-              "type": "string",
-              "default": "douglas"
-            },
-            "description": "String containing full name or partial name of the author"
+            "required": true,
+            "description": "ID of user to remove"
           }
         ],
+        "tags": ["user"],
+        "summary": "Remove a user by ID",
+        "operationId": "user-remove",
         "responses": {
-          "200": {
-            "description": "Search results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "books": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/BookSchema"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          "204": {
+            "description": "User removed"
           },
-          "500": {
-            "description": "Internal Server Error",
+          "404": {
+            "description": "User not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServerErrorSchema"
+                  "$ref": "#/components/schemas/NotFoundErrorSchema"
                 }
               }
             }
@@ -274,34 +213,34 @@
         },
         "required": ["error"]
       },
-      "DraftBookSchema": {
+
+      "UserSchema": {
         "type": "object",
         "properties": {
-          "name": {
+          "uuid": {
             "type": "string",
-            "description": "Name of the book",
-            "example": "The Hitchhiker's Guide to the Galaxy"
+            "description": "id of the user",
+            "example": "5d7224d3b-40b1a1a0-46697dd-46697dd"
           },
-          "author": {
+          "accountId": {
             "type": "string",
-            "description": "Name of the author",
-            "example": "Douglas Adams"
-          }
-        },
-        "required": ["name", "author"]
-      },
-      "BookSchema": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DraftBookSchema"
-          }
-        ],
-        "type": "object",
-        "properties": {
-          "_id": {
+            "description": "accountId of the user",
+            "example": "5d7224d3b-40b1a1a0-46697dd-46697dd"
+          },
+          "firstName": {
             "type": "string",
-            "description": "MongoDB id of the document",
-            "example": "5d7224d3b40b1a1a046697dd"
+            "description": "first name of the user",
+            "example": "Saul"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "last name of the user",
+            "example": "Goodman"
+          },
+          "email": {
+            "type": "string",
+            "description": "email of the user",
+            "example": "saul.goodman@law.com"
           },
           "createdAt": {
             "type": "number",
@@ -314,7 +253,14 @@
             "example": 1616158942428
           }
         },
-        "required": ["_id", "createdAt", "updatedAt"]
+        "required": [
+          "uuid",
+          "firsName",
+          "lastName",
+          "email",
+          "createdAt",
+          "updatedAt"
+        ]
       }
     }
   }
