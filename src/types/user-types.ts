@@ -1,28 +1,27 @@
+import { EntityDetails } from ".";
+
 // tslint:disable-next-line: no-namespace
 export namespace UserTypes {
   export interface IUserService {
-    add(request: UserTypes.AddUserRequest): Promise<UserTypes.UserDetails>;
-    edit(uuid: string, request: UserTypes.EditUserRequest): Promise<void>;
-    get(uuid: string): Promise<UserTypes.UserDetails | undefined>;
-    remove(uuid: string): Promise<void>;
+    add(request: AddUserRequest): Promise<UserDetails>;
+    edit(id: string, request: EditUserRequest): Promise<void>;
+    get(id: string): Promise<UserDetails | undefined>;
+    remove(id: string): Promise<void>;
   }
 
   export interface IUserRepository {
-    add(userDetails: UserTypes.UserDetails): Promise<UserTypes.UserDetails>;
-    edit(uuid: string, request: UserTypes.EditUserRequest): Promise<void>;
-    get(uuid: string): Promise<UserTypes.UserDetails | undefined>;
-    remove(uuid: string): Promise<void>;
+    add(userDetails: UserDetails): Promise<UserDetails>;
+    edit(id: string, request: EditUserRequest): Promise<void>;
+    get(id: string): Promise<UserDetails | undefined>;
+    remove(id: string): Promise<void>;
   }
 
-  export interface UserDetails {
-    uuid: string;
+  export interface UserDetails extends EntityDetails {
+    id: string;
     accountId?: string;
     firstName: string;
     lastName: string;
     email: string;
-    deleted: boolean;
-    createdAt: Date;
-    updatedAt: Date;
   }
 
   export interface EditUserRequest {

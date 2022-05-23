@@ -1,13 +1,11 @@
-import { Model, Schema, model, Document } from "mongoose";
+import { Model, Schema, model } from "mongoose";
 import { UserTypes } from "../types";
 
-export interface IUser extends Document, UserTypes.UserDetails {}
+interface IUserModel extends Model<UserTypes.UserDetails> {}
 
-interface IUserModel extends Model<IUser> {}
-
-const schema = new Schema<IUser>(
+const schema = new Schema<UserTypes.UserDetails>(
   {
-    uuid: { type: String, index: true, required: true },
+    id: { type: String, index: true, required: true },
     accountId: { type: String, index: true, required: false },
     firstName: { type: String, index: true, required: true },
     lastName: { type: String, index: true, required: true },
@@ -19,6 +17,9 @@ const schema = new Schema<IUser>(
   { timestamps: true }
 );
 
-const User: IUserModel = model<IUser, IUserModel>("User", schema);
+const User: IUserModel = model<UserTypes.UserDetails, IUserModel>(
+  "User",
+  schema
+);
 
 export default User;

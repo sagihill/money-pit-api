@@ -1,7 +1,9 @@
-import { LoggerTypes, UserTypes, MongoTypes } from "../../types";
+import { LoggerTypes, UserTypes, MongoTypes, AccountTypes } from "../../types";
 import { getLogger } from "../logger";
-import { UserRepository, UserService } from "../user";
 import { Mongo as MongoProvider } from "../mongo";
+
+import { getUserRepository, UserService } from "../user";
+import { getAccountRepository, AccountService } from "../account";
 
 export class ServicesProvider {
   private SP: any;
@@ -22,7 +24,7 @@ export class ServicesProvider {
     const logger = await this.Logger();
     try {
       if (!this.SP.User) {
-        const repository = new UserRepository();
+        const repository = getUserRepository();
         const userService = new UserService(repository, logger);
         this.SP.User = userService;
       }
@@ -30,6 +32,27 @@ export class ServicesProvider {
     } catch (error) {
       logger.error(
         `Something happend while trying to load User from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+  async Account(): Promise<AccountTypes.IAccountService> {
+    const logger = await this.Logger();
+    try {
+      if (!this.SP.Account) {
+        const repository = getAccountRepository();
+        const userService = await this.User();
+        const accountService = new AccountService(
+          userService,
+          repository,
+          logger
+        );
+        this.SP.Account = accountService;
+      }
+      return this.SP.Account;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Account from Services, error: ${error}`
       );
       throw error;
     }

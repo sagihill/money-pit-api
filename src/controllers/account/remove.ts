@@ -4,11 +4,11 @@ import { ServicesProvider } from "../../services/services-provider";
 
 const remove: RequestHandler = async (req: Request, res) => {
   const SP = ServicesProvider.get();
-  const userService = await SP.User();
+  const account = await SP.Account();
 
   const { id } = req.params;
 
-  await userService.remove(id);
+  await account.remove(id);
 
   res.send({
     message: "Deleted",

@@ -12,14 +12,14 @@ export const editUserRequestValidator = Joi.object().keys({
 });
 
 const edit: RequestHandler = async (
-  req: Request<{ userId: string }, {}, UserTypes.EditUserRequest>,
+  req: Request<any, {}, UserTypes.EditUserRequest>,
   res
 ) => {
   const SP = ServicesProvider.get();
   const userService = await SP.User();
 
   const { firstName, lastName, email, accountId } = req.body;
-  await userService.edit(req.params.userId, {
+  await userService.edit(req.params.id, {
     firstName,
     lastName,
     email,

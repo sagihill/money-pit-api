@@ -3,7 +3,7 @@ import compression from "compression";
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
-import routes from "./routes";
+import rootRouter from "./routes";
 import { ServicesProvider } from "./services/services-provider";
 
 const app = express();
@@ -42,7 +42,7 @@ app.use(
   express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
 );
 
-app.use(routes);
+app.use("/", rootRouter);
 
 app.use(
   (err: ApplicationError, req: Request, res: Response, next: NextFunction) => {

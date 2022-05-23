@@ -71,12 +71,12 @@
         }
       }
     },
-    "/user/id/{userId}": {
+    "/user/id/{id}": {
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "userId",
+            "name": "id",
             "schema": {
               "type": "string"
             },
@@ -118,7 +118,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userId",
+            "name": "id",
             "schema": {
               "type": "string"
             },
@@ -149,7 +149,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "userId",
+            "name": "id",
             "schema": {
               "type": "string"
             },

@@ -1,5 +1,5 @@
-import { ID } from "../../lib/common";
 import { LoggerTypes, UserTypes } from "../../types";
+import { createNewUserDetails } from "./user-factory";
 
 export class UserService implements UserTypes.IUserService {
   constructor(
@@ -10,15 +10,7 @@ export class UserService implements UserTypes.IUserService {
   async add(request: UserTypes.AddUserRequest): Promise<UserTypes.UserDetails> {
     try {
       this.logger.info(`Creating user : ${{ request }}`);
-      const now = new Date();
-      const userDetails: UserTypes.UserDetails = {
-        ...request,
-        uuid: ID.get(),
-        deleted: false,
-        createdAt: now,
-        updatedAt: now,
-      };
-
+      const userDetails = createNewUserDetails(request);
       return await this.userRepository.add(userDetails);
     } catch (error) {
       this.logger.error(`Can't create new user: ${{ request, error }}`);
@@ -26,30 +18,30 @@ export class UserService implements UserTypes.IUserService {
     }
   }
 
-  async edit(uuid: string, request: UserTypes.EditUserRequest): Promise<void> {
+  async edit(id: string, request: UserTypes.EditUserRequest): Promise<void> {
     try {
-      this.logger.info(`Editing user : ${{ uuid, request }}`);
-      await this.userRepository.edit(uuid, request);
+      this.logger.info(`Editing user : ${{ id, request }}`);
+      await this.userRepository.edit(id, request);
     } catch (error) {
-      this.logger.error(`Can't edit user: ${{ uuid, request, error }}`);
+      this.logger.error(`Can't edit user: ${{ id, request, error }}`);
     }
   }
 
-  async get(uuid: string): Promise<UserTypes.UserDetails | undefined> {
+  async get(id: string): Promise<UserTypes.UserDetails | undefined> {
     try {
-      this.logger.info(`Getting user : ${{ uuid }}`);
-      return await this.userRepository.get(uuid);
+      this.logger.info(`Getting user : ${{ id }}`);
+      return await this.userRepository.get(id);
     } catch (error) {
-      this.logger.error(`Can't get user: ${{ uuid, error }}`);
+      this.logger.error(`Can't get user: ${{ id, error }}`);
     }
   }
 
-  async remove(uuid: string): Promise<void> {
+  async remove(id: string): Promise<void> {
     try {
-      this.logger.info(`Deleting user : ${{ uuid }}`);
-      return await this.userRepository.remove(uuid);
+      this.logger.info(`Deleting user : ${{ id }}`);
+      return await this.userRepository.remove(id);
     } catch (error) {
-      this.logger.error(`Can't remove user: ${{ uuid, error }}`);
+      this.logger.error(`Can't remove user: ${{ id, error }}`);
     }
   }
 }
