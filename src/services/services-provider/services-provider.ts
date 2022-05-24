@@ -1,8 +1,15 @@
-import { LoggerTypes, UserTypes, MongoTypes, AccountTypes } from "../../types";
+import {
+  LoggerTypes,
+  UserTypes,
+  MongoTypes,
+  AccountTypes,
+  AuthTypes,
+} from "../../types";
 import { getLogger } from "../logger";
 import { Mongo as MongoProvider } from "../mongo";
 
 import { getUserRepository, UserService } from "../user";
+import { AuthService, getAuthRepository} from "../auth";
 import { getAccountRepository, AccountService } from "../account";
 
 export class ServicesProvider {
@@ -36,6 +43,25 @@ export class ServicesProvider {
       throw error;
     }
   }
+
+  async Auth(): Promise<AuthTypes.IAuthService> {
+    const logger = await this.Logger();
+    const user = await this.User();
+    try {
+      if (!this.SP.Auth) {
+        const repository = getAuthRepository();
+        const auth = new AuthService(user, repository, logger);
+        this.SP.Auth = auth;
+      }
+      return this.SP.Auth;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Auth from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
   async Account(): Promise<AccountTypes.IAccountService> {
     const logger = await this.Logger();
     try {

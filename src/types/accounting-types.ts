@@ -1,37 +1,51 @@
+import { EntityDetails, TimeFrame } from ".";
+
 // tslint:disable-next-line: no-namespace
 export namespace AccountingTypes {
-  // export interface IAccountingService {
-  // 	createAccount(id: string)
-  // 	registerExpense(accountId: string, expense: Expense, isConst: boolean): Promise<string>;
-  // 	getMonthlyAccountSummary(
-  // 		accountId: string,
-  // 		year: number,
-  // 		month: number
-  // 	): Promise<AccountSummary>;
-  // 	getMonthlyAccountExpenses(
-  // 		accountId: string,
-  // 		year: number,
-  // 		month: number
-  // 	): Promise<Expense[]>;
-  // 	getMostFrequentExpenses(accountId: string): Promise<Expense[]>;
-  // }
+  export interface IAccountingService {
+    addExpenses(expenses: Expense[]): Promise<void>;
+    getAccountSummery(
+      accountId: string,
+      timeFrame: TimeFrame
+    ): Promise<AccountSummery>;
+  }
 
-  // export interface IAccountingRepository {}
+  export interface IAccountingRepository {
+    addExpenses(expenses: Expense[]): Promise<void>;
+    getExpenses(accountId: string, timeFrame: TimeFrame): Promise<Expense[]>;
+  }
 
-  // export type Account = {
-  // 	id: string;
-  // 	type: AccountType;
-  // 	members: string[];
-  // 	adminId: string;
-  // };
+  export type AccountSummery = {
+    expenseAmount: number;
+    incomeAmount: number;
+    balance: number;
+    categoriesSummery: CategoriesSummery;
+  };
 
-  export type Expense = {
+  export type CategoriesSummery = {
+    [key: string]: CategorySummery;
+  };
+
+  export type CategorySummery = {
+    expenseAmount: number;
+    budget: number;
+    balance: number;
+  };
+  export interface Expense extends EntityDetails {
+    id: string;
+    accountId: string;
     category: ExpenseCategory;
     name: string;
     amount: number;
     currency: Currency;
-    timestamp?: Date;
-  };
+  }
+
+  export interface EditExpenseRequest {
+    category: ExpenseCategory;
+    name: string;
+    amount: number;
+    currency: Currency;
+  }
 
   export interface Income {
     amount: number;
@@ -48,5 +62,9 @@ export namespace AccountingTypes {
     EUR = "EUR",
   }
 
-  export enum ExpenseCategory {}
+  export enum ExpenseCategory {
+    Food = "food",
+    USD = "USD",
+    EUR = "EUR",
+  }
 }

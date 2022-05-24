@@ -34,6 +34,10 @@ export namespace AccountTypes {
     members: string[];
     income: AccountingTypes.Salary;
   };
+  export type AddAccountNetworkRequest = {
+    type: AccountType;
+    income: AccountingTypes.Salary;
+  };
 
   export enum AccountType {
     Family = "family",

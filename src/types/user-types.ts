@@ -1,4 +1,4 @@
-import { EntityDetails } from ".";
+import { EntityDetails, MongoTypes } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace UserTypes {
@@ -7,9 +7,12 @@ export namespace UserTypes {
     edit(id: string, request: EditUserRequest): Promise<void>;
     get(id: string): Promise<UserDetails | undefined>;
     remove(id: string): Promise<void>;
+    find(query: any): Promise<UserDetails[]>;
+    findOne(query: any): Promise<UserDetails | undefined>;
   }
 
-  export interface IUserRepository {
+  export interface IUserRepository
+    extends MongoTypes.Repository<UserDetails, EditUserRequest> {
     add(userDetails: UserDetails): Promise<UserDetails>;
     edit(id: string, request: EditUserRequest): Promise<void>;
     get(id: string): Promise<UserDetails | undefined>;
@@ -22,6 +25,7 @@ export namespace UserTypes {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
   }
 
   export interface EditUserRequest {
@@ -35,5 +39,6 @@ export namespace UserTypes {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
   };
 }

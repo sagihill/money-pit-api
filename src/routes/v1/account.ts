@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import { AccountController } from "../controllers";
+import { AccountController } from "../../controllers";
 
 const router = Router();
 
-// User routes
+// Account routes
 router.post("/add", AccountController.add);
 router.get("/id/:id", AccountController.get);
 router.delete("/id/:id", AccountController.remove);

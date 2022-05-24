@@ -27,7 +27,11 @@ const edit: RequestHandler = async (
   });
 
   res.send({
-    message: "Edited",
+    message: "User data edited",
+    responseCode: 200,
+    data: {
+      userId: req.params.id,
+    },
   });
 };
 

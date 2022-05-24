@@ -5,7 +5,7 @@ import { Model } from "mongoose";
  * A generic base class for Mongo-backed repositories.
  */
 export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
-  constructor(private readonly model: Model<T>) {
+  constructor(protected readonly model: Model<T>) {
     ///
   }
 
@@ -13,6 +13,11 @@ export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
     const modelInstance = new this.model(data);
     const doc = await modelInstance.save();
     return this.deserialize(doc.toObject());
+  }
+
+  async addMany(data: T[]): Promise<void> {
+    const modelInstance = new this.model(data);
+    await modelInstance.collection.insertMany(data);
   }
 
   async edit(id: string, editRequest: E): Promise<void> {
@@ -42,7 +47,7 @@ export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
 
     if (limit) query.limit(limit);
 
-    let a = await (await query).map((v) => this.deserialize(v));
+    let a = await (await query).map((v) => this.deserialize(v.toObject()));
     return a;
   }
 

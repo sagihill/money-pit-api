@@ -14,7 +14,11 @@ const get: RequestHandler = async (req: Request, res) => {
     });
   }
   return res.status(200).send({
-    user: JSON.stringify(user),
+    message: "New user created",
+    responseCode: 200,
+    data: {
+      userId: user.id,
+    },
   });
 };
 

@@ -41,25 +41,18 @@ export const requestMiddleware =
         return;
       }
     }
-
     try {
-      handler(req, res, next);
+      await handler(req, res, next);
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
-        (async () => {
-          try {
-            const SP = ServicesProvider.get();
-            const logger = await SP.Logger();
-            logger.log({
-              level: "error",
-              message: "Error in request handler",
-              error: err,
-            });
-          } catch (e) {
-            console.log(e);
-          }
-        })();
+        const SP = ServicesProvider.get();
+        const logger = await SP.Logger();
+        logger.error({
+          message: "Error in request handler",
+          error: err,
+        });
       }
+
       next(err);
     }
   };
