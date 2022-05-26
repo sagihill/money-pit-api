@@ -1,4 +1,4 @@
-import { EntityDetails, MongoTypes } from ".";
+import { IEntityDetails, MongoTypes } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace UserTypes {
@@ -19,7 +19,7 @@ export namespace UserTypes {
     remove(id: string): Promise<void>;
   }
 
-  export interface UserDetails extends EntityDetails {
+  export interface UserDetails extends IEntityDetails {
     id: string;
     accountId?: string;
     firstName: string;

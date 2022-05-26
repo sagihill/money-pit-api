@@ -1,4 +1,4 @@
-import { EntityDetails, AccountingTypes } from ".";
+import { IEntityDetails, AccountingTypes } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountTypes {
@@ -16,7 +16,7 @@ export namespace AccountTypes {
     remove(id: string): Promise<void>;
   }
 
-  export interface AccountDetails extends EntityDetails {
+  export interface AccountDetails extends IEntityDetails {
     id: string;
     type: AccountType;
     adminUserId: string;

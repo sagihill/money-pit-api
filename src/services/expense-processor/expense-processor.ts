@@ -7,10 +7,7 @@ import {
 import xlsx from "node-xlsx";
 import * as fs from "fs";
 import * as path from "path";
-import { default as moment } from "moment";
-
-// const { csv } = require("csv-parser");
-
+import { ID } from "../../lib/common";
 export class ExpenseProcessor
   implements ExpenseProcessorTypes.IExpenseProcessor
 {
@@ -19,18 +16,9 @@ export class ExpenseProcessor
     רגילה: AccountingTypes.ExpenseType.Regular,
   };
 
-  private expenseCategoryMap: {
-    [key: string]: AccountingTypes.ExpenseCategory;
-  } = {
-    ביטוח: AccountingTypes.ExpenseCategory.Insurance,
-    "מזון וצריכה": AccountingTypes.ExpenseCategory.FoodAndConsumption,
-    "שירותי תקשורת": AccountingTypes.ExpenseCategory.CommunicationServices,
-    "מחשבים, תוכנות וחשמל":
-      AccountingTypes.ExpenseCategory.CommunicationServices,
-  };
-
   constructor(
     private readonly accountingService: AccountingTypes.IAccountingService,
+    private readonly options: ExpenseProcessorTypes.ExpenseProcessorOptions,
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
@@ -80,13 +68,10 @@ export class ExpenseProcessor
     expenseData: string[]
   ): Promise<ExpenseProcessorTypes.ExpenseExtract> {
     return {
+      id: ID.get(expenseData.join("")),
       timestamp: this.getDate(expenseData[0]),
       name: this.formatString(expenseData[1]),
-      category: await this.getCategory(
-        expenseData,
-        this.expenseCategoryMap,
-        this.expenseCategoryMap
-      ),
+      category: await this.getCategory(expenseData),
       amount: Number(expenseData[5]),
       description: !!expenseData[10]
         ? this.formatString(expenseData[10])
@@ -98,12 +83,12 @@ export class ExpenseProcessor
   }
 
   private async getCategory(
-    expenseData: string[],
-    categoryMap: ExpenseProcessorTypes.CategoryMap,
-    categoryNameMap: ExpenseProcessorTypes.CategoryMap
+    expenseData: string[]
   ): Promise<AccountingTypes.ExpenseCategory> {
-    const categoryFromName = categoryNameMap[expenseData[1]];
-    const categoryFromCategory = categoryMap[expenseData[2]];
+    const categoryFromName =
+      this.options.expenseCategoryNameMap[expenseData[1]];
+    const categoryFromCategory =
+      this.options.expenseCategoryCategoryMap[expenseData[2]];
     if (categoryFromName) {
       return categoryFromName;
     } else if (categoryFromCategory) {
@@ -138,3 +123,18 @@ export class ExpenseProcessor
     return reversed.reverse().join(" ");
   }
 }
+
+// const map = {
+//   ביטוח: AccountingTypes.ExpenseCategory.Insurance,
+//   "מזון וצריכה": AccountingTypes.ExpenseCategory.FoodAndConsumption,
+//   "שרותי תקשורת": AccountingTypes.ExpenseCategory.CommunicationServices,
+//   "מחשבים, תוכנות וחשמל": AccountingTypes.ExpenseCategory.Other,
+//   "דלק חשמל וגז": AccountingTypes.ExpenseCategory.FuelGasAndElectricity,
+//   "עירייה וממשלה": AccountingTypes.ExpenseCategory.GovAndMuni,
+//   כלבו: AccountingTypes.ExpenseCategory.Other,
+//   שונות: AccountingTypes.ExpenseCategory.Other,
+// };
+
+// const json = JSON.stringify(map);
+
+// console.log(json);

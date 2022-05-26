@@ -1,4 +1,4 @@
-import { EntityDetails } from ".";
+import { IEntityDetails } from ".";
 
 export namespace AuthTypes {
   export interface IAuthService {

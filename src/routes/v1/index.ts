@@ -3,6 +3,7 @@ import { Router } from "express";
 import user from "./user";
 import account from "./account";
 import auth from "./auth";
+import config from "./config";
 
 import swaggerUi from "swagger-ui-express";
 import apiSpec from "../../../openapi.json";
@@ -16,6 +17,7 @@ let rootRouter = Router();
 rootRouter.use("/v1/user", authorize, user);
 rootRouter.use("/v1/account", authorize, account);
 rootRouter.use("/v1/auth", auth);
+rootRouter.use("/v1/config", config);
 
 // Dev routes
 if (process.env.NODE_ENV === "development") {

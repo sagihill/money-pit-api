@@ -5,8 +5,9 @@ export * from "./account-types";
 export * from "./accounting-types";
 export * from "./expense-processor-types";
 export * from "./auth-types";
+export * from "./config-types";
 
-export interface EntityDetails {
+export interface IEntityDetails {
   deleted: boolean;
   createdAt: Date;
   updatedAt: Date;

@@ -51,3 +51,15 @@ export namespace Utils {
     return req?.headers?.authorization?.split(" ")[1];
   }
 }
+
+export namespace Async {
+  export function IIFE(callback: Function) {
+    (async () => {
+      try {
+        await callback();
+      } catch (e) {
+        console.log(e);
+      }
+    })();
+  }
+}

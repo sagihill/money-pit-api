@@ -1,16 +1,14 @@
 /* eslint-disable import/first */
-import dotenv from "dotenv";
-
-const result = dotenv.config();
-if (result.error) {
-  dotenv.config({ path: ".env.default" });
-}
-
 import app from "./app";
+import { Async } from "./lib/common";
 import { ServicesProvider } from "./services/services-provider";
 
 const PORT = process.env.PORT || 3000;
 const SP = ServicesProvider.get();
+
+Async.IIFE(async () => {
+  const config = await SP.Config();
+});
 
 const serve = async () => {
   const logger = await SP.Logger();
@@ -26,10 +24,12 @@ const serve = async () => {
   });
 };
 
-(async () => {
+Async.IIFE(async () => {
   try {
     const logger = await SP.Logger();
-    if (process.env.MONGO_URL == null) {
+    const config = await SP.Config();
+    const mongoUrl = await config.get("MONGO_URL");
+    if (mongoUrl == null) {
       logger.error(
         "MONGO_URL not specified in environment",
         new Error("MONGO_URL not specified in environment")
@@ -43,11 +43,11 @@ const serve = async () => {
   } catch (e) {
     console.log(e);
   }
-})();
+});
 
 // Close the Mongoose connection, when receiving SIGINT
 process.on("SIGINT", () => {
-  (async () => {
+  Async.IIFE(async () => {
     try {
       const logger = await SP.Logger();
       console.log("\n"); /* eslint-disable-line */
@@ -58,5 +58,5 @@ process.on("SIGINT", () => {
     } catch (e) {
       console.log(e);
     }
-  })();
+  });
 });

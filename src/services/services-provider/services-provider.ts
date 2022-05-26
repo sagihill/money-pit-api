@@ -6,6 +6,7 @@ import {
   AuthTypes,
   AccountingTypes,
   ExpenseProcessorTypes,
+  ConfigTypes,
 } from "../../types";
 import { getLogger } from "../logger";
 import { Mongo as MongoProvider } from "../mongo";
@@ -15,6 +16,8 @@ import { AuthService, getAuthRepository } from "../auth";
 import { getAccountRepository, AccountService } from "../account";
 import { AccountingService, getAccountingRepository } from "../accounting";
 import { ExpenseProcessor } from "../expense-processor";
+import { ConfigService } from "../config/config-service";
+import { getConfigRepository } from "../config/config-repository";
 
 export class ServicesProvider {
   private SP: any;
@@ -107,10 +110,20 @@ export class ServicesProvider {
   async ExpesnseProcessor(): Promise<ExpenseProcessorTypes.IExpenseProcessor> {
     const logger = await this.Logger();
     const accountingService = await this.Accounting();
+    const config = await this.Config();
+    const options: ExpenseProcessorTypes.ExpenseProcessorOptions = {
+      expenseCategoryCategoryMap: (await config.getObject(
+        "EXPENSE_CATEGORY_CATEGORY_MAP"
+      )) as ExpenseProcessorTypes.CategoryMap,
+      expenseCategoryNameMap: (await config.getObject(
+        "EXPENSE_CATEGORY_NAME_MAP"
+      )) as ExpenseProcessorTypes.CategoryMap,
+    };
     try {
       if (!this.SP.ExpesnseProcessor) {
         const expenseProcessor = new ExpenseProcessor(
           accountingService,
+          options,
           logger
         );
 
@@ -135,6 +148,24 @@ export class ServicesProvider {
       // tslint:disable-next-line: no-console
       console.error(
         `Something happend while trying to load Logger from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  async Config(): Promise<ConfigTypes.IConfigService> {
+    const logger = await this.Logger();
+    try {
+      if (!this.SP.Config) {
+        const repository = getConfigRepository();
+        const accountingService = new ConfigService(repository, logger);
+        this.SP.Config = accountingService;
+      }
+      return this.SP.Config;
+    } catch (error) {
+      // tslint:disable-next-line: no-console
+      console.error(
+        `Something happend while trying to load Config from Services, error: ${error}`
       );
       throw error;
     }

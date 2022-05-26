@@ -1,4 +1,4 @@
-import { Currency, EntityDetails, TimeFrame } from ".";
+import { Currency, IEntityDetails, TimeFrame } from ".";
 import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
@@ -37,7 +37,7 @@ export namespace AccountingTypes {
     budget: number;
     balance: number;
   };
-  export interface Expense extends EntityDetails {
+  export interface Expense extends IEntityDetails {
     id: string;
     accountId: string;
     category: ExpenseCategory;
@@ -86,8 +86,12 @@ export namespace AccountingTypes {
 
   export enum ExpenseCategory {
     FoodAndConsumption = "food_and_consumption",
+    FuelGasAndElectricity = "fuel_gas_and_electricity",
+    GovAndMuni = "goverment_and_municipality",
     Insurance = "insurance",
     CommunicationServices = "communication_services",
+    Mia = "mia",
     Other = "other",
+    Home = "home",
   }
 }
