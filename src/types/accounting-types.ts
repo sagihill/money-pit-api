@@ -5,6 +5,7 @@ import { MongoTypes } from "./mongo-types";
 export namespace AccountingTypes {
   export interface IAccountingService {
     addExpenses(expenses: Expense[]): Promise<void>;
+    addExpensesFromExtract(expenses: AccountingTypes.Expense[]): Promise<void>;
     editExpense(id: string, request: EditExpenseRequest): Promise<void>;
     getAccountSummery(
       accountId: string,
@@ -18,6 +19,7 @@ export namespace AccountingTypes {
   export interface IAccountingRepository
     extends MongoTypes.Repository<Expense, EditExpenseRequest> {
     addExpenses(expenses: Expense[]): Promise<void>;
+    addExpensesFromExtract(expenses: AccountingTypes.Expense[]): Promise<void>;
     getExpenses(accountId: string, timeFrame: TimeFrame): Promise<Expense[]>;
   }
 
@@ -85,7 +87,8 @@ export namespace AccountingTypes {
   }
 
   export enum ExpenseCategory {
-    FoodAndConsumption = "food_and_consumption",
+    Consumption = "consumption",
+    Groceries = "groceries",
     FuelGasAndElectricity = "fuel_gas_and_electricity",
     GovAndMuni = "goverment_and_municipality",
     Insurance = "insurance",

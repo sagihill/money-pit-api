@@ -5,6 +5,7 @@ import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1";
 import { ServicesProvider } from "./services/services-provider";
+import { Async } from "./lib/common";
 
 const app = express();
 const SP = ServicesProvider.get();
@@ -13,21 +14,17 @@ function logResponseTime(req: Request, res: Response, next: NextFunction) {
   const startHrTime = process.hrtime();
 
   res.on("finish", () => {
-    const elapsedHrTime = process.hrtime(startHrTime);
-    const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
-    const message = `${req.method} ${res.statusCode} ${elapsedTimeInMs}ms\t${req.path}`;
-    (async () => {
-      try {
-        const logger = await SP.Logger();
-        logger.log({
-          level: "debug",
-          message,
-          consoleLoggerOptions: { label: "API" },
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    })();
+    Async.IIFE(async () => {
+      const elapsedHrTime = process.hrtime(startHrTime);
+      const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
+      const message = `${req.method} ${res.statusCode} ${elapsedTimeInMs}ms\t${req.path}`;
+      const logger = await SP.Logger();
+      logger.log({
+        level: "debug",
+        message,
+        consoleLoggerOptions: { label: "API" },
+      });
+    });
   });
   next();
 }
@@ -56,13 +53,9 @@ app.use(
   }
 );
 
-(async () => {
-  try {
-    const EP = await SP.ExpesnseProcessor();
-    await EP.run();
-  } catch (e) {
-    console.log(e);
-  }
-})();
+Async.IIFE(async () => {
+  const EP = await SP.ExpesnseProcessor();
+  await EP.run({ accountId: "fc9c5ac9-5f9d-4e67-8784-bc4e7de3b48c" });
+});
 
 export default app;

@@ -1,10 +1,15 @@
 import { MongoRepository } from "../../lib/repository";
 import Expense from "../../models/Expense";
-import { MongoTypes, AccountingTypes, TimeFrame } from "../../types";
+import {
+  MongoTypes,
+  AccountingTypes,
+  TimeFrame,
+  LoggerTypes,
+} from "../../types";
 import { Model } from "mongoose";
 
-export const getAccountingRepository = () => {
-  return new AccountingRepository(Expense);
+export const getAccountingRepository = (logger: LoggerTypes.ILogger) => {
+  return new AccountingRepository(Expense, logger);
 };
 
 export class AccountingRepository
@@ -19,12 +24,23 @@ export class AccountingRepository
       AccountingTypes.EditExpenseRequest
     >
 {
-  constructor(model: Model<AccountingTypes.Expense>) {
+  constructor(
+    model: Model<AccountingTypes.Expense>,
+    private readonly logger: LoggerTypes.ILogger
+  ) {
     super(model);
   }
 
   async addExpenses(expenses: AccountingTypes.Expense[]): Promise<void> {
     await this.addMany(expenses);
+  }
+
+  async addExpensesFromExtract(
+    expenses: AccountingTypes.Expense[]
+  ): Promise<void> {
+    await this.model.insertMany(expenses, { ordered: false }).catch((err) => {
+      this.logger.info(`Added ${err.result.result.nInserted} expenses`);
+    });
   }
 
   async getExpenses(

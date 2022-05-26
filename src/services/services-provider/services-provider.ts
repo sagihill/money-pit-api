@@ -95,7 +95,7 @@ export class ServicesProvider {
     const logger = await this.Logger();
     try {
       if (!this.SP.Accounting) {
-        const repository = getAccountingRepository();
+        const repository = getAccountingRepository(logger);
         const accountingService = new AccountingService(repository, logger);
         this.SP.Accounting = accountingService;
       }
@@ -118,6 +118,7 @@ export class ServicesProvider {
       expenseCategoryNameMap: (await config.getObject(
         "EXPENSE_CATEGORY_NAME_MAP"
       )) as ExpenseProcessorTypes.CategoryMap,
+      expenseSheetsPath: "../../public/expense-sheets",
     };
     try {
       if (!this.SP.ExpesnseProcessor) {

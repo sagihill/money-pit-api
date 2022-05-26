@@ -30,6 +30,18 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     }
   }
 
+  async addExpensesFromExtract(
+    expenses: AccountingTypes.Expense[]
+  ): Promise<void> {
+    try {
+      this.logger.info(`Adding expenses`);
+      await this.accountingRepository.addExpensesFromExtract(expenses);
+    } catch (error) {
+      this.logger.error(`Can't add expenses`);
+      throw error;
+    }
+  }
+
   createNewExpense(
     request: AccountingTypes.AddExpenseRequest
   ): AccountingTypes.Expense {

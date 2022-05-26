@@ -1,13 +1,14 @@
-import { AccountingTypes } from ".";
+import { AccountingTypes, Currency } from ".";
 
 export namespace ExpenseProcessorTypes {
   export interface IExpenseProcessor {
-    run(): Promise<void>;
+    run(params: { accountId: string }): Promise<void>;
   }
 
   export type ExpenseProcessorOptions = {
     expenseCategoryCategoryMap: CategoryMap;
     expenseCategoryNameMap: CategoryMap;
+    expenseSheetsPath: string;
   };
 
   export type ExpenseExtract = {
@@ -18,6 +19,8 @@ export namespace ExpenseProcessorTypes {
     type: AccountingTypes.ExpenseType;
     timestamp: Date;
     description?: string;
+    currency: Currency;
+    accountId: string;
   };
 
   export type CategoryMap = { [key: string]: AccountingTypes.ExpenseCategory };

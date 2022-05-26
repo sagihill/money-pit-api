@@ -27,46 +27,41 @@ export class ConfigService implements ConfigTypes.IConfigService {
 
   async get(key: string): Promise<string | undefined> {
     try {
-      this.logger.info(`get config`);
       return await this.configRepository.get(key);
     } catch (error) {
-      this.logger.error(`Can't get config`);
+      this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
   async getNumber(key: string): Promise<number | undefined> {
     try {
-      this.logger.info(`get config`);
       return await this.configRepository.getNumber(key);
     } catch (error) {
-      this.logger.error(`Can't get config`);
+      this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
   async getBool(key: string): Promise<boolean | undefined> {
     try {
-      this.logger.info(`get config`);
       return await this.configRepository.getBool(key);
     } catch (error) {
-      this.logger.error(`Can't get config`);
+      this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
   async getArray<T>(key: string): Promise<T[] | undefined> {
     try {
-      this.logger.info(`get config`);
       return await this.configRepository.getArray<T>(key);
     } catch (error) {
-      this.logger.error(`Can't get config`);
+      this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
   async getObject(key: string): Promise<object | undefined> {
     try {
-      this.logger.info(`get config`);
       return await this.configRepository.getObject(key);
     } catch (error) {
-      this.logger.error(`Can't get config`);
+      this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }

@@ -5,7 +5,7 @@ interface IExpenseModel extends Model<AccountingTypes.Expense> {}
 
 const schema = new Schema<AccountingTypes.Expense>(
   {
-    id: { type: String, index: true, required: true },
+    id: { type: String, index: true, required: true, unique: true },
     accountId: { type: String, index: true, required: true },
     category: { type: String, index: true, required: true },
     name: { type: String, index: true, required: true },
