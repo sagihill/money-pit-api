@@ -5,7 +5,12 @@ import { ServicesProvider } from "../../services/services-provider";
 import { AccountTypes } from "../../types";
 
 export const editAccountRequestValidator = Joi.object().keys({
-  income: Joi.object().required(),
+  configuration: {
+    incomes: Joi.array(),
+    members: Joi.array(),
+    budget: Joi.object(),
+    recurrentExpenses: Joi.array(),
+  },
 });
 
 const edit: RequestHandler = async (
@@ -15,9 +20,9 @@ const edit: RequestHandler = async (
   const SP = ServicesProvider.get();
   const accountService = await SP.Account();
 
-  const { income } = req.body;
+  const { configuration } = req.body;
   await accountService.edit(req.params.id, {
-    income,
+    configuration,
   });
 
   res.send({

@@ -66,14 +66,14 @@ export class ExpenseProcessor
         expenseData,
         accountId
       );
+
+      console.log(expenseExtract);
       expensesExtracts.push(expenseExtract);
     }
     await this.addExpenses(expensesExtracts);
 
     this.postProcess(filePath, fileId);
   }
-
-  private preProcess() {}
 
   private postProcess(filePath: string, fileId: string): void {
     const newPath = path.join(
@@ -102,7 +102,7 @@ export class ExpenseProcessor
     accountId: string
   ): Promise<ExpenseProcessorTypes.ExpenseExtract> {
     return {
-      id: ID.get(expenseData.join("")),
+      id: ID.get(expenseData.join("") + accountId),
       timestamp: this.getDate(expenseData[0]),
       name: expenseData[1],
       category: await this.getCategory(expenseData),

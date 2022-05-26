@@ -1,4 +1,4 @@
-import { IEntityDetails, AccountingTypes } from ".";
+import { IEntityDetails, AccountingTypes, Currency } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountTypes {
@@ -20,23 +20,62 @@ export namespace AccountTypes {
     id: string;
     type: AccountType;
     adminUserId: string;
+    configuration: AccountConfiguration;
+  }
+  export type AccountConfiguration = {
     members: string[];
-    income: AccountingTypes.Salary;
+    incomes: AccountingTypes.Salary[];
+    budget?: Budget;
+    recurrentExpenses?: RecurrentExpense[];
+  };
+
+  export type Budget = {
+    totalBudget?: number;
+    categoriesBudget?: {
+      [key: string]: number;
+    };
+  };
+
+  export type RecurrentExpense = {
+    category: AccountingTypes.ExpenseCategory;
+    name: string;
+    type: AccountingTypes.ExpenseType;
+    description?: string;
+    amount: number;
+    currency: Currency;
+    dueDay: number;
+    recurrence: Recurrence;
+  };
+
+  export enum Recurrence {
+    Monthly = "monthly",
+    Semesterly = "semesterly",
+    Quarterly = "quarterly",
+    Medianly = "medianly",
   }
 
   export interface EditAccountRequest {
-    income?: AccountingTypes.Salary;
+    configuration?: {
+      members?: string[];
+      incomes?: AccountingTypes.Salary[];
+      budget?: Budget;
+      // recurrentExpenses?: RecurrentExpense[];
+    };
   }
 
   export type AddAccountRequest = {
     type: AccountType;
     adminUserId: string;
-    members: string[];
-    income: AccountingTypes.Salary;
+    configuration: AccountConfiguration;
   };
+
   export type AddAccountNetworkRequest = {
     type: AccountType;
-    income: AccountingTypes.Salary;
+    configuration: {
+      incomes: AccountingTypes.Salary[];
+      budget?: Budget;
+      recurrentExpenses?: RecurrentExpense[];
+    };
   };
 
   export enum AccountType {

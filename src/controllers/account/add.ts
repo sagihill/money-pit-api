@@ -3,11 +3,16 @@ import Joi from "joi";
 import { Utils } from "../../lib/common";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { AccountTypes, UserTypes } from "../../types";
+import { AccountTypes } from "../../types";
 
 export const addAccountRequestValidator = Joi.object().keys({
   type: Joi.string().required(),
-  income: Joi.object().required(),
+  configuration: {
+    incomes: Joi.array().required(),
+    members: Joi.array(),
+    budget: Joi.object(),
+    recurrentExpenses: Joi.array(),
+  },
 });
 
 const add: RequestHandler = async (
@@ -18,14 +23,18 @@ const add: RequestHandler = async (
   const accountService = await SP.Account();
   const userService = await SP.User();
 
-  const { type, income } = req.body;
+  const { type, configuration } = req.body;
   const userId = await Utils.getUserIdFromRequest(req);
 
   const accountDetails = await accountService.add({
     type,
     adminUserId: userId,
-    members: [userId],
-    income,
+    configuration: {
+      members: [userId],
+      incomes: configuration.incomes,
+      budget: configuration.budget,
+      recurrentExpenses: configuration.recurrentExpenses,
+    },
   });
 
   await userService.edit(userId, { accountId: accountDetails.id });

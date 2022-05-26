@@ -11,6 +11,7 @@ const schema = new Schema<AccountingTypes.Expense>(
     name: { type: String, index: true, required: true },
     amount: { type: Number, index: true, required: true },
     currency: { type: String, index: true, required: true },
+    timestamp: { type: Date, index: true, required: true },
     deleted: { type: Boolean, index: true, required: true },
     createdAt: { type: Date, index: true, required: true },
     updatedAt: { type: Date, index: true, required: true },

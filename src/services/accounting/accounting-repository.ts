@@ -47,9 +47,9 @@ export class AccountingRepository
     accountId: string,
     timeFrame: TimeFrame
   ): Promise<AccountingTypes.Expense[]> {
-    return this.find({
+    return await this.find({
       accountId,
-      createdAt: { $gte: timeFrame.from, $lte: timeFrame.to },
+      timestamp: { $gte: timeFrame.from, $lte: timeFrame.to },
     });
   }
 }

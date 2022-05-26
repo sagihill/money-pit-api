@@ -93,10 +93,15 @@ export class ServicesProvider {
 
   async Accounting(): Promise<AccountingTypes.IAccountingService> {
     const logger = await this.Logger();
+    const account = await this.Account();
     try {
       if (!this.SP.Accounting) {
         const repository = getAccountingRepository(logger);
-        const accountingService = new AccountingService(repository, logger);
+        const accountingService = new AccountingService(
+          account,
+          repository,
+          logger
+        );
         this.SP.Accounting = accountingService;
       }
       return this.SP.Accounting;

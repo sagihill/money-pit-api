@@ -24,8 +24,9 @@ export namespace AccountingTypes {
   }
 
   export type AccountSummery = {
-    expenseAmount: number;
     incomeAmount: number;
+    totalBudget: number;
+    expenseAmount: number;
     balance: number;
     categoriesSummery: CategoriesSummery;
   };
@@ -36,8 +37,8 @@ export namespace AccountingTypes {
 
   export type CategorySummery = {
     expenseAmount: number;
-    budget: number;
-    balance: number;
+    budget?: number;
+    balance?: number;
   };
   export interface Expense extends IEntityDetails {
     id: string;
@@ -75,6 +76,10 @@ export namespace AccountingTypes {
     type: ExpenseType;
     timestamp: Date;
     description?: string;
+  }
+
+  export interface GetSummeryRequest {
+    timeFrame: TimeFrame;
   }
 
   export interface Income {
