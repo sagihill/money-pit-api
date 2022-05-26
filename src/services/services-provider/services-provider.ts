@@ -4,13 +4,17 @@ import {
   MongoTypes,
   AccountTypes,
   AuthTypes,
+  AccountingTypes,
+  ExpenseProcessorTypes,
 } from "../../types";
 import { getLogger } from "../logger";
 import { Mongo as MongoProvider } from "../mongo";
 
 import { getUserRepository, UserService } from "../user";
-import { AuthService, getAuthRepository} from "../auth";
+import { AuthService, getAuthRepository } from "../auth";
 import { getAccountRepository, AccountService } from "../account";
+import { AccountingService, getAccountingRepository } from "../accounting";
+import { ExpenseProcessor } from "../expense-processor";
 
 export class ServicesProvider {
   private SP: any;
@@ -79,6 +83,43 @@ export class ServicesProvider {
     } catch (error) {
       logger.error(
         `Something happend while trying to load Account from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  async Accounting(): Promise<AccountingTypes.IAccountingService> {
+    const logger = await this.Logger();
+    try {
+      if (!this.SP.Accounting) {
+        const repository = getAccountingRepository();
+        const accountingService = new AccountingService(repository, logger);
+        this.SP.Accounting = accountingService;
+      }
+      return this.SP.Accounting;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Accounting from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+  async ExpesnseProcessor(): Promise<ExpenseProcessorTypes.IExpenseProcessor> {
+    const logger = await this.Logger();
+    const accountingService = await this.Accounting();
+    try {
+      if (!this.SP.ExpesnseProcessor) {
+        const expenseProcessor = new ExpenseProcessor(
+          accountingService,
+          logger
+        );
+
+        this.SP.ExpesnseProcessor = expenseProcessor;
+      }
+      return this.SP.ExpesnseProcessor;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Expense Processor from Services, error: ${error}`
       );
       throw error;
     }

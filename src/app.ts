@@ -56,4 +56,13 @@ app.use(
   }
 );
 
+(async () => {
+  try {
+    const EP = await SP.ExpesnseProcessor();
+    await EP.run();
+  } catch (e) {
+    console.log(e);
+  }
+})();
+
 export default app;

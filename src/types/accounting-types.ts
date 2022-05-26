@@ -1,16 +1,22 @@
-import { EntityDetails, TimeFrame } from ".";
+import { Currency, EntityDetails, TimeFrame } from ".";
+import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountingTypes {
   export interface IAccountingService {
     addExpenses(expenses: Expense[]): Promise<void>;
+    editExpense(id: string, request: EditExpenseRequest): Promise<void>;
     getAccountSummery(
       accountId: string,
       timeFrame: TimeFrame
     ): Promise<AccountSummery>;
+    createNewExpense(
+      request: AccountingTypes.AddExpenseRequest
+    ): AccountingTypes.Expense;
   }
 
-  export interface IAccountingRepository {
+  export interface IAccountingRepository
+    extends MongoTypes.Repository<Expense, EditExpenseRequest> {
     addExpenses(expenses: Expense[]): Promise<void>;
     getExpenses(accountId: string, timeFrame: TimeFrame): Promise<Expense[]>;
   }
@@ -36,8 +42,16 @@ export namespace AccountingTypes {
     accountId: string;
     category: ExpenseCategory;
     name: string;
+    type: ExpenseType;
+    description?: string;
     amount: number;
     currency: Currency;
+    timestamp: Date;
+  }
+
+  export enum ExpenseType {
+    Regular = "regular",
+    Installments = "installments",
   }
 
   export interface EditExpenseRequest {
@@ -45,6 +59,20 @@ export namespace AccountingTypes {
     name: string;
     amount: number;
     currency: Currency;
+    type: ExpenseType;
+    description: string;
+    timestamp: Date;
+  }
+  export interface AddExpenseRequest {
+    id?: string;
+    accountId: string;
+    category: ExpenseCategory;
+    name: string;
+    amount: number;
+    currency: Currency;
+    type: ExpenseType;
+    timestamp: Date;
+    description?: string;
   }
 
   export interface Income {
@@ -56,15 +84,10 @@ export namespace AccountingTypes {
     payDay: number;
   }
 
-  export enum Currency {
-    ILS = "ILS",
-    USD = "USD",
-    EUR = "EUR",
-  }
-
   export enum ExpenseCategory {
-    Food = "food",
-    USD = "USD",
-    EUR = "EUR",
+    FoodAndConsumption = "food_and_consumption",
+    Insurance = "insurance",
+    CommunicationServices = "communication_services",
+    Other = "other",
   }
 }
