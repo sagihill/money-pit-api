@@ -6,6 +6,7 @@ import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1/rootRouter";
 import { ServicesProvider } from "./services/services-provider";
 import { Async } from "./lib/common";
+import { WebCrawler } from "./services/web-crawler/web-crawler";
 
 const app = express();
 const SP = ServicesProvider.get();
@@ -52,6 +53,11 @@ app.use(
     });
   }
 );
+
+Async.IIFE(async () => {
+  const wb = new WebCrawler();
+  await wb.login();
+});
 
 Async.IIFE(async () => {
   const EP = await SP.ExpesnseProcessor();
