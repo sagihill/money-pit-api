@@ -7,6 +7,7 @@ import {
   AccountingTypes,
   ExpenseProcessorTypes,
   ConfigTypes,
+  ExpenseSheetsTypes,
 } from "../../types";
 import { getLogger } from "../logger";
 import { Mongo as MongoProvider } from "../mongo";
@@ -18,9 +19,10 @@ import { AccountingService, getAccountingRepository } from "../accounting";
 import { ExpenseProcessor } from "../expense-processor";
 import { ConfigService } from "../config/config-service";
 import { getConfigRepository } from "../config/config-repository";
-
+import { ExpenseSheets } from "../expense-sheets";
+const Cryptr = require("cryptr");
 export class ServicesProvider {
-  private SP: any;
+  protected SP: any;
   private static instance: ServicesProvider;
 
   static get(): ServicesProvider {
@@ -71,13 +73,16 @@ export class ServicesProvider {
 
   async Account(): Promise<AccountTypes.IAccountService> {
     const logger = await this.Logger();
+    const config = await this.Config();
     try {
       if (!this.SP.Account) {
         const repository = getAccountRepository();
         const userService = await this.User();
+        const crypter = new Cryptr(await config.get("CREDIT_ACCOUNTS_SECRET"));
         const accountService = new AccountService(
           userService,
           repository,
+          crypter,
           logger
         );
         this.SP.Account = accountService;
@@ -112,6 +117,7 @@ export class ServicesProvider {
       throw error;
     }
   }
+
   async ExpesnseProcessor(): Promise<ExpenseProcessorTypes.IExpenseProcessor> {
     const logger = await this.Logger();
     const accountingService = await this.Accounting();
@@ -139,6 +145,26 @@ export class ServicesProvider {
     } catch (error) {
       logger.error(
         `Something happend while trying to load Expense Processor from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  async ExpesnseSheets(): Promise<ExpenseSheetsTypes.IExpenseSheets> {
+    const logger = await this.Logger();
+    const options: ExpenseSheetsTypes.ExpenseSheetsOptions = {
+      expenseSheetsPath: "../../public/expense-sheets",
+    };
+    try {
+      if (!this.SP.ExpesnseSheets) {
+        const expenseSheets = new ExpenseSheets(options, logger);
+
+        this.SP.ExpesnseSheets = expenseSheets;
+      }
+      return this.SP.ExpesnseSheets;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Expense Sheets from Services, error: ${error}`
       );
       throw error;
     }

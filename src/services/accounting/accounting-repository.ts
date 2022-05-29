@@ -38,9 +38,14 @@ export class AccountingRepository
   async addExpensesFromExtract(
     expenses: AccountingTypes.Expense[]
   ): Promise<void> {
-    await this.model.insertMany(expenses, { ordered: false }).catch((err) => {
-      this.logger.info(`Added ${err.result.result.nInserted} expenses`);
-    });
+    await this.model
+      .insertMany(expenses, { ordered: false })
+      .then(() => {
+        this.logger.info(`Added ${expenses.length} expenses`);
+      })
+      .catch((err) => {
+        this.logger.info(`Added ${err.result.result.nInserted} expenses`);
+      });
   }
 
   async getExpenses(

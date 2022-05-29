@@ -4,6 +4,7 @@ export * from "./mongo-types";
 export * from "./account-types";
 export * from "./accounting-types";
 export * from "./expense-processor-types";
+export * from "./expense-sheets-types";
 export * from "./auth-types";
 export * from "./config-types";
 
@@ -23,3 +24,8 @@ export enum Currency {
   USD = "USD",
   EUR = "EUR",
 }
+
+export type Credentials = {
+  username: string;
+  password: string;
+};

@@ -34,6 +34,7 @@ const add: RequestHandler = async (
       incomes: configuration.incomes,
       budget: configuration.budget,
       recurrentExpenses: configuration.recurrentExpenses,
+      creditAccountsConfig: configuration.creditAccountsConfig,
     },
   });
 

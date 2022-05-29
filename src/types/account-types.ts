@@ -1,4 +1,4 @@
-import { IEntityDetails, AccountingTypes, Currency } from ".";
+import { IEntityDetails, AccountingTypes, Currency, Credentials } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountTypes {
@@ -7,6 +7,8 @@ export namespace AccountTypes {
     edit(id: string, request: EditAccountRequest): Promise<void>;
     get(id: string): Promise<AccountDetails | undefined>;
     remove(id: string): Promise<void>;
+
+    getCreditAccounts(): Promise<CreditAccount[]>;
   }
 
   export interface IAccountRepository {
@@ -14,6 +16,8 @@ export namespace AccountTypes {
     edit(id: string, request: EditAccountRequest): Promise<void>;
     get(id: string): Promise<AccountDetails | undefined>;
     remove(id: string): Promise<void>;
+
+    getCreditAccounts(): Promise<CreditAccount[]>;
   }
 
   export interface AccountDetails extends IEntityDetails {
@@ -22,9 +26,11 @@ export namespace AccountTypes {
     adminUserId: string;
     configuration: AccountConfiguration;
   }
+
   export type AccountConfiguration = {
     members: string[];
     incomes: AccountingTypes.Salary[];
+    creditAccountsConfig?: CreditAccountConfig[];
     budget?: Budget;
     recurrentExpenses?: RecurrentExpense[];
   };
@@ -35,6 +41,20 @@ export namespace AccountTypes {
       [key: string]: number;
     };
   };
+
+  export type CreditAccount = {
+    accountId: string;
+    creditAccountsConfig: CreditAccountConfig[];
+  };
+
+  export type CreditAccountConfig = {
+    creditProvider: CreditProvider;
+    credentials: Credentials;
+  };
+
+  export enum CreditProvider {
+    Max = "max",
+  }
 
   export type RecurrentExpense = {
     category: AccountingTypes.ExpenseCategory;
@@ -59,6 +79,8 @@ export namespace AccountTypes {
       members?: string[];
       incomes?: AccountingTypes.Salary[];
       budget?: Budget;
+      creditAccountsConfig?: CreditAccountConfig[];
+
       // recurrentExpenses?: RecurrentExpense[];
     };
   }
@@ -73,6 +95,7 @@ export namespace AccountTypes {
     type: AccountType;
     configuration: {
       incomes: AccountingTypes.Salary[];
+      creditAccountsConfig?: CreditAccountConfig[];
       budget?: Budget;
       recurrentExpenses?: RecurrentExpense[];
     };

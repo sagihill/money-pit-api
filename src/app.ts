@@ -5,8 +5,9 @@ import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1/rootRouter";
 import { ServicesProvider } from "./services/services-provider";
-import { Async } from "./lib/common";
-import { WebCrawler } from "./services/web-crawler/web-crawler";
+import { Async, Sync } from "./lib/common";
+import { ExpenseSheets } from "./services/expense-sheets/expense-sheets";
+import { ExpenseSheetsTypes } from "./types";
 
 const app = express();
 const SP = ServicesProvider.get();
@@ -55,13 +56,27 @@ app.use(
 );
 
 Async.IIFE(async () => {
-  const wb = new WebCrawler();
-  await wb.login();
+  const ES = await SP.ExpesnseSheets();
+  const config = await SP.Config();
+  const params: ExpenseSheetsTypes.ExpesnseSheetsParams = {
+    creditProviderWebsiteUrl: (await config.get("BANK_URL")) ?? "",
+    credentials: {
+      username: (await config.get("BANK_USERNAME")) ?? "",
+      password: (await config.get("BANK_PASSWORD")) ?? "",
+    },
+    accountId: (await config.get("ACCOUNT_ID")) ?? "",
+  };
+
+  await ES.run(params);
+  await Sync.sleep(5000);
+  const EP = await SP.ExpesnseProcessor();
+  await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
 });
 
-Async.IIFE(async () => {
-  const EP = await SP.ExpesnseProcessor();
-  await EP.run({ accountId: "e132f5e5-a715-4c1a-baad-af54242bb8bf" });
-});
+// Async.IIFE(async () => {
+//   const EP = await SP.ExpesnseProcessor();
+//   const config = await SP.Config();
+//   await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
+// });
 
 export default app;

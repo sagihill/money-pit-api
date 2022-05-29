@@ -8,7 +8,7 @@ import {
 import xlsx from "node-xlsx";
 import * as fs from "fs";
 import * as path from "path";
-import { ID } from "../../lib/common";
+import { FS, ID } from "../../lib/common";
 export class ExpenseProcessor
   implements ExpenseProcessorTypes.IExpenseProcessor
 {
@@ -28,7 +28,12 @@ export class ExpenseProcessor
 
   async run(params: { accountId: string }): Promise<void> {
     // Get path to files directory
-    const filesDirPath = path.resolve(__dirname, "../../public/expense-sheets");
+    const filesDirPath = path.resolve(
+      __dirname,
+      `${this.options.expenseSheetsPath}/processing/${params.accountId}`
+    );
+
+    FS.createDirIfNotExists(filesDirPath);
 
     // Get an array of the files inside the folder
     const files = fs.readdirSync(filesDirPath);
@@ -36,19 +41,17 @@ export class ExpenseProcessor
     // Loop through each file that was retrieved and process
     for await (const file of files) {
       if (!fs.lstatSync(filesDirPath + `/${file}`).isDirectory()) {
-        await this.processFile(`/${file}`, params.accountId);
+        await this.processFile(filesDirPath, file, params.accountId);
       }
     }
   }
 
   private async processFile(
+    dirPath: string,
     fileName: string,
     accountId: string
   ): Promise<void> {
-    const filePath = path.join(
-      __dirname,
-      `${this.options.expenseSheetsPath}${fileName}`
-    );
+    const filePath = path.join(dirPath, `/${fileName}`);
 
     const file = fs.readFileSync(filePath);
 
@@ -72,15 +75,22 @@ export class ExpenseProcessor
     }
     await this.addExpenses(expensesExtracts);
 
-    this.postProcess(filePath, fileId);
+    this.postProcess(filePath, fileId, accountId);
   }
 
-  private postProcess(filePath: string, fileId: string): void {
-    const newPath = path.join(
+  private postProcess(
+    filePath: string,
+    fileId: string,
+    accountId: string
+  ): void {
+    const newDirPath = path.join(
       __dirname,
-      `${this.options.expenseSheetsPath}/processed/processed_${fileId}.xlsx`
+      `${this.options.expenseSheetsPath}/processed/${accountId}`
     );
-    fs.rename(filePath, newPath, (err) =>
+    FS.createDirIfNotExists(newDirPath);
+    const newFilePath = path.join(newDirPath, `/processed_${fileId}.xlsx`);
+
+    fs.rename(filePath, newFilePath, (err) =>
       err ? this.logger.error(err?.message) : null
     );
   }
