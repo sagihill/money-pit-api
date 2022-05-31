@@ -38,14 +38,24 @@ export class AccountingRepository
   async addExpensesFromExtract(
     expenses: AccountingTypes.Expense[]
   ): Promise<void> {
-    await this.model
-      .insertMany(expenses, { ordered: false })
-      .then(() => {
-        this.logger.info(`Added ${expenses.length} expenses`);
-      })
-      .catch((err) => {
-        this.logger.info(`Added ${err.result.result.nInserted} expenses`);
-      });
+    // await this.model
+    //   .insertMany(expenses, { ordered: false })
+    //   .then(() => {
+    //     this.logger.info(`Added ${expenses.length} expenses`);
+    //   })
+    //   .catch((err) => {
+    //     this.logger.info(`Added ${err.result.result.nInserted} expenses`);
+    //   });
+
+    for await (const expense of expenses) {
+      await this.model.updateOne(
+        { id: expense.id, chargeDate: { $exists: false } },
+        {
+          $set: { ...expense },
+        },
+        { upsert: true }
+      );
+    }
   }
 
   async getExpenses(

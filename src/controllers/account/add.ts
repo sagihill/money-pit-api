@@ -12,6 +12,7 @@ export const addAccountRequestValidator = Joi.object().keys({
     members: Joi.array(),
     budget: Joi.object(),
     recurrentExpenses: Joi.array(),
+    creditAccountsConfig: Joi.array(),
   },
 });
 

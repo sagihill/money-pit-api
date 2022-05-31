@@ -28,8 +28,8 @@ export class AccountService implements AccountTypes.IAccountService {
         );
       }
 
-      const AccountDetails = createNewAccountDetails(request);
-      return await this.accountRepository.add(AccountDetails);
+      const accountDetails = createNewAccountDetails(request);
+      return await this.accountRepository.add(accountDetails);
     } catch (error) {
       this.logger.error(`Can't create new account: ${{ request, error }}`);
       throw error;
@@ -64,7 +64,6 @@ export class AccountService implements AccountTypes.IAccountService {
       accounts.forEach((account) => {
         this.decryptCreditAccountsConfig(account.creditAccountsConfig);
       });
-
       return accounts;
     } catch (error) {
       this.logger.error(`Can't get credit accounts`);
@@ -87,6 +86,9 @@ export class AccountService implements AccountTypes.IAccountService {
     creditAccounts.forEach((account) => {
       const password = this.cryptr.encrypt(account.credentials.password, 8);
       account.credentials.password = password;
+
+      const username = this.cryptr.encrypt(account.credentials.username, 8);
+      account.credentials.username = username;
     });
   }
 
@@ -96,6 +98,9 @@ export class AccountService implements AccountTypes.IAccountService {
     creditAccounts.forEach((account) => {
       const password = this.cryptr.decrypt(account.credentials.password, 8);
       account.credentials.password = password;
+
+      const username = this.cryptr.decrypt(account.credentials.username, 8);
+      account.credentials.username = username;
     });
   }
 }

@@ -57,9 +57,9 @@ export class ConfigService implements ConfigTypes.IConfigService {
       throw error;
     }
   }
-  async getObject(key: string): Promise<object | undefined> {
+  async getObject<T>(key: string): Promise<T | undefined> {
     try {
-      return await this.configRepository.getObject(key);
+      return await this.configRepository.getObject<T>(key);
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;

@@ -97,14 +97,14 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
     }
   }
 
-  async getObject(key: string): Promise<object | undefined> {
+  async getObject<T>(key: string): Promise<T | undefined> {
     const value = await this.getValue(key);
     let object;
     if (value) {
       object = JSON.parse(value);
     }
     if (typeof object === "object") {
-      return object;
+      return object as T;
     }
   }
 

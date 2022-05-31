@@ -10,12 +10,6 @@ const schema = new Schema<AccountTypes.AccountDetails>(
     adminUserId: { type: String, index: true, required: true },
     configuration: {
       members: { type: [String], index: true, required: true },
-      /*  incomes: {
-        amount: { type: Number, index: true, required: true },
-        timestamp: { type: Date, index: true, required: false },
-        currency: { type: String, index: true, required: true },
-        payDay: { type: Number, index: true, required: true },
-      }, */
       incomes: {
         type: [
           {
@@ -33,6 +27,19 @@ const schema = new Schema<AccountTypes.AccountDetails>(
         categoriesBudget: { type: Schema.Types.Mixed, required: false },
       },
       recurrentExpenses: { type: [Schema.Types.Mixed], required: false },
+      creditAccountsConfig: {
+        type: [
+          {
+            creditProvider: { type: String, index: true, required: true },
+            credentials: {
+              username: { type: String, index: true, required: true },
+              password: { type: String, index: true, required: true },
+            },
+          },
+        ],
+        index: true,
+        required: false,
+      },
     },
     deleted: { type: Boolean, index: true, required: true },
     createdAt: { type: Date, index: true, required: true },

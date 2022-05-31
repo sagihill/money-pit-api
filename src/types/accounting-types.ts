@@ -50,11 +50,13 @@ export namespace AccountingTypes {
     amount: number;
     currency: Currency;
     timestamp: Date;
+    chargeDate?: Date;
   }
 
   export enum ExpenseType {
     Regular = "regular",
     Installments = "installments",
+    Subscription = "subscription",
   }
 
   export interface EditExpenseRequest {
@@ -97,6 +99,7 @@ export namespace AccountingTypes {
     FuelGasAndElectricity = "fuel_gas_and_electricity",
     GovAndMuni = "goverment_and_municipality",
     Insurance = "insurance",
+    Medical = "medical",
     CommunicationServices = "communication_services",
     Mia = "mia",
     Other = "other",

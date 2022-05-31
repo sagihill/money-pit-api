@@ -58,25 +58,24 @@ app.use(
 Async.IIFE(async () => {
   const ES = await SP.ExpesnseSheets();
   const config = await SP.Config();
-  const params: ExpenseSheetsTypes.ExpesnseSheetsParams = {
-    creditProviderWebsiteUrl: (await config.get("BANK_URL")) ?? "",
-    credentials: {
-      username: (await config.get("BANK_USERNAME")) ?? "",
-      password: (await config.get("BANK_PASSWORD")) ?? "",
-    },
-    accountId: (await config.get("ACCOUNT_ID")) ?? "",
-  };
+  // const params: ExpenseSheetsTypes.ExpesnseSheetsParams = {
+  //   creditProviderWebsiteUrl: (await config.get("BANK_URL")) ?? "",
+  //   credentials: {
+  //     username: (await config.get("BANK_USERNAME")) ?? "",
+  //     password: (await config.get("BANK_PASSWORD")) ?? "",
+  //   },
+  //   accountId: (await config.get("ACCOUNT_ID")) ?? "",
+  // };
 
-  await ES.run(params);
-  await Sync.sleep(5000);
+  // await ES.run(params);
+  // await Sync.sleep(5000);
   const EP = await SP.ExpesnseProcessor();
   await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
 });
 
 // Async.IIFE(async () => {
-//   const EP = await SP.ExpesnseProcessor();
-//   const config = await SP.Config();
-//   await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
+//   const Task = await SP.Task();
+//   await Task.run();
 // });
 
 export default app;

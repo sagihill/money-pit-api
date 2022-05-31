@@ -9,7 +9,16 @@ export namespace TaskTypes {
     schedule(): Promise<void>;
   }
 
-  export type TaskOptions = {
-    cronInterval: string;
+  export type TaskServiceConfiguration = {
+    addNewExpenseTaskOptions: AddNewExpenseTaskOptions;
   };
+
+  export interface TaskOptions {
+    cronInterval: string;
+    isEnabled: boolean;
+  }
+
+  export interface AddNewExpenseTaskOptions extends TaskOptions {
+    creditProvidersUrlMap: { [key: string]: string };
+  }
 }

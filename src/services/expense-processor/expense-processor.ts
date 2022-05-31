@@ -8,13 +8,21 @@ import {
 import xlsx from "node-xlsx";
 import * as fs from "fs";
 import * as path from "path";
-import { FS, ID } from "../../lib/common";
+import { FS, ID } from "../../lib";
+import { UsingMiddleware } from "../../lib";
+import { formatName, formatStrings, formatCategory } from "./middleware";
 export class ExpenseProcessor
+  extends UsingMiddleware<
+    ExpenseProcessorTypes.ExpenseExtract,
+    ExpenseProcessorTypes.ExpenseProcessorOptions
+  >
   implements ExpenseProcessorTypes.IExpenseProcessor
 {
   private expenseTypeMap: { [key: string]: AccountingTypes.ExpenseType } = {
     תשלומים: AccountingTypes.ExpenseType.Installments,
     רגילה: AccountingTypes.ExpenseType.Regular,
+    "חיוב חודשי": AccountingTypes.ExpenseType.Subscription,
+    "חיוב עסקות מיידי": AccountingTypes.ExpenseType.Regular,
   };
   private expenseCurrencyMap: { [key: string]: Currency } = {
     "₪": Currency.ILS,
@@ -22,9 +30,16 @@ export class ExpenseProcessor
 
   constructor(
     private readonly accountingService: AccountingTypes.IAccountingService,
+    private readonly logsRepo: ExpenseProcessorTypes.IProcessorLogsRepository,
     private readonly options: ExpenseProcessorTypes.ExpenseProcessorOptions,
     private readonly logger: LoggerTypes.ILogger
-  ) {}
+  ) {
+    super();
+
+    this.use(formatName);
+    this.use(formatCategory);
+    this.use(formatStrings);
+  }
 
   async run(params: { accountId: string }): Promise<void> {
     // Get path to files directory
@@ -60,9 +75,19 @@ export class ExpenseProcessor
       data: string[][];
     }[];
 
-    const fileId = ID.get(file.toString());
-
     const billingDateTransactions: string[][] = workSheets[0].data.slice(4);
+    const fileId = ID.get(billingDateTransactions.toString());
+
+    const isAllreadyProcessed = await this.logsRepo.isAllreadyProcessed(fileId);
+
+    if (isAllreadyProcessed && this.options.skipAllreadyProcessed) {
+      this.logger.info(
+        `Skip processing file_${fileId}. this file was allready processed.`
+      );
+      fs.rmSync(filePath);
+      return;
+    }
+
     const expensesExtracts: ExpenseProcessorTypes.ExpenseExtract[] = [];
     for await (const expenseData of billingDateTransactions) {
       const expenseExtract = await this.getExpenseExtract(
@@ -70,19 +95,18 @@ export class ExpenseProcessor
         accountId
       );
 
-      console.log(expenseExtract);
       expensesExtracts.push(expenseExtract);
     }
     await this.addExpenses(expensesExtracts);
 
-    this.postProcess(filePath, fileId, accountId);
+    await this.postProcess(filePath, fileId, accountId);
   }
 
-  private postProcess(
+  private async postProcess(
     filePath: string,
     fileId: string,
     accountId: string
-  ): void {
+  ): Promise<void> {
     const newDirPath = path.join(
       __dirname,
       `${this.options.expenseSheetsPath}/processed/${accountId}`
@@ -93,6 +117,8 @@ export class ExpenseProcessor
     fs.rename(filePath, newFilePath, (err) =>
       err ? this.logger.error(err?.message) : null
     );
+
+    await this.logsRepo.add({ fileId: fileId, processedAt: new Date() });
   }
 
   private async addExpenses(
@@ -100,7 +126,7 @@ export class ExpenseProcessor
   ): Promise<void> {
     const expenses = expensesExtracts.map((expenseExtract) => {
       return this.accountingService.createNewExpense({
-        ...expenseExtract,
+        ...(expenseExtract as AccountingTypes.AddExpenseRequest),
       });
     });
 
@@ -111,37 +137,44 @@ export class ExpenseProcessor
     expenseData: string[],
     accountId: string
   ): Promise<ExpenseProcessorTypes.ExpenseExtract> {
-    return {
-      id: ID.get(expenseData.join("") + accountId),
-      timestamp: this.getDate(expenseData[0]),
-      name: expenseData[1],
-      category: await this.getCategory(expenseData),
-      amount: Number(expenseData[5]),
-      description: !!expenseData[10]
-        ? this.formatString(expenseData[10])
-        : undefined,
-      type:
-        this.expenseTypeMap[expenseData[4]] ??
-        this.formatString(expenseData[4]),
-      currency: this.expenseCurrencyMap[expenseData[6]],
+    const name = expenseData[1];
+    const category = expenseData[2];
+    const amount = Number(expenseData[5]);
+    const description = expenseData[10];
+    const type = this.expenseTypeMap[expenseData[4]];
+    const currency = this.expenseCurrencyMap[expenseData[6]];
+    const timestamp = this.getDate(expenseData[0]);
+    const chargeDate = !!expenseData[9]
+      ? this.getDate(expenseData[9])
+      : undefined;
+    let expenseExtract: ExpenseProcessorTypes.ExpenseExtract = {
+      name,
+      category,
+      amount,
+      description,
+      type,
+      currency,
       accountId,
+      timestamp,
+      chargeDate,
     };
-  }
 
-  private async getCategory(
-    expenseData: string[]
-  ): Promise<AccountingTypes.ExpenseCategory> {
-    const categoryFromName =
-      this.options.expenseCategoryNameMap[expenseData[1]];
-    const categoryFromCategory =
-      this.options.expenseCategoryCategoryMap[expenseData[2]];
-    if (categoryFromName) {
-      return categoryFromName;
-    } else if (categoryFromCategory) {
-      return categoryFromCategory;
-    } else {
-      return AccountingTypes.ExpenseCategory.Other;
-    }
+    expenseExtract = this.runMiddleware(expenseExtract, this.options);
+
+    expenseExtract.id = ID.get(
+      [
+        expenseExtract.name,
+        expenseExtract.category,
+        expenseExtract.amount,
+        expenseExtract.description,
+        expenseExtract.type,
+        expenseExtract.currency,
+        expenseExtract.accountId,
+        expenseExtract.timestamp,
+      ].join("")
+    );
+
+    return expenseExtract;
   }
 
   private getDate(dateString: string): Date {
@@ -154,18 +187,5 @@ export class ExpenseProcessor
     );
 
     return date;
-  }
-
-  private formatString(sentence: string): string {
-    const words = sentence.split(" ");
-    const reversed = words.map((word) => {
-      if (/[\u0590-\u05FF]/.test(word)) {
-        return word.split("").reverse().join("");
-      } else {
-        return word;
-      }
-    });
-
-    return reversed.reverse().join(" ");
   }
 }

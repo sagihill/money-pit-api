@@ -20,6 +20,9 @@ import { ExpenseProcessor } from "../expense-processor";
 import { ConfigService } from "../config/config-service";
 import { getConfigRepository } from "../config/config-repository";
 import { ExpenseSheets } from "../expense-sheets";
+import { getProcessorLogsRepository } from "../expense-processor/processor-logs-repository";
+import { TaskTypes } from "../../types/task-types";
+import { TaskService } from "../tasks/task-service";
 const Cryptr = require("cryptr");
 export class ServicesProvider {
   protected SP: any;
@@ -129,12 +132,20 @@ export class ServicesProvider {
       expenseCategoryNameMap: (await config.getObject(
         "EXPENSE_CATEGORY_NAME_MAP"
       )) as ExpenseProcessorTypes.CategoryMap,
+      expenseNameFormatConfig: (await config.getObject(
+        "EXPENSE_NAME_FORMAT_CONFIG"
+      )) as any,
       expenseSheetsPath: "../../public/expense-sheets",
+      skipAllreadyProcessed: (await config.getBool(
+        "SKIP_ALLREADY_PROCESSED_SHEETS"
+      )) as boolean,
     };
     try {
       if (!this.SP.ExpesnseProcessor) {
+        const logsRepo = getProcessorLogsRepository(logger);
         const expenseProcessor = new ExpenseProcessor(
           accountingService,
+          logsRepo,
           options,
           logger
         );
@@ -165,6 +176,44 @@ export class ServicesProvider {
     } catch (error) {
       logger.error(
         `Something happend while trying to load Expense Sheets from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  async Task(): Promise<TaskTypes.ITaskService> {
+    const logger = await this.Logger();
+    const account = await this.Account();
+    const expenseSheets = await this.ExpesnseSheets();
+    const expenseProcessor = await this.ExpesnseProcessor();
+    const config = await this.Config();
+
+    const options: TaskTypes.TaskServiceConfiguration = {
+      addNewExpenseTaskOptions: {
+        creditProvidersUrlMap: (await config.getObject(
+          "CREDIT_PROVIDERS_URL_MAP"
+        )) as any,
+        cronInterval: (await config.get(
+          "ADD_NEW_EXPENSE_TASK_CRON_INTERVAL"
+        )) as any,
+        isEnabled: (await config.get("ADD_NEW_EXPENSE_TASK_IS_ENABLED")) as any,
+      },
+    };
+    try {
+      if (!this.SP.Task) {
+        this.SP.Task = new TaskService(
+          account,
+          expenseSheets,
+          expenseProcessor,
+          logger,
+          options
+        );
+      }
+      return this.SP.Task;
+    } catch (error) {
+      // tslint:disable-next-line: no-console
+      console.error(
+        `Something happend while trying to load Task from Services, error: ${error}`
       );
       throw error;
     }

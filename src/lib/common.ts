@@ -2,7 +2,6 @@ import * as UUID from "uuid";
 import * as UUIDFromString from "uuid-by-string";
 import { ServicesProvider } from "../services/services-provider";
 import { RequestHandler, Request, Response, NextFunction } from "express";
-import * as fs from "fs";
 
 const uuidFromString = UUIDFromString.default;
 
@@ -65,10 +64,3 @@ export namespace Async {
   }
 }
 
-export namespace FS {
-  export function createDirIfNotExists(dirPath: fs.PathLike): void {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-  }
-}

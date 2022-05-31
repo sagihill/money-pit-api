@@ -9,7 +9,7 @@ export namespace ConfigTypes {
     getNumber(key: string): Promise<number | undefined>;
     getBool(key: string): Promise<boolean | undefined>;
     getArray<T>(key: string): Promise<T[] | undefined>;
-    getObject(key: string): Promise<object | undefined>;
+    getObject<T>(key: string): Promise<T | undefined>;
   }
 
   export interface IConfigRepository {
@@ -20,7 +20,7 @@ export namespace ConfigTypes {
     getNumber(key: string): Promise<number | undefined>;
     getBool(key: string): Promise<boolean | undefined>;
     getArray<T>(key: string): Promise<T[] | undefined>;
-    getObject(key: string): Promise<object | undefined>;
+    getObject<T>(key: string): Promise<T | undefined>;
   }
 
   export interface IConfig extends IEntityDetails {

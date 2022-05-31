@@ -4,8 +4,8 @@ import { LoggerTypes } from "../../../types";
 
 export abstract class BaseTask implements TaskTypes.ITask {
   constructor(
-    private readonly options: TaskTypes.TaskOptions,
-    private readonly logger: LoggerTypes.ILogger
+    protected readonly options: TaskTypes.TaskOptions,
+    protected readonly logger: LoggerTypes.ILogger
   ) {}
 
   abstract run(): Promise<void>;
@@ -15,6 +15,7 @@ export abstract class BaseTask implements TaskTypes.ITask {
 
     setTimeout(async () => {
       await this.run();
+      await this.schedule();
     }, interval);
   }
 
@@ -33,5 +34,9 @@ export abstract class BaseTask implements TaskTypes.ITask {
     if (!interval || !interval.hasNext()) {
     }
     return interval.next().getTime() - Date.now();
+  }
+
+  protected getOptions<T>(): T {
+    return this.options as unknown as T;
   }
 }
