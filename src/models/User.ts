@@ -23,6 +23,12 @@ const schema = new Schema<UserTypes.UserDetails>(
       },
     },
     password: { type: String, index: false, required: true },
+    role: {
+      type: String,
+      index: false,
+      required: true,
+      default: UserTypes.UserRole.Regular,
+    },
     deleted: { type: Boolean, index: true, required: true },
     createdAt: { type: Date, index: true, required: true },
     updatedAt: { type: Date, index: true, required: true },

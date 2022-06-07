@@ -4,7 +4,6 @@ import { Async } from "./lib/common";
 import { ServicesProvider } from "./services/services-provider";
 import { ConfigTypes } from "./types";
 
-const PORT = process.env.PORT || 3000;
 const SP = ServicesProvider.get();
 let config: ConfigTypes.IConfigService;
 

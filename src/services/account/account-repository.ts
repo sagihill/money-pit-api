@@ -9,26 +9,6 @@ export const getAccountRepository = () => {
 class AccountsRepository
   extends MongoRepository<
     AccountTypes.AccountDetails,
-    AccountTypes.EditAccountRequest
+    AccountTypes.Requests.EditAccountRequest
   >
-  implements AccountTypes.IAccountRepository
-{
-  async getCreditAccounts(): Promise<AccountTypes.CreditAccount[]> {
-    const accounts = await this.find({
-      "accounts.configuration.creditAccounts": { $exists: true, $ne: [] },
-    });
-
-    const creditAccounts: AccountTypes.CreditAccount[] = [];
-
-    accounts.forEach((account) => {
-      if (account.configuration.creditAccountsConfig) {
-        creditAccounts.push({
-          accountId: account.id,
-          creditAccountsConfig: account.configuration.creditAccountsConfig,
-        });
-      }
-    });
-
-    return creditAccounts;
-  }
-}
+  implements AccountTypes.IAccountRepository {}

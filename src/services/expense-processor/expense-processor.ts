@@ -1,5 +1,6 @@
 import {
   AccountingTypes,
+  AccountTypes,
   Currency,
   ExpenseProcessorTypes,
   LoggerTypes,
@@ -10,7 +11,12 @@ import * as fs from "fs";
 import * as path from "path";
 import { FS, ID } from "../../lib";
 import { UsingMiddleware } from "../../lib";
-import { formatName, formatStrings, formatCategory } from "./middleware";
+import {
+  formatName,
+  formatStrings,
+  formatCategory,
+  formatAmount,
+} from "./middleware";
 export class ExpenseProcessor
   extends UsingMiddleware<
     ExpenseProcessorTypes.ExpenseExtract,
@@ -18,18 +24,9 @@ export class ExpenseProcessor
   >
   implements ExpenseProcessorTypes.IExpenseProcessor
 {
-  private expenseTypeMap: { [key: string]: AccountingTypes.ExpenseType } = {
-    תשלומים: AccountingTypes.ExpenseType.Installments,
-    רגילה: AccountingTypes.ExpenseType.Regular,
-    "חיוב חודשי": AccountingTypes.ExpenseType.Subscription,
-    "חיוב עסקות מיידי": AccountingTypes.ExpenseType.Regular,
-  };
-  private expenseCurrencyMap: { [key: string]: Currency } = {
-    "₪": Currency.ILS,
-  };
-
   constructor(
     private readonly accountingService: AccountingTypes.IAccountingService,
+    private readonly accountService: AccountTypes.IAccountService,
     private readonly logsRepo: ExpenseProcessorTypes.IProcessorLogsRepository,
     private readonly options: ExpenseProcessorTypes.ExpenseProcessorOptions,
     private readonly logger: LoggerTypes.ILogger
@@ -38,10 +35,59 @@ export class ExpenseProcessor
 
     this.use(formatName);
     this.use(formatCategory);
-    this.use(formatStrings);
+    this.use(formatAmount);
   }
 
-  async run(params: { accountId: string }): Promise<void> {
+  async processRecurrentExpenses(
+    params: ExpenseProcessorTypes.ExpenseProcessorReccurentParams
+  ): Promise<void> {
+    if (!params.recurrentExpenses?.length) {
+      return;
+    }
+
+    const transactionSheet = this.createSheet(params.recurrentExpenses);
+
+    const expenseExtracts = await this.processSheet(
+      transactionSheet,
+      params.accountId
+    );
+
+    await this.addExpenses(expenseExtracts);
+  }
+
+  private createSheet(
+    recurrentExpenses: AccountingTypes.RecurrentExpense[]
+  ): string[][] {
+    const transactionSheet: string[][] = [];
+    recurrentExpenses.forEach((recurrentExpense) => {
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+      const timestamp = `${recurrentExpense.dueDay}-${month}-${year}`;
+
+      const transaction = [
+        timestamp,
+        recurrentExpense.name.toString(),
+        recurrentExpense.category.toString(),
+        "",
+        recurrentExpense.type.toString(),
+        recurrentExpense.amount.toString(),
+        recurrentExpense.currency.toString(),
+        "",
+        "",
+        "",
+        recurrentExpense.description ?? "",
+      ];
+
+      transactionSheet.push(transaction);
+    });
+
+    return transactionSheet;
+  }
+
+  async processExpenseDownload(
+    params: ExpenseProcessorTypes.ExpenseProcessorParams
+  ): Promise<void> {
     // Get path to files directory
     const filesDirPath = path.resolve(
       __dirname,
@@ -67,16 +113,16 @@ export class ExpenseProcessor
     accountId: string
   ): Promise<void> {
     const filePath = path.join(dirPath, `/${fileName}`);
+    const sheets = await this.getSheets(filePath);
 
-    const file = fs.readFileSync(filePath);
-
-    const workSheets = xlsx.parse(file) as unknown as {
-      name: string;
-      data: string[][];
-    }[];
-
-    const billingDateTransactions: string[][] = workSheets[0].data.slice(4);
-    const fileId = ID.get(billingDateTransactions.toString());
+    const fileId = ID.get(
+      [
+        sheets.billingDateTransactions?.toString(),
+        sheets.notProcessedYetTransactions?.toString(),
+        sheets.foreignTransactions?.toString(),
+        sheets.immediateTransactions?.toString(),
+      ].join("")
+    );
 
     const isAllreadyProcessed = await this.logsRepo.isAllreadyProcessed(fileId);
 
@@ -89,17 +135,86 @@ export class ExpenseProcessor
     }
 
     const expensesExtracts: ExpenseProcessorTypes.ExpenseExtract[] = [];
-    for await (const expenseData of billingDateTransactions) {
-      const expenseExtract = await this.getExpenseExtract(
-        expenseData,
-        accountId
-      );
+    expensesExtracts.push(
+      ...(await this.processSheet(
+        sheets.billingDateTransactions,
+        accountId,
+        false
+      )),
+      ...(await this.processSheet(
+        sheets.notProcessedYetTransactions,
+        accountId,
+        true
+      )),
+      ...(await this.processSheet(
+        sheets.foreignTransactions,
+        accountId,
+        false
+      )),
+      ...(await this.processSheet(
+        sheets.immediateTransactions,
+        accountId,
+        false
+      ))
+    );
 
-      expensesExtracts.push(expenseExtract);
-    }
     await this.addExpenses(expensesExtracts);
 
     await this.postProcess(filePath, fileId, accountId);
+  }
+
+  private getSheets(filePath: string) {
+    const file = fs.readFileSync(filePath);
+
+    const transactionsSheets = xlsx.parse(file) as unknown as {
+      name: string;
+      data: string[][];
+    }[];
+
+    const billingDateTransactions: string[][] =
+      transactionsSheets[0]?.data.slice(4);
+
+    const notProcessedYetTransactions: string[][] =
+      transactionsSheets[1]?.data.slice(4);
+
+    const foreignTransactions: string[][] =
+      transactionsSheets[2]?.data.slice(4);
+    const immediateTransactions: string[][] =
+      transactionsSheets[3]?.data.slice(4);
+
+    return {
+      billingDateTransactions,
+      notProcessedYetTransactions,
+      foreignTransactions,
+      immediateTransactions,
+    };
+  }
+
+  private async processSheet(
+    transactionsSheet: string[][],
+    accountId: string,
+    isNotProcessedYet: boolean = false
+  ): Promise<ExpenseProcessorTypes.ExpenseExtract[]> {
+    if (!transactionsSheet) {
+      return [];
+    }
+    const expensesExtracts: ExpenseProcessorTypes.ExpenseExtract[] = [];
+    for await (const expenseData of transactionsSheet) {
+      if (!expenseData[0]) {
+        continue;
+      }
+      const expenseExtract = await this.getExpenseExtract(
+        expenseData,
+        accountId,
+        isNotProcessedYet
+      );
+
+      if (expenseExtract) {
+        expensesExtracts.push(expenseExtract);
+      }
+    }
+
+    return expensesExtracts;
   }
 
   private async postProcess(
@@ -118,7 +233,9 @@ export class ExpenseProcessor
       err ? this.logger.error(err?.message) : null
     );
 
-    await this.logsRepo.add({ fileId: fileId, processedAt: new Date() });
+    if (this.options.skipAllreadyProcessed) {
+      await this.logsRepo.add({ fileId: fileId, processedAt: new Date() });
+    }
   }
 
   private async addExpenses(
@@ -130,19 +247,32 @@ export class ExpenseProcessor
       });
     });
 
-    await this.accountingService.addExpensesFromExtract(expenses);
+    await this.accountingService.addExpenses(expenses);
   }
 
   private async getExpenseExtract(
     expenseData: string[],
-    accountId: string
-  ): Promise<ExpenseProcessorTypes.ExpenseExtract> {
+    accountId: string,
+    isNotProcessedYet: boolean
+  ): Promise<ExpenseProcessorTypes.ExpenseExtract | undefined> {
+    const type = this.getType(expenseData[4]);
+    if (
+      isNotProcessedYet &&
+      type === AccountingTypes.ExpenseType.Installments
+    ) {
+      return;
+    }
+
+    const amount = isNotProcessedYet
+      ? Number(expenseData[7])
+      : Number(expenseData[5]);
     const name = expenseData[1];
     const category = expenseData[2];
-    const amount = Number(expenseData[5]);
     const description = expenseData[10];
-    const type = this.expenseTypeMap[expenseData[4]];
-    const currency = this.expenseCurrencyMap[expenseData[6]];
+    const currency = this.getCurrency(
+      isNotProcessedYet ? expenseData[8] : expenseData[6]
+    );
+
     const timestamp = this.getDate(expenseData[0]);
     const chargeDate = !!expenseData[9]
       ? this.getDate(expenseData[9])
@@ -166,9 +296,6 @@ export class ExpenseProcessor
         expenseExtract.name,
         expenseExtract.category,
         expenseExtract.amount,
-        expenseExtract.description,
-        expenseExtract.type,
-        expenseExtract.currency,
         expenseExtract.accountId,
         expenseExtract.timestamp,
       ].join("")
@@ -187,5 +314,36 @@ export class ExpenseProcessor
     );
 
     return date;
+  }
+
+  private getType(string: string): AccountingTypes.ExpenseType {
+    const expenseTypeMap: { [key: string]: AccountingTypes.ExpenseType } = {
+      תשלומים: AccountingTypes.ExpenseType.Installments,
+      רגילה: AccountingTypes.ExpenseType.Regular,
+      "חיוב חודשי": AccountingTypes.ExpenseType.Subscription,
+      "חיוב עסקות מיידי": AccountingTypes.ExpenseType.Regular,
+    };
+
+    if (
+      Object.values(AccountingTypes.ExpenseType).includes(
+        string as AccountingTypes.ExpenseType
+      )
+    ) {
+      return string as AccountingTypes.ExpenseType;
+    } else {
+      return expenseTypeMap[string];
+    }
+  }
+
+  private getCurrency(string: string): Currency {
+    const expenseCurrencyMap: { [key: string]: Currency } = {
+      "₪": Currency.ILS,
+    };
+
+    if (Object.values(Currency).includes(string as Currency)) {
+      return string as Currency;
+    } else {
+      return expenseCurrencyMap[string];
+    }
   }
 }

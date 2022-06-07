@@ -1,8 +1,9 @@
+import moment from "moment";
 import {
   LoggerTypes,
   AccountingTypes,
-  TimeFrame,
   AccountTypes,
+  ChargeMonth,
 } from "../../types";
 import { createNewExpense } from "./expense-factory";
 
@@ -10,6 +11,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
   constructor(
     private readonly accountService: AccountTypes.IAccountService,
     private readonly accountingRepository: AccountingTypes.IAccountingRepository,
+    private readonly config: AccountingTypes.AccountingServiceConfiguration,
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
@@ -36,18 +38,6 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     }
   }
 
-  async addExpensesFromExtract(
-    expenses: AccountingTypes.Expense[]
-  ): Promise<void> {
-    try {
-      this.logger.info(`Adding expenses`);
-      await this.accountingRepository.addExpensesFromExtract(expenses);
-    } catch (error) {
-      this.logger.error(`Can't add expenses`);
-      throw error;
-    }
-  }
-
   createNewExpense(
     request: AccountingTypes.AddExpenseRequest
   ): AccountingTypes.Expense {
@@ -56,26 +46,39 @@ export class AccountingService implements AccountingTypes.IAccountingService {
 
   async getAccountSummery(
     accountId: string,
-    timeFrame: TimeFrame
+    chargeMonth: ChargeMonth
   ): Promise<AccountingTypes.AccountSummery> {
     try {
-      console.log(timeFrame);
       const account = await this.accountService.get(accountId);
 
       if (!account) {
         throw new Error(`account_${accountId} doesn't exits.`);
       }
 
-      const expenses = await this.accountingRepository.getExpenses(
-        accountId,
-        timeFrame
-      );
+      const dates = this.getDatesForAccountSummer(chargeMonth);
+      const expenses = await this.accountingRepository.find({
+        $or: [
+          {
+            accountId,
+            chargeDate: {
+              $gte: dates.chargeLowerBoundary,
+              $lte: dates.chargeUpperBoundary,
+            },
+          },
+          {
+            accountId,
+            chargeDate: { $exists: false },
+            timestamp: {
+              $gte: dates.timestampLowerBoundary,
+              $lte: dates.timestampUpperBoundary,
+            },
+          },
+        ],
+      });
 
       if (!expenses.length) {
-        throw new Error("No expenses in this time frame");
+        throw new Error("No expenses for this charge month");
       }
-
-      console.log(expenses);
 
       const incomeAmount = account.configuration.incomes.reduce(
         (acc, income) => acc + income.amount,
@@ -106,6 +109,49 @@ export class AccountingService implements AccountingTypes.IAccountingService {
       this.logger.error(`Can't get account summery: ${error?.message}`);
       throw error;
     }
+  }
+
+  private getDatesForAccountSummer(chargeMonth: ChargeMonth): {
+    chargeLowerBoundary: Date;
+    chargeUpperBoundary: Date;
+    timestampLowerBoundary: Date;
+    timestampUpperBoundary: Date;
+  } {
+    const chargeLowerBoundary = new Date(
+      Number(chargeMonth.year),
+      Number(chargeMonth.month) - 2,
+      this.config.accountingSummeryDatesWindow.lowerChargeDay + 1,
+      0
+    );
+
+    const chargeUpperBoundary = new Date(
+      Number(chargeMonth.year),
+      Number(chargeMonth.month) - 1,
+      this.config.accountingSummeryDatesWindow.upperChargeDay + 1,
+      0
+    );
+
+    const timestampLowerBoundary = new Date(
+      Number(chargeMonth.year),
+      Number(chargeMonth.month) - 2,
+      this.config.accountingSummeryDatesWindow.lowerTimestampDay + 1,
+      0
+    );
+
+    const timestampUpperBoundary = new Date(
+      Number(chargeMonth.year),
+      Number(chargeMonth.month) - 1,
+      this.config.accountingSummeryDatesWindow.upperTimestampDay + 1,
+      0
+    );
+    const dates = {
+      chargeLowerBoundary,
+      chargeUpperBoundary,
+      timestampLowerBoundary,
+      timestampUpperBoundary,
+    };
+
+    return dates;
   }
 
   private getCategoriesSummery(

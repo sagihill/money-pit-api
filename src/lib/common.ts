@@ -50,6 +50,17 @@ export namespace Utils {
   export function getTokenFromRequest(req: Request): string | undefined {
     return req?.headers?.authorization?.split(" ")[1];
   }
+
+  export const searchMap = (string: string, map: { [key: string]: string }) => {
+    let category;
+    Object.entries(map).forEach((entry) => {
+      if (string.includes(entry[0])) {
+        category = entry[1];
+      }
+    });
+
+    return category;
+  };
 }
 
 export namespace Async {
@@ -62,5 +73,32 @@ export namespace Async {
       }
     })();
   }
-}
 
+  export function setTimeoutExtended(callback: Function, delay: number) {
+    var maxDelay = Math.pow(2, 31) - 1;
+
+    if (delay > maxDelay) {
+      var args = arguments;
+      args[1] -= maxDelay;
+
+      return setTimeout(function () {
+        setTimeoutExtended.apply(undefined, args as any);
+      }, maxDelay);
+    }
+
+    return setTimeout.apply(undefined, arguments as any);
+  }
+}
+export namespace Dates {
+  export function toDate(dateString: string, format: string): Date {
+    const dateParsed = dateString.split("-");
+
+    const date = new Date(
+      Number(dateParsed[2]),
+      Number(dateParsed[1]) - 1,
+      Number(dateParsed[0]) + 1
+    );
+
+    return date;
+  }
+}

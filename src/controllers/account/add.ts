@@ -4,20 +4,15 @@ import { Utils } from "../../lib/common";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { AccountTypes } from "../../types";
+import { configurationKeysValidation } from "../account-configuration/update";
 
-export const addAccountRequestValidator = Joi.object().keys({
+export const addAccountRequestValidation = Joi.object().keys({
   type: Joi.string().required(),
-  configuration: {
-    incomes: Joi.array().required(),
-    members: Joi.array(),
-    budget: Joi.object(),
-    recurrentExpenses: Joi.array(),
-    creditAccountsConfig: Joi.array(),
-  },
+  configuration: configurationKeysValidation,
 });
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, AccountTypes.AddAccountNetworkRequest>,
+  req: Request<{}, {}, AccountTypes.Requests.AddAccountNetworkRequest>,
   res
 ) => {
   const SP = ServicesProvider.get();
@@ -30,13 +25,7 @@ const add: RequestHandler = async (
   const accountDetails = await accountService.add({
     type,
     adminUserId: userId,
-    configuration: {
-      members: [userId],
-      incomes: configuration.incomes,
-      budget: configuration.budget,
-      recurrentExpenses: configuration.recurrentExpenses,
-      creditAccountsConfig: configuration.creditAccountsConfig,
-    },
+    configuration,
   });
 
   await userService.edit(userId, { accountId: accountDetails.id });
@@ -48,5 +37,5 @@ const add: RequestHandler = async (
 };
 
 export default requestMiddleware(add, {
-  validation: { body: addAccountRequestValidator },
+  validation: { body: addAccountRequestValidation },
 });

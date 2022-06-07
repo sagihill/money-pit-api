@@ -24,7 +24,7 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
   }
 
   async add(request: ConfigTypes.AddConfigRequest): Promise<void> {
-    const exists = !!(await this.getValue(request.key));
+    const exists = !!(await this.getValueFromDBOnly(request.key));
     if (exists) {
       throw new Error("Configuration allready exists.");
     }
@@ -41,7 +41,7 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
   }
 
   async edit(request: ConfigTypes.EditConfigRequest): Promise<void> {
-    const exists = !!(await this.getValue(request.key));
+    const exists = !!(await this.getValueFromDBOnly(request.key));
     if (!exists) {
       throw new Error("Configuration doesn't exists.");
     }
@@ -59,6 +59,92 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
       }
     );
   }
+
+  async addMapEntry(
+    request: ConfigTypes.ConfigureMapEntryRequest
+  ): Promise<void> {
+    const value = (await this.getObject(request.mapName)) as any;
+    const exists = !!value;
+    if (!exists) {
+      throw new Error("Configuration doesn't exists.");
+    }
+
+    if (!!value[request.mapEntry.key]) {
+      throw new Error("Map entry allready exists, try to edit it.");
+    }
+
+    value[request.mapEntry.key] = request.mapEntry.value;
+
+    const now = new Date();
+
+    await this.ConfigModel.updateOne(
+      { key: request.mapName },
+      {
+        $set: {
+          value: JSON.stringify(value),
+          updatedAt: now,
+        },
+      }
+    );
+  }
+
+  async editMapEntry(
+    request: ConfigTypes.ConfigureMapEntryRequest
+  ): Promise<void> {
+    const value = (await this.getObject(request.mapName)) as any;
+    const exists = !!value;
+    if (!exists) {
+      throw new Error("Configuration doesn't exists.");
+    }
+
+    if (!value[request.mapEntry.key]) {
+      throw new Error("Map entry doesn't exists, try to add it.");
+    }
+
+    value[request.mapEntry.key] = request.mapEntry.value;
+
+    const now = new Date();
+
+    await this.ConfigModel.updateOne(
+      { key: request.mapName },
+      {
+        $set: {
+          value: JSON.stringify(value),
+          updatedAt: now,
+        },
+      }
+    );
+  }
+
+  async removeMapEntry(
+    request: ConfigTypes.RemoveMapEntryRequest
+  ): Promise<void> {
+    const value = (await this.getObject(request.mapName)) as any;
+    const exists = !!value;
+    if (!exists) {
+      throw new Error("Configuration doesn't exists.");
+    }
+
+    if (!value[request.mapEntry.key]) {
+      throw new Error("Map entry doesn't exists, can't remove it.");
+    }
+
+    delete value[request.mapEntry.key];
+
+    const now = new Date();
+
+    await this.ConfigModel.updateOne(
+      { key: request.mapName },
+      {
+        $set: {
+          value: JSON.stringify(value),
+          updatedAt: now,
+        },
+      }
+    );
+  }
+
+  private mapEntryValidation(value: any): void {}
 
   async get(key: string): Promise<string | undefined> {
     const value = await this.getValue(key);
@@ -116,5 +202,19 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
     const doc = await this.ConfigModel.findOne({ key });
     const object = doc?.toObject();
     return object?.value;
+  }
+
+  private async getValueFromDBOnly(key: string): Promise<string | undefined> {
+    const doc = await this.ConfigModel.findOne({ key });
+    const object = doc?.toObject();
+    return object?.value;
+  }
+
+  async refresh(): Promise<void> {
+    const docs = await this.ConfigModel.find({});
+    docs.forEach((doc) => {
+      const object = doc?.toObject();
+      process.env[object.key] = object.value;
+    });
   }
 }

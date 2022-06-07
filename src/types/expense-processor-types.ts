@@ -2,12 +2,19 @@ import { AccountingTypes, Currency } from ".";
 
 export namespace ExpenseProcessorTypes {
   export interface IExpenseProcessor {
-    run(params: { accountId: string }): Promise<void>;
+    processExpenseDownload(params: ExpenseProcessorParams): Promise<void>;
+    processRecurrentExpenses(params: ExpenseProcessorParams): Promise<void>;
   }
   export interface IProcessorLogsRepository {
     add(log: ProcessorLog): Promise<void>;
     isAllreadyProcessed(fileID: string): Promise<boolean>;
   }
+
+  export type ExpenseProcessorParams = { accountId: string };
+  export type ExpenseProcessorReccurentParams = {
+    accountId: string;
+    recurrentExpenses: AccountingTypes.RecurrentExpense[];
+  };
 
   export type ExpenseProcessorOptions = {
     expenseCategoryCategoryMap: CategoryMap;

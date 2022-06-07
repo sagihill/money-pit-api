@@ -26,6 +26,12 @@ export namespace UserTypes {
     lastName: string;
     email: string;
     password: string;
+    role: UserRole
+  }
+
+  export enum UserRole {
+    Regular = "regular",
+    Admin = "admin"
   }
 
   export interface EditUserRequest {

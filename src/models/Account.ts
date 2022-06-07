@@ -26,7 +26,6 @@ const schema = new Schema<AccountTypes.AccountDetails>(
         totalBudget: { type: Number, index: true, required: true },
         categoriesBudget: { type: Schema.Types.Mixed, required: false },
       },
-      recurrentExpenses: { type: [Schema.Types.Mixed], required: false },
       creditAccountsConfig: {
         type: [
           {

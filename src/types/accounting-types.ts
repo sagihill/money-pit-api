@@ -1,15 +1,14 @@
-import { Currency, IEntityDetails, TimeFrame } from ".";
+import { ChargeMonth, Currency, IEntityDetails } from ".";
 import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountingTypes {
   export interface IAccountingService {
     addExpenses(expenses: Expense[]): Promise<void>;
-    addExpensesFromExtract(expenses: AccountingTypes.Expense[]): Promise<void>;
     editExpense(id: string, request: EditExpenseRequest): Promise<void>;
     getAccountSummery(
       accountId: string,
-      timeFrame: TimeFrame
+      chargeMonth: ChargeMonth
     ): Promise<AccountSummery>;
     createNewExpense(
       request: AccountingTypes.AddExpenseRequest
@@ -19,9 +18,17 @@ export namespace AccountingTypes {
   export interface IAccountingRepository
     extends MongoTypes.Repository<Expense, EditExpenseRequest> {
     addExpenses(expenses: Expense[]): Promise<void>;
-    addExpensesFromExtract(expenses: AccountingTypes.Expense[]): Promise<void>;
-    getExpenses(accountId: string, timeFrame: TimeFrame): Promise<Expense[]>;
   }
+ 
+
+  export type AccountingServiceConfiguration = {
+    accountingSummeryDatesWindow: {
+      lowerChargeDay: number;
+      upperChargeDay: number;
+      lowerTimestampDay: number;
+      upperTimestampDay: number;
+    };
+  };
 
   export type AccountSummery = {
     incomeAmount: number;
@@ -81,7 +88,7 @@ export namespace AccountingTypes {
   }
 
   export interface GetSummeryRequest {
-    timeFrame: TimeFrame;
+    chargeMonth: ChargeMonth;
   }
 
   export interface Income {
@@ -89,9 +96,7 @@ export namespace AccountingTypes {
     timestamp?: Date;
     currency: Currency;
   }
-  export interface Salary extends Income {
-    payDay: number;
-  }
+
 
   export enum ExpenseCategory {
     Consumption = "consumption",
@@ -104,5 +109,10 @@ export namespace AccountingTypes {
     Mia = "mia",
     Other = "other",
     Home = "home",
+    Fitness = "fitness",
+    BeautyAndGrooming = "beauty_and_grooming",
+    InternetSubscriptions = "internet_subscriptions",
+    Transportation = "transportation",
   }
+
 }

@@ -1,7 +1,7 @@
 import { Credentials } from ".";
 
-export namespace ExpenseSheetsTypes {
-  export interface IExpenseSheets {
+export namespace ExpenseSheetsDownloaderTypes {
+  export interface IExpenseSheetsDownloader {
     run(params: ExpesnseSheetsParams): Promise<void>;
   }
 

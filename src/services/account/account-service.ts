@@ -1,17 +1,23 @@
-import { LoggerTypes, AccountTypes, UserTypes } from "../../types";
+import { ID } from "../../lib";
+import {
+  LoggerTypes,
+  AccountTypes,
+  UserTypes,
+  RecurrentExpenseTypes,
+  AccountConfigurationTypes,
+  CriticalError,
+} from "../../types";
 import { createNewAccountDetails } from "./account-factory";
-const Cryptr = require("cryptr");
-
 export class AccountService implements AccountTypes.IAccountService {
   constructor(
     private readonly userService: UserTypes.IUserService,
     private readonly accountRepository: AccountTypes.IAccountRepository,
-    private readonly cryptr: typeof Cryptr,
+    private readonly accountConfiguration: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
   async add(
-    request: AccountTypes.AddAccountRequest
+    request: AccountTypes.Requests.AddAccountRequest
   ): Promise<AccountTypes.AccountDetails> {
     try {
       this.logger.info(`Creating account : ${{ request }}`);
@@ -21,14 +27,10 @@ export class AccountService implements AccountTypes.IAccountService {
           `Can't create account, user_${request.adminUserId} doesn't exist.`
         );
       }
-
-      if (request.configuration.creditAccountsConfig?.length) {
-        this.encryptCreditAccountsConfig(
-          request.configuration.creditAccountsConfig
-        );
-      }
-
       const accountDetails = createNewAccountDetails(request);
+      await this.accountConfiguration.update(accountDetails.id, {
+        ...request.configuration,
+      });
       return await this.accountRepository.add(accountDetails);
     } catch (error) {
       this.logger.error(`Can't create new account: ${{ request, error }}`);
@@ -36,15 +38,39 @@ export class AccountService implements AccountTypes.IAccountService {
     }
   }
 
-  async edit(
+  async editConfiguration(
     id: string,
-    request: AccountTypes.EditAccountRequest
+    request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
   ): Promise<void> {
     try {
-      this.logger.info(`Editing account : ${{ id, request }}`);
-      await this.accountRepository.edit(id, request);
+      this.logger.info(`Editing account coniguration: ${{ request }}`);
+      await this.accountConfiguration.update(id, {
+        ...request,
+      });
     } catch (error) {
-      this.logger.error(`Can't edit account: ${{ id, request, error }}`);
+      this.logger.error(
+        `Can't edit account configuration: ${{ request, error }}`
+      );
+      throw error;
+    }
+  }
+
+  async displayConfiguration(
+    id: string
+  ): Promise<AccountConfigurationTypes.AccountConfigurationForDisplay> {
+    try {
+      this.logger.info(`getting account coniguration for display: ${{ id }}`);
+      const config = await this.accountConfiguration.getAccountConfiguration(
+        id
+      );
+      return {
+        incomes: config?.incomes,
+        budget: config?.budget,
+        recurrentExpenses: config?.recurrentExpenses,
+      };
+    } catch (error) {
+      this.logger.error(`Can't edit account configuration: ${{ id, error }}`);
+      throw error;
     }
   }
 
@@ -57,14 +83,22 @@ export class AccountService implements AccountTypes.IAccountService {
     }
   }
 
-  async getCreditAccounts(): Promise<AccountTypes.CreditAccount[]> {
+  async getCreditAccounts(
+    accountId: string
+  ): Promise<AccountConfigurationTypes.CreditAccount[]> {
     try {
       this.logger.info(`Getting credit accounts`);
-      const accounts = await this.accountRepository.getCreditAccounts();
-      accounts.forEach((account) => {
-        this.decryptCreditAccountsConfig(account.creditAccountsConfig);
-      });
-      return accounts;
+      const config = await this.accountConfiguration.getAccountConfiguration(
+        accountId
+      );
+      if (!config || !config.creditAccounts || !config.creditAccounts.length) {
+        throw new CriticalError(
+          `Can't get credit accounts for account_${accountId}, configuration is missing.`,
+          null,
+          { accountId }
+        );
+      }
+      return config.creditAccounts;
     } catch (error) {
       this.logger.error(`Can't get credit accounts`);
       throw error;
@@ -78,29 +112,5 @@ export class AccountService implements AccountTypes.IAccountService {
     } catch (error) {
       this.logger.error(`Can't remove account: ${{ id, error }}`);
     }
-  }
-
-  encryptCreditAccountsConfig(
-    creditAccounts: AccountTypes.CreditAccountConfig[]
-  ): void {
-    creditAccounts.forEach((account) => {
-      const password = this.cryptr.encrypt(account.credentials.password, 8);
-      account.credentials.password = password;
-
-      const username = this.cryptr.encrypt(account.credentials.username, 8);
-      account.credentials.username = username;
-    });
-  }
-
-  decryptCreditAccountsConfig(
-    creditAccounts: AccountTypes.CreditAccountConfig[]
-  ): void {
-    creditAccounts.forEach((account) => {
-      const password = this.cryptr.decrypt(account.credentials.password, 8);
-      account.credentials.password = password;
-
-      const username = this.cryptr.decrypt(account.credentials.username, 8);
-      account.credentials.username = username;
-    });
   }
 }

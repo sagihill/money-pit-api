@@ -6,7 +6,14 @@ import { ServicesProvider } from "../../services/services-provider";
 import { AccountingTypes } from "../../types";
 
 export const getSummeryRequestValidator = Joi.object().keys({
-  timeFrame: Joi.object().required(),
+  chargeMonth: {
+    year: Joi.string()
+      .required()
+      .regex(/^[12][0-9]{3}$/),
+    month: Joi.string()
+      .required()
+      .regex(/^(0?[1-9]|1[012])$/),
+  },
 });
 
 const summery: RequestHandler = async (
@@ -17,7 +24,7 @@ const summery: RequestHandler = async (
   const accountingService = await SP.Accounting();
   const userService = await SP.User();
 
-  const { timeFrame } = req.body;
+  const { chargeMonth } = req.body;
   const userId = await Utils.getUserIdFromRequest(req);
 
   const user = await userService.get(userId);
@@ -26,10 +33,10 @@ const summery: RequestHandler = async (
     throw new Error("User don't have an account yet.");
   }
 
-  const summery = await accountingService.getAccountSummery(user.accountId, {
-    from: new Date(timeFrame.from),
-    to: new Date(timeFrame.to),
-  });
+  const summery = await accountingService.getAccountSummery(
+    user.accountId,
+    chargeMonth
+  );
 
   res.send({
     message: "Success",

@@ -4,35 +4,14 @@ import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1/rootRouter";
-import { ServicesProvider } from "./services/services-provider";
-import { Async, Sync } from "./lib/common";
-import { ExpenseSheets } from "./services/expense-sheets/expense-sheets";
-import { ExpenseSheetsTypes } from "./types";
+import adminRouter from "./routes/admin/adminRouter";
+import { Async } from "./lib";
+import boot from "./boot";
+import { logResponseTime } from "./middleware/logResponseTime";
 
 const app = express();
-const SP = ServicesProvider.get();
-
-function logResponseTime(req: Request, res: Response, next: NextFunction) {
-  const startHrTime = process.hrtime();
-
-  res.on("finish", () => {
-    Async.IIFE(async () => {
-      const elapsedHrTime = process.hrtime(startHrTime);
-      const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6;
-      const message = `${req.method} ${res.statusCode} ${elapsedTimeInMs}ms\t${req.path}`;
-      const logger = await SP.Logger();
-      logger.log({
-        level: "debug",
-        message,
-        consoleLoggerOptions: { label: "API" },
-      });
-    });
-  });
-  next();
-}
 
 app.use(logResponseTime);
-
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,6 +21,7 @@ app.use(
 );
 
 app.use("/api", rootRouter);
+app.use("/admin", adminRouter);
 
 app.use(
   (err: ApplicationError, req: Request, res: Response, next: NextFunction) => {
@@ -56,26 +36,7 @@ app.use(
 );
 
 Async.IIFE(async () => {
-  const ES = await SP.ExpesnseSheets();
-  const config = await SP.Config();
-  // const params: ExpenseSheetsTypes.ExpesnseSheetsParams = {
-  //   creditProviderWebsiteUrl: (await config.get("BANK_URL")) ?? "",
-  //   credentials: {
-  //     username: (await config.get("BANK_USERNAME")) ?? "",
-  //     password: (await config.get("BANK_PASSWORD")) ?? "",
-  //   },
-  //   accountId: (await config.get("ACCOUNT_ID")) ?? "",
-  // };
-
-  // await ES.run(params);
-  // await Sync.sleep(5000);
-  const EP = await SP.ExpesnseProcessor();
-  await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
+  await boot();
 });
-
-// Async.IIFE(async () => {
-//   const Task = await SP.Task();
-//   await Task.run();
-// });
 
 export default app;

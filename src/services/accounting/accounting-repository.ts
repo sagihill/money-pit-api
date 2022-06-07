@@ -1,11 +1,6 @@
 import { MongoRepository } from "../../lib/repository";
 import Expense from "../../models/Expense";
-import {
-  MongoTypes,
-  AccountingTypes,
-  TimeFrame,
-  LoggerTypes,
-} from "../../types";
+import { MongoTypes, AccountingTypes, LoggerTypes } from "../../types";
 import { Model } from "mongoose";
 
 export const getAccountingRepository = (logger: LoggerTypes.ILogger) => {
@@ -32,39 +27,37 @@ export class AccountingRepository
   }
 
   async addExpenses(expenses: AccountingTypes.Expense[]): Promise<void> {
-    await this.addMany(expenses);
-  }
-
-  async addExpensesFromExtract(
-    expenses: AccountingTypes.Expense[]
-  ): Promise<void> {
-    // await this.model
-    //   .insertMany(expenses, { ordered: false })
-    //   .then(() => {
-    //     this.logger.info(`Added ${expenses.length} expenses`);
-    //   })
-    //   .catch((err) => {
-    //     this.logger.info(`Added ${err.result.result.nInserted} expenses`);
-    //   });
+    const needInsert = [];
 
     for await (const expense of expenses) {
-      await this.model.updateOne(
-        { id: expense.id, chargeDate: { $exists: false } },
+      const res = await this.model.updateOne(
+        { id: expense.id, chargeDate: null },
         {
           $set: { ...expense },
         },
-        { upsert: true }
+        { upsert: false }
+      );
+
+      if (res.modifiedCount === 0) {
+        needInsert.push(expense);
+      }
+    }
+
+    if (needInsert.length !== expenses.length) {
+      this.logger.info(
+        `Updated ${expenses.length - needInsert.length} expenses`
       );
     }
-  }
 
-  async getExpenses(
-    accountId: string,
-    timeFrame: TimeFrame
-  ): Promise<AccountingTypes.Expense[]> {
-    return await this.find({
-      accountId,
-      timestamp: { $gte: timeFrame.from, $lte: timeFrame.to },
-    });
+    if (needInsert.length) {
+      await this.model
+        .insertMany(expenses, { ordered: false })
+        .then(() => {
+          this.logger.info(`Added ${expenses.length} expenses`);
+        })
+        .catch((err) => {
+          this.logger.info(`Added ${err.result.result.nInserted} expenses`);
+        });
+    }
   }
 }

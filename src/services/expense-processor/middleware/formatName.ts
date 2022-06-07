@@ -1,4 +1,4 @@
-import { IMiddleware } from "../../../lib";
+import { IMiddleware, Utils } from "../../../lib";
 import { ExpenseProcessorTypes } from "../../../types";
 
 export const formatName: IMiddleware<
@@ -8,20 +8,11 @@ export const formatName: IMiddleware<
   expense: ExpenseProcessorTypes.ExpenseExtract,
   options?: ExpenseProcessorTypes.ExpenseProcessorOptions
 ) => {
+  const map = options?.expenseNameFormatConfig as { [key: string]: string };
   let formatted = options?.expenseNameFormatConfig[expense.name];
 
-  switch (expense.name) {
-    case `העברה ב BIT בנה"פ`:
-      formatted = "Bit - העברה ב";
-      break;
-    case `חברת פרטנר תקשורת בע"מ (ה`:
-      formatted = "פרטנר";
-      break;
-    case `שרותי בריאות כללית הו"ק`:
-      formatted = "כללית";
-      break;
-    default:
-      break;
+  if (!formatted) {
+    formatted = Utils.searchMap(expense.name, map);
   }
 
   expense.name = formatted ?? expense.name;

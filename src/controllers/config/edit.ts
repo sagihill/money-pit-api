@@ -18,9 +18,6 @@ const edit: RequestHandler = async (
   const config = await SP.Config();
 
   const { key, value, deleted } = req.body;
-  // const userId = await Utils.getUserIdFromRequest(req);
-
-  //TODO: validate admin user
 
   await config.edit({ key, value, deleted });
 

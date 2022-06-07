@@ -1,21 +1,31 @@
 import puppeteer from "puppeteer";
 import * as path from "path";
 import { FS, Sync } from "../../lib";
-import { ExpenseSheetsTypes, Credentials, LoggerTypes } from "../../types";
+import {
+  ExpenseSheetsDownloaderTypes,
+  Credentials,
+  LoggerTypes,
+} from "../../types";
 
 type Page = puppeteer.Page;
 type Browser = puppeteer.Browser;
 
-export class ExpenseSheets implements ExpenseSheetsTypes.IExpenseSheets {
+export class ExpenseSheetsDownloader
+  implements ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader
+{
   private browser: Browser | undefined;
 
   constructor(
-    private readonly options: ExpenseSheetsTypes.ExpenseSheetsOptions,
+    private readonly options: ExpenseSheetsDownloaderTypes.ExpenseSheetsOptions,
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
-  async run(params: ExpenseSheetsTypes.ExpesnseSheetsParams): Promise<void> {
-    await this.logger.info("Downloading expense sheets");
+  async run(
+    params: ExpenseSheetsDownloaderTypes.ExpesnseSheetsParams
+  ): Promise<void> {
+    await this.logger.info(
+      `Downloading expense sheets for account ${params.accountId}`
+    );
     try {
       const page = await this.initPage();
       await page.goto(params.creditProviderWebsiteUrl);
@@ -34,7 +44,7 @@ export class ExpenseSheets implements ExpenseSheetsTypes.IExpenseSheets {
   async initPage(): Promise<Page> {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: { width: 1920, height: 1080 },
       });
     }
@@ -89,13 +99,10 @@ export class ExpenseSheets implements ExpenseSheetsTypes.IExpenseSheets {
           timeout: 3000,
         }
       );
-      // <a _ngcontent-my-app-id-c104="" title="" class="link">תודה, לא עכשיו</a>
       await closeButton?.click();
     } catch (error) {
-      this.logger.info("didnt find close button");
+      await Sync.sleep(1000);
     }
-
-    await Sync.sleep(2000);
 
     const goToDownloadPage = await page.waitForXPath(
       "//li[@class='ng-tns-c84-1 ng-star-inserted']/a[contains(., 'פירוט חיובים')]",
@@ -111,16 +118,26 @@ export class ExpenseSheets implements ExpenseSheetsTypes.IExpenseSheets {
       downloadPath,
     });
 
+    await Sync.sleep(3000);
+
     const downloadButton = await page.waitForSelector(
       '[class="download-excel"]'
     );
 
     await downloadButton?.click();
     let currentNumberOfFiles = numberOfFiles;
-    while (currentNumberOfFiles === numberOfFiles) {
-      this.logger.info("Waiting for download...");
+    this.logger.info("Waiting for download...");
+
+    let downloadTimeoutCounter = 0;
+
+    const downloadTimer = setTimeout(function () {
       currentNumberOfFiles = FS.countNumOfFiles(downloadPath);
-    }
+      if (currentNumberOfFiles > numberOfFiles || downloadTimeoutCounter > 30) {
+        clearInterval(downloadTimer);
+      }
+
+      downloadTimeoutCounter++;
+    }, 1000);
 
     return;
   }

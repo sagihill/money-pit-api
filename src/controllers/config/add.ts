@@ -17,9 +17,6 @@ const add: RequestHandler = async (
   const config = await SP.Config();
 
   const { key, value } = req.body;
-  // const userId = await Utils.getUserIdFromRequest(req);
-
-  //TODO: validate admin user
 
   await config.add({ key, value });
 

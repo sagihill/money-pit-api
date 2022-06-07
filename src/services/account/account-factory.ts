@@ -2,22 +2,14 @@ import { ID } from "../../lib/common";
 import { AccountTypes } from "../../types";
 
 export function createNewAccountDetails(
-  request: AccountTypes.AddAccountRequest
+  request: AccountTypes.Requests.AddAccountRequest
 ) {
   const now = new Date();
-  const totalIncome = request.configuration.incomes.reduce(
-    (acc, income) => acc + income.amount,
-    0
-  );
+
   const accountDetails: AccountTypes.AccountDetails = {
     ...request,
-    configuration: {
-      ...request.configuration,
-      budget: {
-        ...request.configuration.budget,
-        totalBudget: request.configuration.budget?.totalBudget ?? totalIncome,
-      },
-    },
+    members: [request.adminUserId],
+
     id: ID.get(),
     deleted: false,
     createdAt: now,

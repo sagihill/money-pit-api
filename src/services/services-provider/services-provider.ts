@@ -7,7 +7,9 @@ import {
   AccountingTypes,
   ExpenseProcessorTypes,
   ConfigTypes,
-  ExpenseSheetsTypes,
+  ExpenseSheetsDownloaderTypes,
+  RecurrentExpenseTypes,
+  AccountConfigurationTypes,
 } from "../../types";
 import { getLogger } from "../logger";
 import { Mongo as MongoProvider } from "../mongo";
@@ -19,10 +21,19 @@ import { AccountingService, getAccountingRepository } from "../accounting";
 import { ExpenseProcessor } from "../expense-processor";
 import { ConfigService } from "../config/config-service";
 import { getConfigRepository } from "../config/config-repository";
-import { ExpenseSheets } from "../expense-sheets";
+import { ExpenseSheetsDownloader } from "../expense-sheets-downloader";
 import { getProcessorLogsRepository } from "../expense-processor/processor-logs-repository";
 import { TaskTypes } from "../../types/task-types";
 import { TaskService } from "../tasks/task-service";
+import {
+  getReccurentExpensesRepository,
+  ReccurentExpensesService,
+} from "../recurrent-expenses";
+import {
+  AccountConfigurationService,
+  getAccountConfigurationRepository,
+} from "../account-configuration";
+
 const Cryptr = require("cryptr");
 export class ServicesProvider {
   protected SP: any;
@@ -77,14 +88,16 @@ export class ServicesProvider {
   async Account(): Promise<AccountTypes.IAccountService> {
     const logger = await this.Logger();
     const config = await this.Config();
+    const recurrentExpenseService = await this.RecurrentExpense();
+    const userService = await this.User();
     try {
       if (!this.SP.Account) {
-        const repository = getAccountRepository();
-        const userService = await this.User();
+        const accountRepo = getAccountRepository();
         const crypter = new Cryptr(await config.get("CREDIT_ACCOUNTS_SECRET"));
         const accountService = new AccountService(
           userService,
-          repository,
+          accountRepo,
+          recurrentExpenseService,
           crypter,
           logger
         );
@@ -99,15 +112,71 @@ export class ServicesProvider {
     }
   }
 
+  async AccountConfiguration(): Promise<AccountConfigurationTypes.IAccountConfigurationService> {
+    const logger = await this.Logger();
+    const account = await this.Account();
+    const recurrentExpenseService = await this.RecurrentExpense();
+    try {
+      if (!this.SP.AccountConfiguration) {
+        const repo = getAccountConfigurationRepository(logger);
+        const accountConfigurationService = new AccountConfigurationService(
+          repo,
+          recurrentExpenseService,
+          account,
+          logger
+        );
+        this.SP.AccountConfiguration = accountConfigurationService;
+      }
+      return this.SP.AccountConfiguration;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Account Configuration from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
+  async RecurrentExpense(): Promise<RecurrentExpenseTypes.IReccurentExpensesService> {
+    const logger = await this.Logger();
+    try {
+      if (!this.SP.RecurrentExpense) {
+        const repo = getReccurentExpensesRepository();
+        const recurrentExpenseService = new ReccurentExpensesService(
+          repo,
+          logger
+        );
+
+        this.SP.RecurrentExpense = recurrentExpenseService;
+      }
+      return this.SP.ReccurentExpensesService;
+    } catch (error) {
+      logger.error(
+        `Something happend while trying to load Recurrent Expense from Services, error: ${error}`
+      );
+      throw error;
+    }
+  }
+
   async Accounting(): Promise<AccountingTypes.IAccountingService> {
     const logger = await this.Logger();
     const account = await this.Account();
+    const config = await this.Config();
+
+    const options: AccountingTypes.AccountingServiceConfiguration = {
+      accountingSummeryDatesWindow: {
+        lowerChargeDay: await config.getNumber("LOWER_CHARGE_DAY"),
+        upperChargeDay: await config.getNumber("UPPER_CHARGE_DAY"),
+        lowerTimestampDay: await config.getNumber("LOWER_TIMESTAMP_DAY"),
+        upperTimestampDay: await config.getNumber("UPPER_TIMESTAMP_DAY"),
+      },
+    };
     try {
       if (!this.SP.Accounting) {
         const repository = getAccountingRepository(logger);
         const accountingService = new AccountingService(
           account,
           repository,
+          options,
           logger
         );
         this.SP.Accounting = accountingService;
@@ -124,27 +193,29 @@ export class ServicesProvider {
   async ExpesnseProcessor(): Promise<ExpenseProcessorTypes.IExpenseProcessor> {
     const logger = await this.Logger();
     const accountingService = await this.Accounting();
+    const accountService = await this.Account();
     const config = await this.Config();
     const options: ExpenseProcessorTypes.ExpenseProcessorOptions = {
-      expenseCategoryCategoryMap: (await config.getObject(
+      expenseCategoryCategoryMap: await config.getObject(
         "EXPENSE_CATEGORY_CATEGORY_MAP"
-      )) as ExpenseProcessorTypes.CategoryMap,
-      expenseCategoryNameMap: (await config.getObject(
+      ),
+      expenseCategoryNameMap: await config.getObject(
         "EXPENSE_CATEGORY_NAME_MAP"
-      )) as ExpenseProcessorTypes.CategoryMap,
-      expenseNameFormatConfig: (await config.getObject(
+      ),
+      expenseNameFormatConfig: await config.getObject(
         "EXPENSE_NAME_FORMAT_CONFIG"
-      )) as any,
-      expenseSheetsPath: "../../public/expense-sheets",
-      skipAllreadyProcessed: (await config.getBool(
+      ),
+      expenseSheetsPath: "../../expense-sheets",
+      skipAllreadyProcessed: await config.getBool(
         "SKIP_ALLREADY_PROCESSED_SHEETS"
-      )) as boolean,
+      ),
     };
     try {
       if (!this.SP.ExpesnseProcessor) {
         const logsRepo = getProcessorLogsRepository(logger);
         const expenseProcessor = new ExpenseProcessor(
           accountingService,
+          accountService,
           logsRepo,
           options,
           logger
@@ -161,21 +232,24 @@ export class ServicesProvider {
     }
   }
 
-  async ExpesnseSheets(): Promise<ExpenseSheetsTypes.IExpenseSheets> {
+  async ExpenseSheetsDownloader(): Promise<ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader> {
     const logger = await this.Logger();
-    const options: ExpenseSheetsTypes.ExpenseSheetsOptions = {
-      expenseSheetsPath: "../../public/expense-sheets",
+    const options: ExpenseSheetsDownloaderTypes.ExpenseSheetsOptions = {
+      expenseSheetsPath: "../../expense-sheets",
     };
     try {
-      if (!this.SP.ExpesnseSheets) {
-        const expenseSheets = new ExpenseSheets(options, logger);
+      if (!this.SP.ExpenseSheetsDownloader) {
+        const expenseSheetsDownloader = new ExpenseSheetsDownloader(
+          options,
+          logger
+        );
 
-        this.SP.ExpesnseSheets = expenseSheets;
+        this.SP.ExpenseSheetsDownloader = expenseSheetsDownloader;
       }
-      return this.SP.ExpesnseSheets;
+      return this.SP.ExpenseSheetsDownloader;
     } catch (error) {
       logger.error(
-        `Something happend while trying to load Expense Sheets from Services, error: ${error}`
+        `Something happend while trying to load Expense Sheets downloader from Services, error: ${error}`
       );
       throw error;
     }
@@ -184,27 +258,63 @@ export class ServicesProvider {
   async Task(): Promise<TaskTypes.ITaskService> {
     const logger = await this.Logger();
     const account = await this.Account();
-    const expenseSheets = await this.ExpesnseSheets();
+    const accounting = await this.Accounting();
+    const recurrentExpenses = await this.RecurrentExpense();
+    const expenseSheets = await this.ExpenseSheetsDownloader();
     const expenseProcessor = await this.ExpesnseProcessor();
     const config = await this.Config();
 
     const options: TaskTypes.TaskServiceConfiguration = {
       addNewExpenseTaskOptions: {
-        creditProvidersUrlMap: (await config.getObject(
+        creditProvidersUrlMap: await config.getObject(
           "CREDIT_PROVIDERS_URL_MAP"
-        )) as any,
-        cronInterval: (await config.get(
-          "ADD_NEW_EXPENSE_TASK_CRON_INTERVAL"
-        )) as any,
-        isEnabled: (await config.get("ADD_NEW_EXPENSE_TASK_IS_ENABLED")) as any,
+        ),
+        cronInterval: await config.get("ADD_NEW_EXPENSE_TASK_CRON_INTERVAL"),
+        isEnabled: await config.getBool("ADD_NEW_EXPENSE_TASK_IS_ENABLED"),
+      },
+      refreshConfigsTaskOptions: {
+        cronInterval: await config.get("REFRESH_CONFIGS_TASK_CRON_INTERVAL"),
+        isEnabled: await config.getBool("REFRESH_CONFIGS_TASK_IS_ENABLED"),
+      },
+      addRecurrentExpensesOptions: {
+        monthly: {
+          recurrence: RecurrentExpenseTypes.Recurrence.Monthly,
+          cronInterval: await config.get(
+            "ADD_MONTHLY_RECURRENT_EXPENSES_TASK_CRON_INTERVAL"
+          ),
+          isEnabled: await config.getBool(
+            "ADD_MONTHLY_RECURRENT_EXPENSES_TASK_IS_ENABLED"
+          ),
+        },
+        medianly: {
+          recurrence: RecurrentExpenseTypes.Recurrence.Medianly,
+          cronInterval: await config.get(
+            "ADD_MEDIANLY_RECURRENT_EXPENSES_TASK_CRON_INTERVAL"
+          ),
+          isEnabled: await config.getBool(
+            "ADD_MEDIANLY_RECURRENT_EXPENSES_TASK_IS_ENABLED"
+          ),
+        },
+        semesterly: {
+          recurrence: RecurrentExpenseTypes.Recurrence.Semesterly,
+          cronInterval: await config.get(
+            "ADD_SEMESTERLY_RECURRENT_EXPENSES_TASK_CRON_INTERVAL"
+          ),
+          isEnabled: await config.getBool(
+            "ADD_SEMESTERLY_RECURRENT_EXPENSES_TASK_IS_ENABLED"
+          ),
+        },
       },
     };
     try {
       if (!this.SP.Task) {
         this.SP.Task = new TaskService(
           account,
+          accounting,
           expenseSheets,
           expenseProcessor,
+          recurrentExpenses,
+          config,
           logger,
           options
         );

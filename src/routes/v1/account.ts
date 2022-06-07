@@ -1,6 +1,9 @@
 import { Router } from "express";
 
-import { AccountController } from "../../controllers";
+import {
+  AccountController,
+  AccountConfigurationController,
+} from "../../controllers";
 
 const router = Router();
 
@@ -8,6 +11,6 @@ const router = Router();
 router.post("/add", AccountController.add);
 router.get("/id/:id", AccountController.get);
 router.delete("/id/:id", AccountController.remove);
-router.put("/id/:id", AccountController.edit);
+router.post("/configuration", AccountConfigurationController.update);
 
 export default router;

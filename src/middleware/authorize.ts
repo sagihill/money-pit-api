@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ServicesProvider } from "../services/services-provider";
 
-export const authorize = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const authorize = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const SP = ServicesProvider.get();
     const auth = await SP.Auth();
@@ -35,3 +31,5 @@ export const authorize = async (
     next(err);
   }
 };
+
+export default authorize;

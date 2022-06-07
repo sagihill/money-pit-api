@@ -25,41 +25,85 @@ export class ConfigService implements ConfigTypes.IConfigService {
     }
   }
 
-  async get(key: string): Promise<string | undefined> {
+  async addMapEntry(
+    request: ConfigTypes.ConfigureMapEntryRequest
+  ): Promise<void> {
     try {
-      return await this.configRepository.get(key);
+      this.logger.info(`add map entry`);
+      return await this.configRepository.addMapEntry(request);
+    } catch (error) {
+      this.logger.error(`Can't add map entry`);
+      throw error;
+    }
+  }
+
+  async editMapEntry(
+    request: ConfigTypes.ConfigureMapEntryRequest
+  ): Promise<void> {
+    try {
+      this.logger.info(`edit map entry`);
+      return await this.configRepository.editMapEntry(request);
+    } catch (error) {
+      this.logger.error(`Can't edit map entry`);
+      throw error;
+    }
+  }
+  async removeMapEntry(
+    request: ConfigTypes.RemoveMapEntryRequest
+  ): Promise<void> {
+    try {
+      this.logger.info(`remove map entry`);
+      return await this.configRepository.removeMapEntry(request);
+    } catch (error) {
+      this.logger.error(`Can't remove map entry`);
+      throw error;
+    }
+  }
+
+  async refresh(): Promise<void> {
+    try {
+      await this.configRepository.refresh();
+    } catch (error) {
+      this.logger.error(`Can't refresh configs`);
+      throw error;
+    }
+  }
+
+  async get(key: string): Promise<string> {
+    try {
+      return (await this.configRepository.get(key)) as string;
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
-  async getNumber(key: string): Promise<number | undefined> {
+  async getNumber(key: string): Promise<number> {
     try {
-      return await this.configRepository.getNumber(key);
+      return (await this.configRepository.getNumber(key)) as number;
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
-  async getBool(key: string): Promise<boolean | undefined> {
+  async getBool(key: string): Promise<boolean> {
     try {
-      return await this.configRepository.getBool(key);
+      return (await this.configRepository.getBool(key)) as boolean;
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
-  async getArray<T>(key: string): Promise<T[] | undefined> {
+  async getArray<T>(key: string): Promise<T[]> {
     try {
-      return await this.configRepository.getArray<T>(key);
+      return (await this.configRepository.getArray<T>(key)) as T[];
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;
     }
   }
-  async getObject<T>(key: string): Promise<T | undefined> {
+  async getObject<T>(key: string): Promise<T> {
     try {
-      return await this.configRepository.getObject<T>(key);
+      return (await this.configRepository.getObject<T>(key)) as T;
     } catch (error) {
       this.logger.error(`Can't get config of key: ${key}`);
       throw error;

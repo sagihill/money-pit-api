@@ -26,7 +26,5 @@ export const formatStrings: IMiddleware<
 
   expense.description = _formatString(expense.description);
 
-  console.log(expense.description);
-
   return expense;
 };

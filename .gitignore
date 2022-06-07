@@ -127,4 +127,6 @@ Temporary Items
 dist
 data
 
-*.xlsx
+
+# Expense sheets directory
+expense-sheets
