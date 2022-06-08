@@ -44,6 +44,7 @@ export class AccountService implements AccountTypes.IAccountService {
   ): Promise<void> {
     try {
       this.logger.info(`Editing account coniguration: ${{ request }}`);
+      await this.validateAccount(id);
       await this.accountConfiguration.update(id, {
         ...request,
       });
@@ -57,17 +58,19 @@ export class AccountService implements AccountTypes.IAccountService {
 
   async displayConfiguration(
     id: string
-  ): Promise<AccountConfigurationTypes.AccountConfigurationForDisplay> {
+  ): Promise<AccountConfigurationTypes.AccountConfiguration> {
     try {
       this.logger.info(`getting account coniguration for display: ${{ id }}`);
+      await this.validateAccount(id);
       const config = await this.accountConfiguration.getAccountConfiguration(
         id
       );
-      return {
-        incomes: config?.incomes,
-        budget: config?.budget,
-        recurrentExpenses: config?.recurrentExpenses,
-      };
+      return config as AccountConfigurationTypes.AccountConfiguration;
+      // return {
+      //   incomes: config?.incomes,
+      //   budget: config?.budget,
+      //   recurrentExpenses: config?.recurrentExpenses,
+      // };
     } catch (error) {
       this.logger.error(`Can't edit account configuration: ${{ id, error }}`);
       throw error;
@@ -82,12 +85,23 @@ export class AccountService implements AccountTypes.IAccountService {
       this.logger.error(`Can't get account: ${{ id, error }}`);
     }
   }
+  async getByAdminUserId(
+    adminUserId: string
+  ): Promise<AccountTypes.AccountDetails | undefined> {
+    try {
+      this.logger.info(`Getting account by admin user id : ${{ adminUserId }}`);
+      return await this.accountRepository.getByAdminUserId(adminUserId);
+    } catch (error) {
+      this.logger.error(`Can't get account: ${{ adminUserId, error }}`);
+    }
+  }
 
   async getCreditAccounts(
     accountId: string
   ): Promise<AccountConfigurationTypes.CreditAccount[]> {
     try {
       this.logger.info(`Getting credit accounts`);
+      await this.validateAccount(accountId);
       const config = await this.accountConfiguration.getAccountConfiguration(
         accountId
       );
@@ -105,12 +119,34 @@ export class AccountService implements AccountTypes.IAccountService {
     }
   }
 
+  async findConfigurations(
+    request: AccountConfigurationTypes.Requests.FindConfigurationRequest
+  ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined> {
+    try {
+      this.logger.info(`Finding configurations : ${{ request }}`);
+      return await this.accountConfiguration.findConfigurations(request);
+    } catch (error) {
+      this.logger.error(`Can't Finding configurations: ${{ request, error }}`);
+      throw error;
+    }
+  }
+
   async remove(id: string): Promise<void> {
     try {
       this.logger.info(`Deleting account : ${{ id }}`);
       return await this.accountRepository.remove(id);
     } catch (error) {
       this.logger.error(`Can't remove account: ${{ id, error }}`);
+    }
+  }
+
+  private async validateAccount(accountId: string): Promise<void> {
+    const account = await this.get(accountId);
+
+    if (!account) {
+      throw new Error(
+        `Can't update account_${accountId} configuration, account doesn't exist.`
+      );
     }
   }
 }

@@ -1,4 +1,5 @@
 import moment from "moment";
+import { ID } from "../../lib";
 import {
   LoggerTypes,
   AccountTypes,
@@ -13,7 +14,6 @@ export class AccountConfigurationService
   constructor(
     private readonly repository: AccountConfigurationTypes.IAccountConfigurationRepository,
     private readonly recurrentExpense: RecurrentExpenseTypes.IReccurentExpensesService,
-    private readonly accountService: AccountTypes.IAccountService,
     private readonly cryptr: typeof Cryptr,
     private readonly logger: LoggerTypes.ILogger
   ) {}
@@ -21,8 +21,6 @@ export class AccountConfigurationService
   async getAccountConfiguration(
     accountId: string
   ): Promise<AccountConfigurationTypes.AccountConfiguration | undefined> {
-    await this.validateAccount(accountId);
-
     const recurrentExpenses =
       await this.recurrentExpense.getRecurrentExpensesByAccount(accountId);
     const config = (await this.repository.find({ accountId }))[0];
@@ -43,7 +41,6 @@ export class AccountConfigurationService
     accountId: string,
     request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
   ): Promise<void> {
-    await this.validateAccount(accountId);
     const { recurrentExpenses, creditAccounts, budget, incomes } = request;
 
     if (recurrentExpenses?.length) {
@@ -61,13 +58,24 @@ export class AccountConfigurationService
       }
     }
 
-    const totalIncome = (incomes || []).reduce(
-      (acc: number, income: { amount: number }) => acc + income.amount,
-      0
-    );
+    let totalIncome = 0;
 
-    if (creditAccounts) {
-      this.encryptCreditAccounts(creditAccounts);
+    if (incomes?.length) {
+      incomes.forEach((income) => {
+        totalIncome = totalIncome + income.amount;
+        if (!income.id) {
+          income.id = ID.get();
+        }
+      });
+    }
+
+    if (creditAccounts?.length) {
+      creditAccounts.forEach((account) => {
+        this.encryptCreditAccounts(account);
+        if (!account.id) {
+          account.id = ID.get();
+        }
+      });
     }
 
     await this.repository.update(accountId, {
@@ -80,26 +88,26 @@ export class AccountConfigurationService
     });
   }
 
-  private async validateAccount(accountId: string): Promise<void> {
-    const account = await this.accountService.get(accountId);
-
-    if (!account) {
-      throw new Error(
-        `Can't update account_${accountId} configuration, account doesn't exist.`
-      );
+  async findConfigurations(
+    request: AccountConfigurationTypes.Requests.FindConfigurationRequest
+  ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined> {
+    try {
+      this.logger.info(`Finding configurations : ${{ request }}`);
+      return await this.repository.findConfigurations(request);
+    } catch (error) {
+      this.logger.error(`Can't Finding configurations: ${{ request, error }}`);
+      throw error;
     }
   }
 
   private encryptCreditAccounts(
-    creditAccounts: AccountConfigurationTypes.CreditAccount[]
+    creditAccount: AccountConfigurationTypes.CreditAccount
   ): void {
-    creditAccounts.forEach((account) => {
-      const password = this.cryptr.encrypt(account.credentials.password, 8);
-      account.credentials.password = password;
+    const password = this.cryptr.encrypt(creditAccount.credentials.password, 8);
+    creditAccount.credentials.password = password;
 
-      const username = this.cryptr.encrypt(account.credentials.username, 8);
-      account.credentials.username = username;
-    });
+    const username = this.cryptr.encrypt(creditAccount.credentials.username, 8);
+    creditAccount.credentials.username = username;
   }
 
   private decryptCreditAccounts(

@@ -1,7 +1,7 @@
 import { ID, Dates } from "../../../lib/common";
 import {
   AccountingTypes,
-  ExpenseProcessorTypes,
+  RecurrentExpenseTypes,
   ExpenseSheetsDownloaderTypes,
   LoggerTypes,
 } from "../../../types";
@@ -13,7 +13,7 @@ export class AddReccurentExpensesTask
   implements TaskTypes.ITask
 {
   constructor(
-    private readonly recurrentExpensesService: AccountingTypes.IReccurentExpensesService,
+    private readonly recurrentExpensesService: RecurrentExpenseTypes.IReccurentExpensesService,
     private readonly accountingService: AccountingTypes.IAccountingService,
     options: TaskTypes.AddRecurrentExpensesTaskOptions,
     logger: LoggerTypes.ILogger

@@ -9,23 +9,37 @@ export class ReccurentExpensesService
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
-  getRecurrentExpensesByAccount(
+  async getRecurrentExpensesByAccount(
     accountId: string
   ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
-    throw new Error("Method not implemented.");
+    try {
+      this.logger.info(
+        `running getRecurrentExpensesByAccount in ReccurentExpensesService for account_${accountId}`
+      );
+      const expenses = await this.repository.getRecurrentExpensesByAccount(
+        accountId
+      );
+      return expenses;
+    } catch (error) {
+      this.logger.info(
+        `error on getRecurrentExpensesByAccount in ReccurentExpensesService for account_${accountId}`
+      );
+      throw error;
+    }
   }
-  getRecurrentExpense(
+  async getRecurrentExpense(
     id: string
   ): Promise<RecurrentExpenseTypes.RecurrentExpense> {
-    throw new Error("Method not implemented.");
+    const expense = await this.repository.getRecurrentExpense(id);
+    return expense;
   }
-  updateRecurrentExpense(
+  async updateRecurrentExpense(
     recurrentExpense: RecurrentExpenseTypes.RecurrentExpense
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    await this.updateRecurrentExpense(recurrentExpense);
   }
-  removeRecurrentExpense(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async removeRecurrentExpense(id: string): Promise<void> {
+    await this.removeRecurrentExpense(id);
   }
 
   async addRecurrentExpenses(

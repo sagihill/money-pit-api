@@ -4,6 +4,8 @@ import {
   AccountingTypes,
   AccountTypes,
   ChargeMonth,
+  AccountConfigurationTypes,
+  CriticalError,
 } from "../../types";
 import { createNewExpense } from "./expense-factory";
 
@@ -52,7 +54,27 @@ export class AccountingService implements AccountingTypes.IAccountingService {
       const account = await this.accountService.get(accountId);
 
       if (!account) {
-        throw new Error(`account_${accountId} doesn't exits.`);
+        throw new CriticalError(
+          `Can't get account summery. account_${accountId} doesn't exists.`,
+          null,
+          {
+            accountId,
+            chargeMonth,
+          }
+        );
+      }
+
+      const config = await this.accountService.displayConfiguration(accountId);
+
+      if (!config) {
+        throw new CriticalError(
+          `Can't get account summery. account_${accountId} configuration doesn't exists.`,
+          null,
+          {
+            accountId,
+            chargeMonth,
+          }
+        );
       }
 
       const dates = this.getDatesForAccountSummer(chargeMonth);
@@ -80,7 +102,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
         throw new Error("No expenses for this charge month");
       }
 
-      const incomeAmount = account.configuration.incomes.reduce(
+      const incomeAmount = (config.incomes || []).reduce(
         (acc, income) => acc + income.amount,
         0
       );
@@ -90,18 +112,14 @@ export class AccountingService implements AccountingTypes.IAccountingService {
         0
       );
 
-      const totalBudget =
-        account.configuration.budget?.totalBudget ?? incomeAmount;
+      const totalBudget = config.budget?.totalBudget ?? incomeAmount;
 
       const accountSummery: AccountingTypes.AccountSummery = {
         incomeAmount,
         totalBudget,
         expenseAmount,
         balance: totalBudget - expenseAmount,
-        categoriesSummery: this.getCategoriesSummery(
-          expenses,
-          account.configuration
-        ),
+        categoriesSummery: this.getCategoriesSummery(expenses, config),
       };
 
       return accountSummery;
@@ -156,7 +174,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
 
   private getCategoriesSummery(
     expenses: AccountingTypes.Expense[],
-    accountConfig: AccountTypes.AccountConfiguration
+    accountConfig: AccountConfigurationTypes.AccountConfigurationForDisplay
   ): AccountingTypes.CategoriesSummery {
     const summery: AccountingTypes.CategoriesSummery = {};
     expenses.forEach((expense) => {

@@ -19,7 +19,6 @@ export namespace AccountingTypes {
     extends MongoTypes.Repository<Expense, EditExpenseRequest> {
     addExpenses(expenses: Expense[]): Promise<void>;
   }
- 
 
   export type AccountingServiceConfiguration = {
     accountingSummeryDatesWindow: {
@@ -92,11 +91,11 @@ export namespace AccountingTypes {
   }
 
   export interface Income {
+    id?: string;
     amount: number;
     timestamp?: Date;
     currency: Currency;
   }
-
 
   export enum ExpenseCategory {
     Consumption = "consumption",
@@ -114,5 +113,4 @@ export namespace AccountingTypes {
     InternetSubscriptions = "internet_subscriptions",
     Transportation = "transportation",
   }
-
 }

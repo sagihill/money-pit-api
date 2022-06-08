@@ -10,42 +10,38 @@ import {
 } from "../../types";
 
 export const configurationKeysValidation = {
-  accountId: Joi.string().required().uuid(),
-  incomes: [
-    {
-      amount: Joi.number(),
-      currency: Joi.allow(Object.values(Currency)),
-      payDay: Joi.number(),
-    },
-  ],
-  creditAccounts: [
-    {
-      creditProvider: Joi.allow(
-        Object.values(AccountConfigurationTypes.CreditProvider)
-      ),
-      credentials: { username: Joi.string(), password: Joi.string() },
-    },
-  ],
+  incomes: Joi.array().items({
+    id: Joi.string().uuid(),
+    amount: Joi.number(),
+    currency: Joi.allow(...Object.values(Currency)),
+    payDay: Joi.number(),
+  }),
+  creditAccounts: Joi.array().items({
+    id: Joi.string().uuid(),
+    creditProvider: Joi.allow(
+      ...Object.values(AccountConfigurationTypes.CreditProvider)
+    ),
+    credentials: { username: Joi.string(), password: Joi.string() },
+  }),
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
-  recurrentExpenses: [
-    {
-      id: Joi.string().uuid(),
-      accountId: Joi.string().required().uuid(),
-      name: Joi.string().required(),
-      category: Joi.string().required(),
-      amount: Joi.number().required(),
-      currency: Joi.string().required(),
-      dueDay: Joi.number().required(),
-      description: Joi.string(),
-      recurrence: Joi.string().required(),
-      type: Joi.string().required(),
-    },
-  ],
+  recurrentExpenses: Joi.array().items({
+    id: Joi.string().uuid(),
+    accountId: Joi.string().required().uuid(),
+    name: Joi.string().required(),
+    category: Joi.string().required(),
+    amount: Joi.number().required(),
+    currency: Joi.string().required(),
+    dueDay: Joi.number().required(),
+    description: Joi.string(),
+    recurrence: Joi.string().required(),
+    type: Joi.string().required(),
+  }),
 };
 
-export const updateAccountConfigurationRequestValidator = Joi.object().keys(
-  configurationKeysValidation
-);
+export const updateAccountConfigurationRequestValidator = Joi.object().keys({
+  accountId: Joi.string().required().uuid(),
+  ...configurationKeysValidation,
+});
 
 const update: RequestHandler = async (
   req: Request<
@@ -55,8 +51,14 @@ const update: RequestHandler = async (
   >,
   res
 ) => {
-  const { creditAccounts, recurrentExpenses, budget, incomes, accountId } =
-    req.body;
+  const {
+    creditAccounts,
+    recurrentExpenses,
+    budget,
+    incomes,
+    accountId,
+    toggles,
+  } = req.body;
   try {
     const SP = ServicesProvider.get();
     const account = await SP.Account();
@@ -66,6 +68,7 @@ const update: RequestHandler = async (
       recurrentExpenses,
       budget,
       incomes,
+      toggles,
     });
 
     const response: ApiResponse = {

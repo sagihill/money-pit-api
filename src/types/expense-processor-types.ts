@@ -1,4 +1,5 @@
 import { AccountingTypes, Currency } from ".";
+import { RecurrentExpenseTypes } from "./recurrent-expense-types";
 
 export namespace ExpenseProcessorTypes {
   export interface IExpenseProcessor {
@@ -13,7 +14,7 @@ export namespace ExpenseProcessorTypes {
   export type ExpenseProcessorParams = { accountId: string };
   export type ExpenseProcessorReccurentParams = {
     accountId: string;
-    recurrentExpenses: AccountingTypes.RecurrentExpense[];
+    recurrentExpenses: RecurrentExpenseTypes.RecurrentExpense[];
   };
 
   export type ExpenseProcessorOptions = {

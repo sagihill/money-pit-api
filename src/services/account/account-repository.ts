@@ -11,4 +11,12 @@ class AccountsRepository
     AccountTypes.AccountDetails,
     AccountTypes.Requests.EditAccountRequest
   >
-  implements AccountTypes.IAccountRepository {}
+  implements AccountTypes.IAccountRepository
+{
+  async getByAdminUserId(
+    adminUserId: string
+  ): Promise<AccountTypes.AccountDetails | undefined> {
+    const result = await this.find({ deleted: false, adminUserId });
+    return result[0];
+  }
+}

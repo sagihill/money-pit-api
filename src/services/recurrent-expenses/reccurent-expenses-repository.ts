@@ -13,10 +13,11 @@ class ReccurentExpensesRepository
   >
   implements RecurrentExpenseTypes.IReccurentExpensesRepository
 {
-  getRecurrentExpensesByAccount(
+  async getRecurrentExpensesByAccount(
     accountId: string
   ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
-    throw new Error("Method not implemented.");
+    const expenses = await this.model.find({ deleted: false, accountId });
+    return expenses;
   }
   getRecurrentExpense(
     id: string

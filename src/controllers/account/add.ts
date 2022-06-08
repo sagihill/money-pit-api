@@ -22,6 +22,11 @@ const add: RequestHandler = async (
   const { type, configuration } = req.body;
   const userId = await Utils.getUserIdFromRequest(req);
 
+  const currentAccount = await accountService.getByAdminUserId(userId);
+  if (currentAccount) {
+    await accountService.remove(currentAccount.id);
+  }
+
   const accountDetails = await accountService.add({
     type,
     adminUserId: userId,

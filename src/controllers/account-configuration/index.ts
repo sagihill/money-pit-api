@@ -1,3 +1,4 @@
 import update from "./update";
+import displayConfiguration from "./displayConfiguration";
 
-export { update };
+export { update, displayConfiguration };

@@ -21,26 +21,31 @@ export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
   async run(): Promise<void> {
     try {
       const options = this.getOptions<TaskTypes.AddNewExpenseTaskOptions>();
-      const accounts = await this.accountService.getCreditAccounts();
-      for await (const account of accounts) {
-        // const creditAccountsConfig = account.creditAccountsConfig;
-        const creditAccountsConfig = account.creditAccountsConfig;
+      const configs = await this.accountService.findConfigurations({
+        toggles: { enableAutoExpenseAdd: true },
+      });
+      
+      if (!configs) {
+        return;
+      }
 
-        for await (const accountConfig of creditAccountsConfig) {
+      for await (const config of configs) {
+        const creditAccount = config?.creditAccounts ?? [];
+        for await (const account of creditAccount) {
           const creditProviderWebsiteUrl =
-            options.creditProvidersUrlMap[accountConfig.creditProvider];
+            options.creditProvidersUrlMap[account.creditProvider];
 
           try {
             await this.expenseSheetsDownloader.run({
-              accountId: account.accountId,
-              credentials: accountConfig.credentials,
+              accountId: config.accountId,
+              credentials: account.credentials,
               creditProviderWebsiteUrl,
             });
 
             await Sync.sleep(2000);
 
             await this.expenseProcessor.processExpenseDownload({
-              accountId: account.accountId,
+              accountId: config.accountId,
             });
 
             await Sync.sleep(5000);

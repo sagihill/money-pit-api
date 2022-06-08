@@ -1,9 +1,11 @@
 import {
+  AccountConfigurationTypes,
   AccountingTypes,
   AccountTypes,
   Currency,
   ExpenseProcessorTypes,
   LoggerTypes,
+  RecurrentExpenseTypes,
 } from "../../types";
 
 import xlsx from "node-xlsx";
@@ -56,7 +58,7 @@ export class ExpenseProcessor
   }
 
   private createSheet(
-    recurrentExpenses: AccountingTypes.RecurrentExpense[]
+    recurrentExpenses: RecurrentExpenseTypes.RecurrentExpense[]
   ): string[][] {
     const transactionSheet: string[][] = [];
     recurrentExpenses.forEach((recurrentExpense) => {

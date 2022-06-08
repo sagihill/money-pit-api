@@ -5,9 +5,10 @@ import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1/rootRouter";
 import adminRouter from "./routes/admin/adminRouter";
-import { Async } from "./lib";
+import { Async, Objects } from "./lib";
 import boot from "./boot";
 import { logResponseTime } from "./middleware/logResponseTime";
+import sanitize from "./middleware/santize";
 
 const app = express();
 
@@ -20,9 +21,8 @@ app.use(
   express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
 );
 
-app.use("/api", rootRouter);
-app.use("/admin", adminRouter);
-
+app.use("/api", sanitize, rootRouter);
+app.use("/admin", sanitize, adminRouter);
 app.use(
   (err: ApplicationError, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {

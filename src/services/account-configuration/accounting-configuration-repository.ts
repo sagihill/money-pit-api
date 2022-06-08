@@ -36,6 +36,31 @@ export class AccountConfigurationRepository
     accountId: string,
     request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    try {
+      this.logger.info(`updating configuration for account_${accountId}`);
+      await this.model.updateOne(
+        { accountId },
+        { $set: { ...request } },
+        { upsert: true }
+      );
+    } catch (error) {
+      this.logger.error(`Can't update configuration for account_${accountId}`);
+      throw error;
+    }
+  }
+
+  async findConfigurations(
+    request: AccountConfigurationTypes.Requests.FindConfigurationRequest
+  ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined> {
+    try {
+      this.logger.info(`Finding configurations : ${{ request }}`);
+      return await this.model.find({
+        deleted: false,
+        ...request,
+      });
+    } catch (error) {
+      this.logger.error(`Can't Finding configurations: ${{ request, error }}`);
+      throw error;
+    }
   }
 }

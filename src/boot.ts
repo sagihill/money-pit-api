@@ -14,25 +14,21 @@ const boot = async () => {
   //   //   },
   //   //   accountId: (await config.get("ACCOUNT_ID")) ?? "",
   //   // };\
-
   //   // await ES.run(params);
   //   // await Sync.sleep(5000);
   //   const EP = await SP.ExpesnseProcessor();
   //   await EP.run({ accountId: (await config.get("ACCOUNT_ID")) ?? "" });
   // });
-
-  Async.IIFE(async () => {
-    const Task = await SP.Task();
-    await Task.run();
-  });
-
+  // Async.IIFE(async () => {
+  //   const Task = await SP.Task();
+  //   await Task.run();
+  // });
   // setInterval(function () {
   //   Async.IIFE(async () => {
   //     const Config = await SP.Config();
   //     console.log(await Config.get("test"));
   //   });
   // }, 30000);
-
   // Async.IIFE(async () => {
   //   const config = await SP.Config();
   //   const EP = await SP.ExpesnseProcessor();

@@ -1,5 +1,6 @@
 import { MongoTypes } from "../types";
 import { Model } from "mongoose";
+import { Objects } from "./common";
 
 /**
  * A generic base class for Mongo-backed repositories.
@@ -81,9 +82,12 @@ export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
    * @param src A record object coming from the DB.
    */
   deserialize(src: any): T {
-    delete src.deleted;
-    delete src._id;
-    delete src.__v;
-    return { ...src } as T;
+    const deserialized = Objects.Sanitize(src, [
+      "deleted",
+      "_id",
+      "__v",
+      "updatedAt",
+    ]);
+    return { ...deserialized } as T;
   }
 }

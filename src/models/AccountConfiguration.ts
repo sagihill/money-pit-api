@@ -1,14 +1,16 @@
 import { Model, Schema, model } from "mongoose";
 import { AccountConfigurationTypes } from "../types";
-import RecurrentExpense from "./RecurrentExpense";
+import RecurrentExpense, { RecurrentExpenseFields } from "./RecurrentExpense";
 
 interface IAccountConfigurationModel
   extends Model<AccountConfigurationTypes.AccountConfiguration> {}
 
 const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
+  accountId: { type: String, index: true, required: true },
   incomes: {
     type: [
       {
+        id: { type: String, index: true, required: true },
         amount: { type: Number, index: true, required: true },
         timestamp: { type: Date, index: true, required: false },
         currency: { type: String, index: true, required: true },
@@ -25,6 +27,7 @@ const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
   creditAccounts: {
     type: [
       {
+        id: { type: String, index: true, required: true },
         creditProvider: { type: String, index: true, required: true },
         credentials: {
           username: { type: String, index: true, required: true },
@@ -35,7 +38,18 @@ const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
     index: true,
     required: false,
   },
-  recurrentExpenses: [RecurrentExpense],
+  toggles: {
+    type: {
+      enableAutoExpenseAdd: { type: Boolean, index: true, required: false },
+    },
+    index: true,
+    required: false,
+  },
+  recurrentExpenses: {
+    type: [RecurrentExpenseFields],
+    index: true,
+    required: false,
+  },
 });
 
 const AccountConfiguration: IAccountConfigurationModel = model<
