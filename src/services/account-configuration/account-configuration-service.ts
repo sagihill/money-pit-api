@@ -46,7 +46,8 @@ export class AccountConfigurationService
     if (recurrentExpenses?.length) {
       const toAdd = [];
       for await (const recurrentExpense of recurrentExpenses) {
-        if (!!recurrentExpense.id) {
+        
+        if (!recurrentExpense.id) {
           toAdd.push(recurrentExpense);
         } else {
           await this.recurrentExpense.updateRecurrentExpense(recurrentExpense);

@@ -14,6 +14,9 @@ Async.IIFE(async () => {
 const serve = async () => {
   const logger = await SP.Logger();
   const PORT = (await config.get("PORT")) || 3000;
+  const Task = await SP.Task();
+  await Task.run();
+
   return app.listen(PORT, async () => {
     logger.info(`🌏 Express server started at http://localhost:${PORT}`);
 

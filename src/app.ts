@@ -5,8 +5,6 @@ import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
 import rootRouter from "./routes/v1/rootRouter";
 import adminRouter from "./routes/admin/adminRouter";
-import { Async, Objects } from "./lib";
-import boot from "./boot";
 import { logResponseTime } from "./middleware/logResponseTime";
 import sanitize from "./middleware/santize";
 
@@ -34,9 +32,5 @@ app.use(
     });
   }
 );
-
-Async.IIFE(async () => {
-  await boot();
-});
 
 export default app;

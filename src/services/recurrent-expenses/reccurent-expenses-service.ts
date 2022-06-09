@@ -46,19 +46,38 @@ export class ReccurentExpensesService
     recurrentExpenses: RecurrentExpenseTypes.RecurrentExpense[]
   ): Promise<string[]> {
     const recurrentExpensesIds = [];
-    for await (const recurrentExpense of recurrentExpenses) {
+    const recurrentExpensesToAdd = [];
+    const now = new Date();
+    for await (let recurrentExpense of recurrentExpenses) {
       const id = ID.get();
-      recurrentExpense.id = id;
+      recurrentExpense = {
+        ...recurrentExpense,
+        id,
+        deleted: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      recurrentExpensesToAdd.push(recurrentExpense);
       recurrentExpensesIds.push(id);
     }
-    await this.repository.addRecurrentExpenses(recurrentExpenses);
+    await this.repository.addRecurrentExpenses(recurrentExpensesToAdd);
     return recurrentExpensesIds;
   }
 
   async getRecurrentExpenses(
     recurrence: RecurrentExpenseTypes.Recurrence
   ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
-    const expenses = await this.repository.getRecurrentExpenses(recurrence);
-    return expenses;
+    try {
+      this.logger.info(
+        `running getRecurrentExpenses in ReccurentExpensesService for ${recurrence} recurrence`
+      );
+      const expenses = await this.repository.getRecurrentExpenses(recurrence);
+      return expenses;
+    } catch (error) {
+      this.logger.info(
+        `error on getRecurrentExpenses in ReccurentExpensesService for ${recurrence} recurrence`
+      );
+      throw error;
+    }
   }
 }

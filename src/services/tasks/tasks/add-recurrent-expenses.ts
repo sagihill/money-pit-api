@@ -34,12 +34,11 @@ export class AddReccurentExpensesTask
       const expenses = [];
       this.logger.info(`Adding ${options.recurrence} recurrent Expenses`);
       for await (const recurrentExpense of recurrentExpenses) {
-        const timestamp = Dates.toDate(
-          `${now.getFullYear()}-${now.getMonth() + 1}-${
-            recurrentExpense.dueDay
-          }`,
-          "yyyy-mm-dd"
-        );
+        const string = `${now.getFullYear()}-${now.getMonth() + 1}-${
+          recurrentExpense.dueDay
+        }`;
+        console.log(string);
+        const timestamp = Dates.toDate(string, "yyyy-mm-dd");
 
         const id = ID.get(
           [
@@ -58,7 +57,7 @@ export class AddReccurentExpensesTask
           name: recurrentExpense.name,
           type: recurrentExpense.type,
           description: recurrentExpense.description,
-          amount: Math.floor(recurrentExpense.amount * 100),
+          amount: Math.floor(Number(recurrentExpense.amount) * 100),
           currency: recurrentExpense.currency,
           timestamp,
           deleted: false,
@@ -68,6 +67,7 @@ export class AddReccurentExpensesTask
 
         expenses.push(expense);
       }
+
       await this.accountingService.addExpenses(expenses);
     } catch (error) {
       this.logger.error(error);

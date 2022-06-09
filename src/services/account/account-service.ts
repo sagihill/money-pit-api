@@ -52,6 +52,7 @@ export class AccountService implements AccountTypes.IAccountService {
       this.logger.error(
         `Can't edit account configuration: ${{ request, error }}`
       );
+
       throw error;
     }
   }
