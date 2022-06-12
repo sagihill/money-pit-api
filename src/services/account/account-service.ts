@@ -1,153 +1,110 @@
-import { ID } from "../../lib";
+import { ID, Validate } from "../../lib";
+import { SimpleService } from "../../lib/service";
 import {
   LoggerTypes,
   AccountTypes,
   UserTypes,
   RecurrentExpenseTypes,
   AccountConfigurationTypes,
-  CriticalError,
+  MongoTypes,
+  SalaryTypes,
+  CreditAccountTypes,
 } from "../../types";
-import { createNewAccountDetails } from "./account-factory";
-export class AccountService implements AccountTypes.IAccountService {
+export class AccountService
+  extends SimpleService<
+    AccountTypes.AccountDetails,
+    AccountTypes.Requests.AddRequest,
+    AccountTypes.Requests.UpdateRequest
+  >
+  implements AccountTypes.IAccountService
+{
   constructor(
     private readonly userService: UserTypes.IUserService,
-    private readonly accountRepository: AccountTypes.IAccountRepository,
-    private readonly accountConfiguration: AccountConfigurationTypes.IAccountConfigurationService,
-    private readonly logger: LoggerTypes.ILogger
-  ) {}
+    private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
+    private readonly recurrentExpenseService: RecurrentExpenseTypes.IReccurentExpensesService,
+    private readonly salaryService: SalaryTypes.ISalaryService,
+    private readonly creditAccountService: CreditAccountTypes.ICreditAccountService,
+    repository: MongoTypes.Repository<
+      AccountTypes.AccountDetails,
+      AccountTypes.Requests.UpdateRequest
+    >,
+    logger: LoggerTypes.ILogger
+  ) {
+    super(repository, logger);
+  }
 
   async add(
-    request: AccountTypes.Requests.AddAccountRequest
+    request: AccountTypes.Requests.AddRequest
   ): Promise<AccountTypes.AccountDetails> {
-    try {
-      this.logger.info(`Creating account : ${{ request }}`);
-      const user = await this.userService.get(request.adminUserId);
-      if (!user) {
-        throw new Error(
-          `Can't create account, user_${request.adminUserId} doesn't exist.`
-        );
-      }
-      const accountDetails = createNewAccountDetails(request);
-      await this.accountConfiguration.update(accountDetails.id, {
-        ...request.configuration,
-      });
-      return await this.accountRepository.add(accountDetails);
-    } catch (error) {
-      this.logger.error(`Can't create new account: ${{ request, error }}`);
-      throw error;
+    const account = await super.add({
+      type: request.type,
+      adminUserId: request.adminUserId,
+    });
+
+    if (request.configuration) {
+      await this.accountConfigurationService.add(request.configuration);
     }
+
+    if (request.creditAccounts) {
+      await this.creditAccountService.addCreditAccounts(request.creditAccounts);
+    }
+
+    if (request.recurrentExpenses) {
+      await this.recurrentExpenseService.addRecurrentExpenses(
+        request.recurrentExpenses
+      );
+    }
+
+    if (request.salaries) {
+      await this.salaryService.addSalaries(request.salaries);
+    }
+
+    return account;
   }
 
-  async editConfiguration(
-    id: string,
-    request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
+  async createEntityDetails(
+    request: AccountTypes.Requests.AddRequest
+  ): Promise<AccountTypes.AccountDetails> {
+    return {
+      ...(await this.getBaseEntityDetails()),
+      type: request.type,
+      adminUserId: request.adminUserId,
+      members: [request.adminUserId],
+      id: ID.get(),
+    };
+  }
+
+  async createValidation(
+    request: AccountTypes.Requests.AddRequest
   ): Promise<void> {
-    try {
-      this.logger.info(`Editing account coniguration: ${{ request }}`);
-      await this.validateAccount(id);
-      await this.accountConfiguration.update(id, {
-        ...request,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Can't edit account configuration: ${{ request, error }}`
+    Validate.required(request.adminUserId, "admin user id");
+
+    const user = await this.userService.get(request.adminUserId);
+    if (!user) {
+      throw new Error(
+        `Can't create account, user_${request.adminUserId} doesn't exist.`
       );
-
-      throw error;
     }
+
+    Validate.accountType(request.type).required();
   }
 
-  async displayConfiguration(
-    id: string
-  ): Promise<AccountConfigurationTypes.AccountConfiguration> {
-    try {
-      this.logger.info(`getting account coniguration for display: ${{ id }}`);
-      await this.validateAccount(id);
-      const config = await this.accountConfiguration.getAccountConfiguration(
-        id
-      );
-      return config as AccountConfigurationTypes.AccountConfiguration;
-      // return {
-      //   incomes: config?.incomes,
-      //   budget: config?.budget,
-      //   recurrentExpenses: config?.recurrentExpenses,
-      // };
-    } catch (error) {
-      this.logger.error(`Can't edit account configuration: ${{ id, error }}`);
-      throw error;
-    }
+  async updateValidation(
+    id: string,
+    request: AccountTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    Validate.required(id, "account id");
+    Validate.accountType(request.type);
   }
 
-  async get(id: string): Promise<AccountTypes.AccountDetails | undefined> {
-    try {
-      this.logger.info(`Getting account : ${{ id }}`);
-      return await this.accountRepository.get(id);
-    } catch (error) {
-      this.logger.error(`Can't get account: ${{ id, error }}`);
-    }
-  }
   async getByAdminUserId(
     adminUserId: string
   ): Promise<AccountTypes.AccountDetails | undefined> {
     try {
       this.logger.info(`Getting account by admin user id : ${{ adminUserId }}`);
-      return await this.accountRepository.getByAdminUserId(adminUserId);
+      return (await this.repository.find({ adminUserId, deleted: false }))[0];
     } catch (error) {
       this.logger.error(`Can't get account: ${{ adminUserId, error }}`);
-    }
-  }
-
-  async getCreditAccounts(
-    accountId: string
-  ): Promise<AccountConfigurationTypes.CreditAccount[]> {
-    try {
-      this.logger.info(`Getting credit accounts`);
-      await this.validateAccount(accountId);
-      const config = await this.accountConfiguration.getAccountConfiguration(
-        accountId
-      );
-      if (!config || !config.creditAccounts || !config.creditAccounts.length) {
-        throw new CriticalError(
-          `Can't get credit accounts for account_${accountId}, configuration is missing.`,
-          null,
-          { accountId }
-        );
-      }
-      return config.creditAccounts;
-    } catch (error) {
-      this.logger.error(`Can't get credit accounts`);
-      throw error;
-    }
-  }
-
-  async findConfigurations(
-    request: AccountConfigurationTypes.Requests.FindConfigurationRequest
-  ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined> {
-    try {
-      this.logger.info(`Finding configurations : ${{ request }}`);
-      return await this.accountConfiguration.findConfigurations(request);
-    } catch (error) {
-      this.logger.error(`Can't Finding configurations: ${{ request, error }}`);
-      throw error;
-    }
-  }
-
-  async remove(id: string): Promise<void> {
-    try {
-      this.logger.info(`Deleting account : ${{ id }}`);
-      return await this.accountRepository.remove(id);
-    } catch (error) {
-      this.logger.error(`Can't remove account: ${{ id, error }}`);
-    }
-  }
-
-  private async validateAccount(accountId: string): Promise<void> {
-    const account = await this.get(accountId);
-
-    if (!account) {
-      throw new Error(
-        `Can't update account_${accountId} configuration, account doesn't exist.`
-      );
     }
   }
 }

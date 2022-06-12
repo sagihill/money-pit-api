@@ -1,32 +1,25 @@
-import { IEntityDetails, Currency } from ".";
-import { AccountingTypes } from "./accounting-types";
-import { MongoTypes } from "./mongo-types";
+import {
+  AccountingTypes,
+  CriticalError,
+  Currency,
+  IEntityDetails,
+  ISimpleService,
+} from ".";
 
+// tslint:disable-next-line: no-namespace
 export namespace RecurrentExpenseTypes {
-  export interface IReccurentExpensesService {
+  export interface IReccurentExpensesService
+    extends ISimpleService<
+      RecurrentExpense,
+      Requests.AddRequest,
+      Requests.UpdateRequest
+    > {
     addRecurrentExpenses(
-      recurrentExpenses: RecurrentExpense[]
-    ): Promise<string[]>;
-    getRecurrentExpenses(recurrence: Recurrence): Promise<RecurrentExpense[]>;
-
-    getRecurrentExpensesByAccount(
-      accountId: string
+      requests: Requests.AddRequest[]
     ): Promise<RecurrentExpense[]>;
-    getRecurrentExpense(id: string): Promise<RecurrentExpense>;
-    updateRecurrentExpense(recurrentExpense: RecurrentExpense): Promise<void>;
-    removeRecurrentExpense(id: string): Promise<void>;
-  }
-  export interface IReccurentExpensesRepository
-    extends MongoTypes.Repository<RecurrentExpense, EditRecurrentExpense> {
-    addRecurrentExpenses(recurrentExpenses: RecurrentExpense[]): Promise<void>;
-    getRecurrentExpenses(recurrence: Recurrence): Promise<RecurrentExpense[]>;
-
-    getRecurrentExpensesByAccount(
-      accountId: string
+    findRecurrentExpenses(
+      request: Requests.FindRequest
     ): Promise<RecurrentExpense[]>;
-    getRecurrentExpense(id: string): Promise<RecurrentExpense>;
-    updateRecurrentExpense(recurrentExpense: RecurrentExpense): Promise<void>;
-    removeRecurrentExpense(id: string): Promise<void>;
   }
 
   export interface RecurrentExpense extends IEntityDetails {
@@ -42,21 +35,47 @@ export namespace RecurrentExpenseTypes {
     recurrence: Recurrence;
   }
 
-  export interface EditRecurrentExpense {
-    category?: AccountingTypes.ExpenseCategory;
-    name?: string;
-    amount?: number;
-    currency?: Currency;
-    type?: AccountingTypes.ExpenseType;
-    description?: string;
-    timestamp?: Date;
-    deleted?: boolean;
-  }
-
   export enum Recurrence {
     Monthly = "monthly",
     Semesterly = "semesterly",
     Quarterly = "quarterly",
     Medianly = "medianly",
+  }
+
+  export class InvalidRecurrence extends CriticalError {
+    constructor(protected readonly recurrnece: Recurrence) {
+      super(
+        `Can't finish operation. recurrnece ${recurrnece} is an invalid value.`
+      );
+    }
+  }
+
+  export namespace Requests {
+    export interface AddRequest {
+      accountId: string;
+      category: AccountingTypes.ExpenseCategory;
+      name: string;
+      type: AccountingTypes.ExpenseType;
+      description?: string;
+      amount: number;
+      currency: Currency;
+      dueDay: number;
+      recurrence: Recurrence;
+    }
+    export interface UpdateRequest {
+      category?: AccountingTypes.ExpenseCategory;
+      name?: string;
+      type?: AccountingTypes.ExpenseType;
+      description?: string;
+      amount?: number;
+      currency?: Currency;
+      dueDay?: number;
+      recurrence?: Recurrence;
+    }
+
+    export interface FindRequest {
+      recurrence?: Recurrence;
+      accountId?: string;
+    }
   }
 }

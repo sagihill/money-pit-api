@@ -3,6 +3,17 @@ import * as UUIDFromString from "uuid-by-string";
 import { ServicesProvider } from "../services/services-provider";
 import { RequestHandler, Request, Response, NextFunction } from "express";
 import { Masks } from "./masks";
+import {
+  AccountingTypes,
+  AccountTypes,
+  Currency,
+  InvalidAmount,
+  InvalidCurrency,
+  InvalidDay,
+  InvalidStringValue,
+  RecurrentExpenseTypes,
+  RequiredParameterError,
+} from "../types";
 
 const uuidFromString = UUIDFromString.default;
 
@@ -221,5 +232,127 @@ export namespace Objects {
 
       return sanitizer(v);
     });
+  }
+}
+
+export namespace Validate {
+  export function isValidAmount(amount?: number): boolean {
+    return (
+      !Number.isNaN(amount) &&
+      Number.isInteger(amount) &&
+      Number.isFinite(amount)
+    );
+  }
+
+  export function expenseCategory(category?: AccountingTypes.ExpenseCategory) {
+    if (
+      category &&
+      !Object.values(AccountingTypes.ExpenseCategory).includes(
+        category as AccountingTypes.ExpenseCategory
+      )
+    ) {
+      throw new AccountingTypes.InvalidExpenseCategory(
+        category as AccountingTypes.ExpenseCategory
+      );
+    }
+
+    return {
+      required: () => required(category, "category"),
+    };
+  }
+
+  export function expenseType(type?: AccountingTypes.ExpenseType) {
+    if (
+      type &&
+      !Object.values(AccountingTypes.ExpenseType).includes(
+        type as AccountingTypes.ExpenseType
+      )
+    ) {
+      throw new AccountingTypes.InvalidExpenseType(
+        type as AccountingTypes.ExpenseType
+      );
+    }
+
+    return {
+      required: () => required(type, "expense type"),
+    };
+  }
+
+  export function currency(currency?: Currency) {
+    if (currency && !Object.values(Currency).includes(currency)) {
+      throw new InvalidCurrency(currency);
+    }
+
+    return {
+      required: () => required(currency, "currency"),
+    };
+  }
+
+  export function day(day?: number) {
+    if (
+      day &&
+      (Number.isNaN(day) ||
+        !Number.isInteger(day) ||
+        !Number.isFinite(day) ||
+        day <= 0 ||
+        day > 31)
+    ) {
+      throw new InvalidDay(day);
+    }
+
+    return {
+      required: () => required(day, "day"),
+    };
+  }
+
+  export function expenseRecurrence(
+    recurrence?: RecurrentExpenseTypes.Recurrence
+  ) {
+    if (
+      recurrence &&
+      !Object.values(RecurrentExpenseTypes.Recurrence).includes(recurrence)
+    ) {
+      throw new RecurrentExpenseTypes.InvalidRecurrence(recurrence);
+    }
+
+    return {
+      required: () => required(recurrence, "expense recurrence"),
+    };
+  }
+
+  export function amount(amount?: number) {
+    if (amount && !isValidAmount(amount)) {
+      throw new InvalidAmount(amount);
+    }
+
+    return {
+      required: () => required(amount, "amount"),
+    };
+  }
+
+  export function string(fieldName: string, str?: string) {
+    if (str && typeof str !== "string") {
+      throw new InvalidStringValue(str, fieldName);
+    }
+
+    return {
+      required: () => required(str, fieldName),
+    };
+  }
+
+  export function accountType(type?: AccountTypes.AccountType) {
+    if (type && !Object.values(AccountTypes.AccountType).includes(type)) {
+      throw new AccountTypes.InvalidAccountType(type);
+    }
+
+    return {
+      required: () => required(type, "account type"),
+    };
+  }
+
+  export function required(value: any, fieldName: string) {
+    if (!value) {
+      throw new RequiredParameterError(fieldName);
+    }
   }
 }

@@ -9,8 +9,13 @@ export default async function RecurrentExpense(
   options: any,
   SP: ServicesProvider
 ): Promise<RecurrentExpenseTypes.IReccurentExpensesService> {
+  const account = await SP.Account();
   const logger = await SP.Logger();
   const repo = getReccurentExpensesRepository();
-  const recurrentExpenseService = new ReccurentExpensesService(repo, logger);
+  const recurrentExpenseService = new ReccurentExpensesService(
+    account,
+    repo,
+    logger
+  );
   return recurrentExpenseService;
 }

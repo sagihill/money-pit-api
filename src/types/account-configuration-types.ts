@@ -1,68 +1,24 @@
-import { AccountingTypes, Credentials, IEntityDetails } from ".";
-import { MongoRepository } from "../lib";
-import { RecurrentExpenseTypes } from "./recurrent-expense-types";
+import { Credentials, CriticalError, IEntityDetails, ISimpleService } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountConfigurationTypes {
-  export interface IAccountConfigurationService {
-    findConfigurations(
-      request: Requests.FindConfigurationRequest
-    ): Promise<AccountConfiguration[] | undefined>;
-    getAccountConfiguration(
-      accountId: string
-    ): Promise<AccountConfiguration | undefined>;
-    update(
-      accountId: string,
-      request: Requests.UpdateConfigurationRequest
-    ): Promise<void>;
-  }
-
-  export interface IAccountConfigurationRepository
-    extends MongoRepository<
+  export interface IAccountConfigurationService
+    extends ISimpleService<
       AccountConfiguration,
-      Requests.UpdateConfigurationRequest
+      Requests.AddRequest,
+      Requests.UpdateRequest
     > {
-    update(
-      accountId: string,
-      request: Requests.UpdateConfigurationRequest
-    ): Promise<void>;
     findConfigurations(
-      request: Requests.FindConfigurationRequest
+      request: Requests.FindRequest
     ): Promise<AccountConfiguration[] | undefined>;
-  }
-
-  export interface AccountConfigurationForDisplay {
-    incomes?: Salary[];
-    budget?: Budget;
-    recurrentExpenses?: RecurrentExpenseTypes.RecurrentExpense[];
-    toggles?: {
-      enableAutoExpenseAdd?: boolean;
-    };
   }
 
   export interface AccountConfiguration extends IEntityDetails {
     accountId: string;
-    incomes?: Salary[];
-    creditAccounts?: CreditAccount[];
     budget?: Budget;
-    recurrentExpenses?: RecurrentExpenseTypes.RecurrentExpense[];
     toggles?: {
       enableAutoExpenseAdd?: boolean;
     };
-  }
-
-  export interface CreditAccount {
-    id?: string;
-    creditProvider: CreditProvider;
-    credentials: Credentials;
-  }
-
-  export interface Salary extends AccountingTypes.Income {
-    payDay: number;
-  }
-
-  export enum CreditProvider {
-    Max = "max",
   }
 
   export interface Budget {
@@ -72,28 +28,31 @@ export namespace AccountConfigurationTypes {
     };
   }
 
-  export namespace Requests {
-    export interface FindConfigurationRequest {
-      toggles?: {
-        enableAutoExpenseAdd?: boolean;
-      };
+  export class InvalidBudgetAmount extends CriticalError {
+    constructor(amount: number) {
+      super(
+        `Can't finish operation. budget amount of ${amount} is an invalid value.`
+      );
     }
-    export interface UpdateConfigurationNetworkRequest {
+  }
+
+  export namespace Requests {
+    export interface AddRequest {
       accountId: string;
-      incomes?: Salary[];
-      creditAccounts?: CreditAccount[];
       budget?: Budget;
-      recurrentExpenses?: RecurrentExpenseTypes.RecurrentExpense[];
       toggles?: {
         enableAutoExpenseAdd?: boolean;
       };
     }
 
-    export interface UpdateConfigurationRequest {
-      incomes?: Salary[];
-      creditAccounts?: CreditAccount[];
+    export interface UpdateRequest {
       budget?: Budget;
-      recurrentExpenses?: RecurrentExpenseTypes.RecurrentExpense[];
+      toggles?: {
+        enableAutoExpenseAdd?: boolean;
+      };
+    }
+
+    export interface FindRequest {
       toggles?: {
         enableAutoExpenseAdd?: boolean;
       };

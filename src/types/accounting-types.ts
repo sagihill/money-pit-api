@@ -1,4 +1,4 @@
-import { ChargeMonth, Currency, IEntityDetails } from ".";
+import { ChargeMonth, CriticalError, Currency, IEntityDetails } from ".";
 import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
@@ -90,8 +90,9 @@ export namespace AccountingTypes {
     chargeMonth: ChargeMonth;
   }
 
-  export interface Income {
+  export interface Income extends IEntityDetails {
     id?: string;
+    accountId: string;
     amount: number;
     timestamp?: Date;
     currency: Currency;
@@ -112,5 +113,20 @@ export namespace AccountingTypes {
     BeautyAndGrooming = "beauty_and_grooming",
     InternetSubscriptions = "internet_subscriptions",
     Transportation = "transportation",
+  }
+
+  export class InvalidExpenseCategory extends CriticalError {
+    constructor(private readonly category: ExpenseCategory) {
+      super(
+        `Can't finish operation. expense category ${category} is an invalid value.`
+      );
+    }
+  }
+  export class InvalidExpenseType extends CriticalError {
+    constructor(private readonly type: ExpenseType) {
+      super(
+        `Can't finish operation. expense type ${type} is an invalid value.`
+      );
+    }
   }
 }

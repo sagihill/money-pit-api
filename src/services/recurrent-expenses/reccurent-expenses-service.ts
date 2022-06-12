@@ -1,83 +1,122 @@
-import { ID } from "../../lib";
-import { RecurrentExpenseTypes, LoggerTypes } from "../../types";
+import { ID, Validate } from "../../lib";
+import { SimpleService } from "../../lib/service";
+import {
+  RecurrentExpenseTypes,
+  LoggerTypes,
+  MongoTypes,
+  AccountTypes,
+  RequiredParameterError,
+  AccountingTypes,
+} from "../../types";
 
 export class ReccurentExpensesService
+  extends SimpleService<
+    RecurrentExpenseTypes.RecurrentExpense,
+    RecurrentExpenseTypes.Requests.AddRequest,
+    RecurrentExpenseTypes.Requests.UpdateRequest
+  >
   implements RecurrentExpenseTypes.IReccurentExpensesService
 {
   constructor(
-    private readonly repository: RecurrentExpenseTypes.IReccurentExpensesRepository,
-    private readonly logger: LoggerTypes.ILogger
-  ) {}
-
-  async getRecurrentExpensesByAccount(
-    accountId: string
-  ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
-    try {
-      this.logger.info(
-        `running getRecurrentExpensesByAccount in ReccurentExpensesService for account_${accountId}`
-      );
-      const expenses = await this.repository.getRecurrentExpensesByAccount(
-        accountId
-      );
-      return expenses;
-    } catch (error) {
-      this.logger.info(
-        `error on getRecurrentExpensesByAccount in ReccurentExpensesService for account_${accountId}`
-      );
-      throw error;
-    }
-  }
-  async getRecurrentExpense(
-    id: string
-  ): Promise<RecurrentExpenseTypes.RecurrentExpense> {
-    const expense = await this.repository.getRecurrentExpense(id);
-    return expense;
-  }
-  async updateRecurrentExpense(
-    recurrentExpense: RecurrentExpenseTypes.RecurrentExpense
-  ): Promise<void> {
-    await this.updateRecurrentExpense(recurrentExpense);
-  }
-  async removeRecurrentExpense(id: string): Promise<void> {
-    await this.removeRecurrentExpense(id);
+    private readonly accountService: AccountTypes.IAccountService,
+    repository: MongoTypes.Repository<
+      RecurrentExpenseTypes.RecurrentExpense,
+      RecurrentExpenseTypes.Requests.UpdateRequest
+    >,
+    logger: LoggerTypes.ILogger
+  ) {
+    super(repository, logger);
   }
 
   async addRecurrentExpenses(
-    recurrentExpenses: RecurrentExpenseTypes.RecurrentExpense[]
-  ): Promise<string[]> {
-    const recurrentExpensesIds = [];
-    const recurrentExpensesToAdd = [];
-    const now = new Date();
-    for await (let recurrentExpense of recurrentExpenses) {
-      const id = ID.get();
-      recurrentExpense = {
-        ...recurrentExpense,
-        id,
-        deleted: false,
-        createdAt: now,
-        updatedAt: now,
-      };
-      recurrentExpensesToAdd.push(recurrentExpense);
-      recurrentExpensesIds.push(id);
-    }
-    await this.repository.addRecurrentExpenses(recurrentExpensesToAdd);
-    return recurrentExpensesIds;
-  }
-
-  async getRecurrentExpenses(
-    recurrence: RecurrentExpenseTypes.Recurrence
+    requests: RecurrentExpenseTypes.Requests.AddRequest[]
   ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
     try {
       this.logger.info(
-        `running getRecurrentExpenses in ReccurentExpensesService for ${recurrence} recurrence`
+        `Running addRecurrentExpenses on ${this.constructor.name}`
       );
-      const expenses = await this.repository.getRecurrentExpenses(recurrence);
-      return expenses;
+      const recurrentExpenses = [];
+      for await (const request of requests) {
+        await this.createValidation(request);
+        const recurrentExpense = await this.createEntityDetails(request);
+        recurrentExpenses.push(recurrentExpense);
+      }
+
+      return await this.repository.addMany(recurrentExpenses);
     } catch (error) {
-      this.logger.info(
-        `error on getRecurrentExpenses in ReccurentExpensesService for ${recurrence} recurrence`
+      this.logger.error(
+        `Error on addRecurrentExpenses function of ${this.constructor.name}`
       );
       throw error;
+    }
+  }
+
+  async findRecurrentExpenses(
+    request: RecurrentExpenseTypes.Requests.FindRequest
+  ): Promise<RecurrentExpenseTypes.RecurrentExpense[]> {
+    try {
+      this.logger.info(
+        `Running findRecurrentExpenses on ${this.constructor.name}`
+      );
+      const recurrentExpenses = await this.repository.find({
+        ...request,
+        deleted: false,
+      });
+      return recurrentExpenses;
+    } catch (error) {
+      this.logger.error(
+        `Error on findRecurrentExpenses function of ${this.constructor.name}`
+      );
+      throw error;
+    }
+  }
+
+  async createValidation(
+    request: RecurrentExpenseTypes.Requests.AddRequest
+  ): Promise<void> {
+    await this.isAccountExistValidation(request.accountId);
+    Validate.expenseCategory(request.category).required();
+    Validate.string("expense name", request.name).required();
+    Validate.expenseType(request.type).required();
+    Validate.string("expense description", request.description);
+    Validate.amount(request.amount).required();
+    Validate.currency(request.currency).required();
+    Validate.day(request.dueDay).required();
+    Validate.expenseRecurrence(request.recurrence).required();
+  }
+
+  async updateValidation(
+    id: string,
+    request: RecurrentExpenseTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    Validate.required(id, "recurrent expense id");
+    Validate.expenseCategory(request.category);
+    Validate.string("expense name", request.name);
+    Validate.expenseType(request.type);
+    Validate.string("expense description", request.description);
+    Validate.amount(request.amount);
+    Validate.currency(request.currency);
+    Validate.day(request.dueDay);
+    Validate.expenseRecurrence(request.recurrence);
+  }
+
+  async createEntityDetails(
+    request: RecurrentExpenseTypes.Requests.AddRequest
+  ): Promise<RecurrentExpenseTypes.RecurrentExpense> {
+    return {
+      id: ID.get(),
+      ...request,
+      ...(await this.getBaseEntityDetails()),
+    };
+  }
+
+  private async isAccountExistValidation(accountId: string): Promise<void> {
+    Validate.required(accountId, "accountId");
+
+    const account = await this.accountService.get(accountId);
+
+    if (!account) {
+      throw new AccountTypes.AccountNotFound(accountId);
     }
   }
 }

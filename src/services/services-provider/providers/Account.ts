@@ -9,11 +9,17 @@ export default async function Account(
   const logger = await SP.Logger();
   const userService = await SP.User();
   const accountConfiguration = await SP.AccountConfiguration();
+  const recurrentExpense = await SP.RecurrentExpense();
+  const salaryService = await SP.Salary();
+  const creditAccountService = await SP.CreditAccount();
   const accountRepo = getAccountRepository();
   const accountService = new AccountService(
     userService,
-    accountRepo,
     accountConfiguration,
+    recurrentExpense,
+    salaryService,
+    creditAccountService,
+    accountRepo,
     logger
   );
 

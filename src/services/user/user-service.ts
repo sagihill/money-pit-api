@@ -18,10 +18,10 @@ export class UserService implements UserTypes.IUserService {
     }
   }
 
-  async edit(id: string, request: UserTypes.EditUserRequest): Promise<void> {
+  async update(id: string, request: UserTypes.EditUserRequest): Promise<void> {
     try {
       this.logger.info(`Editing user : ${{ id, request }}`);
-      await this.userRepository.edit(id, request);
+      await this.userRepository.update(id, request);
     } catch (error) {
       this.logger.error(`Can't edit user: ${{ id, request, error }}`);
       throw error;

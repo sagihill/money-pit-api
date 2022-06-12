@@ -5,7 +5,7 @@ import { Objects } from "./common";
 /**
  * A generic base class for Mongo-backed repositories.
  */
-export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
+export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
   constructor(protected readonly model: Model<T>) {
     ///
   }
@@ -16,12 +16,19 @@ export class MongoRepository<T, E> implements MongoTypes.Repository<T, E> {
     return this.deserialize(doc.toObject());
   }
 
-  async addMany(data: T[]): Promise<void> {
+  async addMany(data: T[]): Promise<T[]> {
     const modelInstance = new this.model(data);
-    await modelInstance.collection.insertMany(data);
+    const result = await modelInstance.collection.insertMany(data);
+    const docs: T[] = [];
+    if (result.insertedCount) {
+      for await (const doc of data) {
+        docs.push(this.deserialize(doc));
+      }
+    }
+    return docs;
   }
 
-  async edit(id: string, editRequest: E): Promise<void> {
+  async update(id: string, editRequest: U): Promise<void> {
     await this.model.findOneAndUpdate(
       { id },
       { ...editRequest, updatedAt: new Date() }

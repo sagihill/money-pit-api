@@ -11,14 +11,11 @@ export default async function AccountConfiguration(
   SP: ServicesProvider
 ): Promise<AccountConfigurationTypes.IAccountConfigurationService> {
   const logger = await SP.Logger();
-  const recurrentExpenseService = await SP.RecurrentExpense();
-  const config = await SP.Config();
-  const repo = getAccountConfigurationRepository(logger);
-  const crypter = new Cryptr(await config.get("CREDIT_ACCOUNTS_SECRET"));
+  const account = await SP.Account();
+  const repo = getAccountConfigurationRepository();
   const accountConfigurationService = new AccountConfigurationService(
+    account,
     repo,
-    recurrentExpenseService,
-    crypter,
     logger
   );
 

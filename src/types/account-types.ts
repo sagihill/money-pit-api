@@ -1,37 +1,23 @@
-import { type } from "os";
-import { IEntityDetails, AccountConfigurationTypes } from ".";
+import {
+  IEntityDetails,
+  AccountConfigurationTypes,
+  CriticalError,
+  SalaryTypes,
+  CreditAccountTypes,
+  ISimpleService,
+  RecurrentExpenseTypes,
+} from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountTypes {
-  export interface IAccountService {
-    add(request: Requests.AddAccountRequest): Promise<AccountDetails>;
-    get(id: string): Promise<AccountDetails | undefined>;
-    remove(id: string): Promise<void>;
-    getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
-
-    editConfiguration(
-      id: string,
-      request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
-    ): Promise<void>;
-    displayConfiguration(
-      id: string
-    ): Promise<AccountConfigurationTypes.AccountConfiguration>;
-    findConfigurations(
-      request: AccountConfigurationTypes.Requests.FindConfigurationRequest
-    ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined>;
-    getCreditAccounts(
-      accountId: string
-    ): Promise<AccountConfigurationTypes.CreditAccount[]>;
-  }
-
-  export interface IAccountRepository {
-    add(accountDetails: AccountDetails): Promise<AccountDetails>;
-    edit(id: string, request: Requests.EditAccountRequest): Promise<void>;
-    get(id: string): Promise<AccountDetails | undefined>;
-    remove(id: string): Promise<void>;
+  export interface IAccountService
+    extends ISimpleService<
+      AccountDetails,
+      Requests.AddRequest,
+      Requests.UpdateRequest
+    > {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
   }
-
   export interface AccountDetails extends IEntityDetails {
     id: string;
     type: AccountType;
@@ -44,20 +30,32 @@ export namespace AccountTypes {
     Single = "single",
   }
 
+  export class AccountNotFound extends CriticalError {
+    constructor(private readonly accountId: string) {
+      super(`Can't finish operation, account_${accountId} is not found.`);
+    }
+  }
+
   export namespace Requests {
-    export interface EditAccountRequest {
+    export interface UpdateRequest {
       type?: AccountType;
     }
 
-    export type AddAccountRequest = {
+    export type AddRequest = {
       type: AccountType;
       adminUserId: string;
-      configuration: AccountConfigurationTypes.Requests.UpdateConfigurationRequest;
+      configuration?: AccountConfigurationTypes.Requests.AddRequest;
+      salaries?: SalaryTypes.Requests.AddRequest[];
+      creditAccounts?: CreditAccountTypes.Requests.AddRequest[];
+      recurrentExpenses?: RecurrentExpenseTypes.Requests.AddRequest[];
     };
+  }
 
-    export type AddAccountNetworkRequest = {
-      type: AccountType;
-      configuration: AccountConfigurationTypes.Requests.UpdateConfigurationNetworkRequest;
-    };
+  export class InvalidAccountType extends CriticalError {
+    constructor(protected readonly type: AccountType) {
+      super(
+        `Can't finish operation. account type ${type} is an invalid value.`
+      );
+    }
   }
 }

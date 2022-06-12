@@ -1,125 +1,114 @@
-import moment from "moment";
-import { ID } from "../../lib";
+import { ID, Validate } from "../../lib";
+import { SimpleService } from "../../lib/service";
 import {
-  LoggerTypes,
   AccountTypes,
   AccountConfigurationTypes,
-  RecurrentExpenseTypes,
+  LoggerTypes,
+  MongoTypes,
+  AccountingTypes,
+  RequiredParameterError,
 } from "../../types";
-const Cryptr = require("cryptr");
 
 export class AccountConfigurationService
+  extends SimpleService<
+    AccountConfigurationTypes.AccountConfiguration,
+    AccountConfigurationTypes.Requests.AddRequest,
+    AccountConfigurationTypes.Requests.UpdateRequest
+  >
   implements AccountConfigurationTypes.IAccountConfigurationService
 {
   constructor(
-    private readonly repository: AccountConfigurationTypes.IAccountConfigurationRepository,
-    private readonly recurrentExpense: RecurrentExpenseTypes.IReccurentExpensesService,
-    private readonly cryptr: typeof Cryptr,
-    private readonly logger: LoggerTypes.ILogger
-  ) {}
-
-  async getAccountConfiguration(
-    accountId: string
-  ): Promise<AccountConfigurationTypes.AccountConfiguration | undefined> {
-    const recurrentExpenses =
-      await this.recurrentExpense.getRecurrentExpensesByAccount(accountId);
-    const config = (await this.repository.find({ accountId }))[0];
-    const { creditAccounts } = config;
-
-    if (creditAccounts) {
-      this.decryptCreditAccounts(creditAccounts);
-    }
-
-    return {
-      ...config,
-      recurrentExpenses,
-      creditAccounts,
-    };
-  }
-
-  async update(
-    accountId: string,
-    request: AccountConfigurationTypes.Requests.UpdateConfigurationRequest
-  ): Promise<void> {
-    const { recurrentExpenses, creditAccounts, budget, incomes } = request;
-
-    if (recurrentExpenses?.length) {
-      const toAdd = [];
-      for await (const recurrentExpense of recurrentExpenses) {
-        
-        if (!recurrentExpense.id) {
-          toAdd.push(recurrentExpense);
-        } else {
-          await this.recurrentExpense.updateRecurrentExpense(recurrentExpense);
-        }
-      }
-
-      if (toAdd.length) {
-        await this.recurrentExpense.addRecurrentExpenses(toAdd);
-      }
-    }
-
-    let totalIncome = 0;
-
-    if (incomes?.length) {
-      incomes.forEach((income) => {
-        totalIncome = totalIncome + income.amount;
-        if (!income.id) {
-          income.id = ID.get();
-        }
-      });
-    }
-
-    if (creditAccounts?.length) {
-      creditAccounts.forEach((account) => {
-        this.encryptCreditAccounts(account);
-        if (!account.id) {
-          account.id = ID.get();
-        }
-      });
-    }
-
-    await this.repository.update(accountId, {
-      creditAccounts,
-      budget: {
-        ...request.budget,
-        totalBudget: request.budget?.totalBudget ?? totalIncome,
-      },
-      incomes,
-    });
+    private readonly accountService: AccountTypes.IAccountService,
+    repository: MongoTypes.Repository<
+      AccountConfigurationTypes.AccountConfiguration,
+      AccountConfigurationTypes.Requests.UpdateRequest
+    >,
+    logger: LoggerTypes.ILogger
+  ) {
+    super(repository, logger);
   }
 
   async findConfigurations(
-    request: AccountConfigurationTypes.Requests.FindConfigurationRequest
+    request: AccountConfigurationTypes.Requests.FindRequest
   ): Promise<AccountConfigurationTypes.AccountConfiguration[] | undefined> {
     try {
-      this.logger.info(`Finding configurations : ${{ request }}`);
-      return await this.repository.findConfigurations(request);
+      this.logger.info(
+        `Running findConfigurations on ${this.constructor.name}`
+      );
+      const configs = await this.repository.find({
+        ...request,
+        deleted: false,
+      });
+      return configs;
     } catch (error) {
-      this.logger.error(`Can't Finding configurations: ${{ request, error }}`);
+      this.logger.error(
+        `Error on findConfigurations function of ${this.constructor.name}`
+      );
       throw error;
     }
   }
 
-  private encryptCreditAccounts(
-    creditAccount: AccountConfigurationTypes.CreditAccount
-  ): void {
-    const password = this.cryptr.encrypt(creditAccount.credentials.password, 8);
-    creditAccount.credentials.password = password;
-
-    const username = this.cryptr.encrypt(creditAccount.credentials.username, 8);
-    creditAccount.credentials.username = username;
+  async createEntityDetails(
+    request: AccountConfigurationTypes.Requests.AddRequest
+  ): Promise<AccountConfigurationTypes.AccountConfiguration> {
+    const creditAccount = {
+      ...request,
+      ...(await this.getBaseEntityDetails()),
+      id: ID.get(),
+    };
+    return creditAccount;
   }
 
-  private decryptCreditAccounts(
-    creditAccounts: AccountConfigurationTypes.CreditAccount[]
-  ): void {
-    creditAccounts.forEach((account) => {
-      const password = this.cryptr.decrypt(account.credentials.password, 8);
-      account.credentials.password = password;
+  async createValidation(
+    request: AccountConfigurationTypes.Requests.AddRequest
+  ): Promise<void> {
+    await this.isAccountExistValidation(request.accountId);
+    if (request.budget) {
+      this.validateBudget(request.budget);
+    }
+  }
 
-      const username = this.cryptr.decrypt(account.credentials.username, 8);
-      account.credentials.username = username;
-    });
+  async updateValidation(
+    id: string,
+    request: AccountConfigurationTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    if (request.budget) {
+      this.validateBudget(request.budget);
+    }
+  }
+
+  private async isAccountExistValidation(accountId: string): Promise<void> {
+    if (!accountId) {
+      throw new RequiredParameterError("accountId");
+    }
+    const account = await this.accountService.get(accountId);
+
+    if (!account) {
+      throw new AccountTypes.AccountNotFound(accountId);
+    }
+  }
+
+  private validateBudget(budget: AccountConfigurationTypes.Budget): void {
+    if (budget.totalBudget) {
+      if (!Validate.isValidAmount(budget.totalBudget)) {
+        throw new AccountConfigurationTypes.InvalidBudgetAmount(
+          budget.totalBudget
+        );
+      }
+    }
+
+    if (budget.categoriesBudget) {
+      for (const category in budget.categoriesBudget) {
+        if (
+          !Object.values(AccountingTypes.ExpenseCategory).includes(
+            category as AccountingTypes.ExpenseCategory
+          )
+        ) {
+          throw new AccountingTypes.InvalidExpenseCategory(
+            category as AccountingTypes.ExpenseCategory
+          );
+        }
+      }
+    }
   }
 }

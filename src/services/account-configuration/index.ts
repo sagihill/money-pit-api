@@ -1,2 +1,2 @@
 export * from "./account-configuration-service";
-export * from "./accounting-configuration-repository";
+export * from "./account-configuration-repository";

@@ -4,7 +4,7 @@ import { IEntityDetails, MongoTypes } from ".";
 export namespace UserTypes {
   export interface IUserService {
     add(request: AddUserRequest): Promise<UserDetails>;
-    edit(id: string, request: EditUserRequest): Promise<void>;
+    update(id: string, request: EditUserRequest): Promise<void>;
     get(id: string): Promise<UserDetails | undefined>;
     remove(id: string): Promise<void>;
     find(query: any): Promise<UserDetails[]>;
@@ -14,7 +14,7 @@ export namespace UserTypes {
   export interface IUserRepository
     extends MongoTypes.Repository<UserDetails, EditUserRequest> {
     add(userDetails: UserDetails): Promise<UserDetails>;
-    edit(id: string, request: EditUserRequest): Promise<void>;
+    update(id: string, request: EditUserRequest): Promise<void>;
     get(id: string): Promise<UserDetails | undefined>;
     remove(id: string): Promise<void>;
   }
@@ -26,12 +26,12 @@ export namespace UserTypes {
     lastName: string;
     email: string;
     password: string;
-    role: UserRole
+    role: UserRole;
   }
 
   export enum UserRole {
     Regular = "regular",
-    Admin = "admin"
+    Admin = "admin",
   }
 
   export interface EditUserRequest {

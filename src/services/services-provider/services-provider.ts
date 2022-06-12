@@ -11,6 +11,8 @@ import {
   RecurrentExpenseTypes,
   AccountConfigurationTypes,
   CriticalError,
+  CreditAccountTypes,
+  SalaryTypes,
 } from "../../types";
 
 import { TaskTypes } from "../../types/task-types";
@@ -136,6 +138,31 @@ export class ServicesProvider {
     try {
       return await this.getProvider<TaskTypes.ITaskService, {}>(
         "Task",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
+  async CreditAccount(): Promise<CreditAccountTypes.ICreditAccountService> {
+    try {
+      return await this.getProvider<
+        CreditAccountTypes.ICreditAccountService,
+        {}
+      >("CreditAccount", {}, CreationMode.singleton);
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
+  async Salary(): Promise<SalaryTypes.ISalaryService> {
+    try {
+      return await this.getProvider<SalaryTypes.ISalaryService, {}>(
+        "Salary",
         {},
         CreationMode.singleton
       );
