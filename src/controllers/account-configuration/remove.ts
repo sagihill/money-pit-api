@@ -4,28 +4,29 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
 
-export const removeAccountRequestParamsValidator = Joi.object().keys({
-  id: Joi.string().uuid().required(),
-});
+export const removeAccountConfigurationRequestParamsValidator =
+  Joi.object().keys({
+    accountId: Joi.string().uuid().required(),
+  });
 
 const remove: RequestHandler = async (req: Request, res) => {
   try {
     const SP = ServicesProvider.get();
-    const account = await SP.Account();
-    const { id } = req.params;
+    const accountConfiguration = await SP.AccountConfiguration();
+    const { accountId } = req.params;
 
-    await account.remove(id);
+    await accountConfiguration.remove(accountId);
 
     const response: ApiResponse = {
       status: ResponseStatus.success,
-      message: `Account ${id} deleted successfully.`,
+      message: `Account configuration for account ${accountId} deleted successfully.`,
     };
 
     res.send(response);
   } catch (error) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
-      message: `removing account ${req.params.id} had an error.`,
+      message: `removing account configuration for account ${req.params.accountId} had an error.`,
       error,
     };
 
@@ -35,6 +36,6 @@ const remove: RequestHandler = async (req: Request, res) => {
 
 export default requestMiddleware(remove, {
   validation: {
-    params: removeAccountRequestParamsValidator,
+    params: removeAccountConfigurationRequestParamsValidator,
   },
 });

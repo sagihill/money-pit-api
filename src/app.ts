@@ -3,7 +3,7 @@ import compression from "compression";
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import ApplicationError from "./errors/application-error";
-import rootRouter from "./routes/v1/rootRouter";
+import rootRouter from "./routes/v1/root-router";
 import adminRouter from "./routes/admin/adminRouter";
 import { logResponseTime } from "./middleware/logResponseTime";
 import sanitize from "./middleware/santize";

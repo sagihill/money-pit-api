@@ -11,7 +11,7 @@ const remove: RequestHandler = async (req: Request, res) => {
   await userService.remove(id);
 
   res.send({
-    message: "Deleted",
+    message: "deleted",
   });
 };
 

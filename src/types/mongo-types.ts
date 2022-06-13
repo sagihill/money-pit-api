@@ -6,7 +6,7 @@ export namespace MongoTypes {
 
   export interface Repository<T, U> {
     find(qry: any, sortObj?: any, limit?: number): Promise<T[]>;
-    deleteMany(qry: any): Promise<void>;
+    removeMany(qry: any): Promise<void>;
     add(data: T): Promise<T>;
     addMany(data: T[]): Promise<T[]>;
     update(id: string, editRequest: U): Promise<void>;

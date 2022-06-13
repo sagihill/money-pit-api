@@ -7,7 +7,7 @@ export namespace FS {
     }
   }
 
-  export function removeDirOrFile(path: fs.PathLike): void {
+  export function deletedirOrFile(path: fs.PathLike): void {
     if (fs.existsSync(path)) {
       fs.rmSync(path, { recursive: true });
     } else {

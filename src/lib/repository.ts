@@ -70,7 +70,7 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
     }
   }
 
-  async deleteMany(qry: any): Promise<void> {
+  async removeMany(qry: any): Promise<void> {
     await this.model.updateMany(qry, {
       $set: { deleted: true, updatedAt: new Date() },
     });

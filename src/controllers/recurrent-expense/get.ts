@@ -4,29 +4,29 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
 
-export const getAccountRequestParamsValidator = Joi.object().keys({
+export const getRecurrentExpenseRequestParamsValidator = Joi.object().keys({
   id: Joi.string().uuid().required(),
 });
 
 const get: RequestHandler = async (req: Request, res) => {
   try {
     const SP = ServicesProvider.get();
-    const accountService = await SP.Account();
+    const recurrentExpenseService = await SP.RecurrentExpense();
     const { id } = req.params;
 
-    const account = await accountService.get(id);
-    if (!account) {
+    const recurrentExpense = await recurrentExpenseService.get(id);
+    if (!recurrentExpense) {
       const response: ApiResponse = {
         status: ResponseStatus.failure,
-        message: `Account ${id} not found.`,
+        message: `Recurrent expense ${id} not found.`,
       };
 
       res.send(response);
     } else {
       const response: ApiResponse = {
         status: ResponseStatus.success,
-        message: `Found account.`,
-        data: { account },
+        message: `Found recurrent expense.`,
+        data: { recurrentExpense },
       };
 
       res.send(response);
@@ -34,7 +34,7 @@ const get: RequestHandler = async (req: Request, res) => {
   } catch (error) {
     const response: ApiResponse = {
       status: ResponseStatus.failure,
-      message: `finding account ${req.body.id} had an error.`,
+      message: `finding recurrent expense ${req.body.id} had an error.`,
       error,
     };
 
@@ -44,6 +44,6 @@ const get: RequestHandler = async (req: Request, res) => {
 
 export default requestMiddleware(get, {
   validation: {
-    params: getAccountRequestParamsValidator,
+    params: getRecurrentExpenseRequestParamsValidator,
   },
 });

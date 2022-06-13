@@ -4,28 +4,28 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
 
-export const removeAccountRequestParamsValidator = Joi.object().keys({
+export const removeSalaryRequestParamsValidator = Joi.object().keys({
   id: Joi.string().uuid().required(),
 });
 
 const remove: RequestHandler = async (req: Request, res) => {
   try {
     const SP = ServicesProvider.get();
-    const account = await SP.Account();
+    const salaryService = await SP.Salary();
     const { id } = req.params;
 
-    await account.remove(id);
+    await salaryService.remove(id);
 
     const response: ApiResponse = {
       status: ResponseStatus.success,
-      message: `Account ${id} deleted successfully.`,
+      message: `Salary ${id} deleted successfully.`,
     };
 
     res.send(response);
   } catch (error) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
-      message: `removing account ${req.params.id} had an error.`,
+      message: `removing salary ${req.body.id} had an error.`,
       error,
     };
 
@@ -35,6 +35,6 @@ const remove: RequestHandler = async (req: Request, res) => {
 
 export default requestMiddleware(remove, {
   validation: {
-    params: removeAccountRequestParamsValidator,
+    params: removeSalaryRequestParamsValidator,
   },
 });

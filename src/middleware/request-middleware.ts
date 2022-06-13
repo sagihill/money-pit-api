@@ -22,6 +22,7 @@ const getMessageFromJoiError = (
 interface HandlerOptions {
   validation?: {
     body?: Joi.ObjectSchema;
+    params?: Joi.ObjectSchema;
   };
 }
 
@@ -36,6 +37,14 @@ export const requestMiddleware =
   async (req: Request, res: Response, next: NextFunction) => {
     if (options?.validation?.body) {
       const { error } = options?.validation?.body.validate(req.body);
+      if (error != null) {
+        next(new BadRequest(getMessageFromJoiError(error)));
+        return;
+      }
+    }
+
+    if (options?.validation?.params) {
+      const { error } = options?.validation?.params.validate(req.params);
       if (error != null) {
         next(new BadRequest(getMessageFromJoiError(error)));
         return;

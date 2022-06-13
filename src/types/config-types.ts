@@ -6,7 +6,7 @@ export namespace ConfigTypes {
     edit(request: EditConfigRequest): Promise<void>;
     addMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
     editMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
-    removeMapEntry(request: RemoveMapEntryRequest): Promise<void>;
+    removeMapEntry(request: removeMapEntryRequest): Promise<void>;
     refresh(): Promise<void>;
 
     get(key: string): Promise<string>;
@@ -21,7 +21,7 @@ export namespace ConfigTypes {
     edit(request: EditConfigRequest): Promise<void>;
     addMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
     editMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
-    removeMapEntry(request: RemoveMapEntryRequest): Promise<void>;
+    removeMapEntry(request: removeMapEntryRequest): Promise<void>;
     refresh(): Promise<void>;
 
     get(key: string): Promise<string | undefined>;
@@ -61,10 +61,8 @@ export namespace ConfigTypes {
     mapName: string;
     mapEntry: { key: string; value: string };
   };
-  export type RemoveMapEntryRequest = {
+  export type removeMapEntryRequest = {
     mapName: string;
     mapEntry: { key: string };
   };
-
-
 }

@@ -131,7 +131,7 @@
         "operationId": "user-remove",
         "responses": {
           "204": {
-            "description": "User removed"
+            "description": "User deleted"
           },
           "404": {
             "description": "User not found",
@@ -162,7 +162,7 @@
         "operationId": "user-remove",
         "responses": {
           "204": {
-            "description": "User removed"
+            "description": "User deleted"
           },
           "404": {
             "description": "User not found",

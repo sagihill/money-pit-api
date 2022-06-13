@@ -74,6 +74,10 @@ export interface ISimpleService<T, A, E> {
   get(id: string): Promise<T | undefined>;
 }
 
+export interface IContext {
+  currentUserId?: string;
+}
+
 export class InvalidCurrency extends CriticalError {
   constructor(protected readonly currency: Currency) {
     super(`Can't finish operation. currency ${currency} is an invalid value.`);

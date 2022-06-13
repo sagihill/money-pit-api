@@ -26,9 +26,9 @@ export class AuthRepository implements AuthTypes.IAuthRepository {
    * @param src A record object coming from the DB.
    */
   deserialize(src: any): AuthTypes.Auth {
-    delete src.deleted;
-    delete src._id;
-    delete src.__v;
+    remove src.deleted;
+    remove src._id;
+    remove src.__v;
     return { ...src } as AuthTypes.Auth;
   }
 }

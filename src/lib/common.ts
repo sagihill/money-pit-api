@@ -182,7 +182,7 @@ export namespace Objects {
           }
 
           if (res[pn] == undefined) {
-            delete res[pn];
+            remove res[pn];
           }
         }
       }

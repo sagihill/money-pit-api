@@ -4,7 +4,7 @@ import { AccountingController } from "../../controllers";
 
 const router = Router();
 
-// Account routes
+// Accounting routes
 router.post("/add", AccountingController.add);
 router.get("/summery", AccountingController.summery);
 

@@ -117,7 +117,7 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
   }
 
   async removeMapEntry(
-    request: ConfigTypes.RemoveMapEntryRequest
+    request: ConfigTypes.removeMapEntryRequest
   ): Promise<void> {
     const value = (await this.getObject(request.mapName)) as any;
     const exists = !!value;
@@ -129,7 +129,7 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
       throw new Error("Map entry doesn't exists, can't remove it.");
     }
 
-    delete value[request.mapEntry.key];
+    remove value[request.mapEntry.key];
 
     const now = new Date();
 

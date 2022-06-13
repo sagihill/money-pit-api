@@ -19,7 +19,7 @@ const edit: RequestHandler = async (
   const userService = await SP.User();
 
   const { firstName, lastName, email, accountId } = req.body;
-  await userService.edit(req.params.id, {
+  await userService.update(req.params.id, {
     firstName,
     lastName,
     email,

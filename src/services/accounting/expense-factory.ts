@@ -2,7 +2,7 @@ import { ID } from "../../lib/common";
 import { AccountingTypes } from "../../types";
 
 export function createNewExpense(
-  request: AccountingTypes.AddExpenseRequest,
+  request: AccountingTypes.AddExpenseRequest
 ): AccountingTypes.Expense {
   const now = new Date();
   const expense: AccountingTypes.Expense = {

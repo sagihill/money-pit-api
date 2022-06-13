@@ -49,7 +49,7 @@ export class ConfigService implements ConfigTypes.IConfigService {
     }
   }
   async removeMapEntry(
-    request: ConfigTypes.RemoveMapEntryRequest
+    request: ConfigTypes.removeMapEntryRequest
   ): Promise<void> {
     try {
       this.logger.info(`remove map entry`);

@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { ParamsDictionary } from "..";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import {
@@ -9,65 +10,38 @@ import {
   ResponseStatus,
 } from "../../types";
 
-export const configurationKeysValidation = {
-  incomes: Joi.array().items({
-    id: Joi.string().uuid(),
-    amount: Joi.number(),
-    currency: Joi.allow(...Object.values(Currency)),
-    payDay: Joi.number(),
-  }),
-  creditAccounts: Joi.array().items({
-    id: Joi.string().uuid(),
-    creditProvider: Joi.allow(
-      ...Object.values(AccountConfigurationTypes.CreditProvider)
-    ),
-    credentials: { username: Joi.string(), password: Joi.string() },
-  }),
+export const accountConfigurationRequestBody = {
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
-  recurrentExpenses: Joi.array().items({
-    id: Joi.string().uuid(),
-    accountId: Joi.string().required().uuid(),
-    name: Joi.string().required(),
-    category: Joi.string().required(),
-    amount: Joi.number().required(),
-    currency: Joi.string().required(),
-    dueDay: Joi.number().required(),
-    description: Joi.string(),
-    recurrence: Joi.string().required(),
-    type: Joi.string().required(),
-  }),
+  toggles: {
+    enableAutoExpenseAdd: Joi.boolean(),
+  },
 };
 
-export const updateAccountConfigurationRequestValidator = Joi.object().keys({
-  accountId: Joi.string().required().uuid(),
-  ...configurationKeysValidation,
-});
+export const updateAccountConfigurationRequestBodyValidator = Joi.object().keys(
+  accountConfigurationRequestBody
+);
+
+export const updateAccountConfigurationRequestParamsValidator =
+  Joi.object().keys({
+    accountId: Joi.string().uuid().required(),
+  });
 
 const update: RequestHandler = async (
   req: Request<
+    ParamsDictionary,
     {},
-    {},
-    AccountConfigurationTypes.Requests.UpdateConfigurationNetworkRequest
+    AccountConfigurationTypes.Requests.UpdateRequest
   >,
   res
 ) => {
-  const {
-    creditAccounts,
-    recurrentExpenses,
-    budget,
-    incomes,
-    accountId,
-    toggles,
-  } = req.body;
+  const { budget, toggles } = req.body;
+  const { accountId } = req.params;
   try {
     const SP = ServicesProvider.get();
-    const account = await SP.Account();
+    const accountConfiguration = await SP.AccountConfiguration();
 
-    await account.editConfiguration(accountId, {
-      creditAccounts,
-      recurrentExpenses,
+    await accountConfiguration.update(accountId, {
       budget,
-      incomes,
       toggles,
     });
 
@@ -88,5 +62,8 @@ const update: RequestHandler = async (
 };
 
 export default requestMiddleware(update, {
-  validation: { body: updateAccountConfigurationRequestValidator },
+  validation: {
+    body: updateAccountConfigurationRequestBodyValidator,
+    params: updateAccountConfigurationRequestParamsValidator,
+  },
 });
