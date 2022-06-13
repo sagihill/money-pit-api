@@ -1,10 +1,9 @@
 import { Model, Schema, model } from "mongoose";
-import { AccountConfigurationTypes } from "../types";
+import { CreditAccountTypes } from "../types";
 
-interface ICreditAccountModel
-  extends Model<AccountConfigurationTypes.CreditAccount> {}
+interface ICreditAccountModel extends Model<CreditAccountTypes.CreditAccount> {}
 
-const schema = new Schema<AccountConfigurationTypes.CreditAccount>({
+const schema = new Schema<CreditAccountTypes.CreditAccount>({
   id: { type: String, index: true, required: true },
   accountId: { type: String, index: true, required: true },
   creditProvider: { type: String, index: true, required: true },
@@ -15,7 +14,7 @@ const schema = new Schema<AccountConfigurationTypes.CreditAccount>({
 });
 
 const CreditAccount: ICreditAccountModel = model<
-  AccountConfigurationTypes.CreditAccount,
+  CreditAccountTypes.CreditAccount,
   ICreditAccountModel
 >("AccountConfiguration", schema);
 

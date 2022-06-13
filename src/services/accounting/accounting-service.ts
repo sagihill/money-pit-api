@@ -6,6 +6,7 @@ import {
   ChargeMonth,
   AccountConfigurationTypes,
   CriticalError,
+  SalaryTypes,
 } from "../../types";
 import { createNewExpense } from "./expense-factory";
 
@@ -13,6 +14,8 @@ export class AccountingService implements AccountingTypes.IAccountingService {
   constructor(
     private readonly accountService: AccountTypes.IAccountService,
     private readonly accountingRepository: AccountingTypes.IAccountingRepository,
+    private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
+    private readonly salaryService: SalaryTypes.ISalaryService,
     private readonly config: AccountingTypes.AccountingServiceConfiguration,
     private readonly logger: LoggerTypes.ILogger
   ) {}
@@ -22,20 +25,20 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     request: AccountingTypes.EditExpenseRequest
   ): Promise<void> {
     try {
-      this.logger.info(`Editing expense`);
-      await this.accountingRepository.edit(id, request);
+      this.logger.info("Editing expense");
+      await this.accountingRepository.update(id, request);
     } catch (error) {
-      this.logger.error(`Can't edit expense`);
+      this.logger.error("Can't edit expense");
       throw error;
     }
   }
 
   async addExpenses(expenses: AccountingTypes.Expense[]): Promise<void> {
     try {
-      this.logger.info(`Adding expenses`);
+      this.logger.info("Adding expenses");
       await this.accountingRepository.addExpenses(expenses);
     } catch (error) {
-      this.logger.error(`Can't add expenses`);
+      this.logger.error("Can't add expenses");
       throw error;
     }
   }
@@ -64,7 +67,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
         );
       }
 
-      const config = await this.accountService.displayConfiguration(accountId);
+      const config = await this.accountConfigurationService.get(accountId);
 
       if (!config) {
         throw new CriticalError(
@@ -102,7 +105,9 @@ export class AccountingService implements AccountingTypes.IAccountingService {
         throw new Error("No expenses for this charge month");
       }
 
-      const incomeAmount = (config.incomes || []).reduce(
+      const incomes = await this.salaryService.findSalaries({ accountId });
+
+      const incomeAmount = (incomes || []).reduce(
         (acc, income) => acc + income.amount,
         0
       );
@@ -174,7 +179,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
 
   private getCategoriesSummery(
     expenses: AccountingTypes.Expense[],
-    accountConfig: AccountConfigurationTypes.AccountConfigurationForDisplay
+    accountConfig: AccountConfigurationTypes.AccountConfiguration
   ): AccountingTypes.CategoriesSummery {
     const summery: AccountingTypes.CategoriesSummery = {};
     expenses.forEach((expense) => {

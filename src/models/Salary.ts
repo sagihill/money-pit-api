@@ -1,9 +1,9 @@
 import { Model, Schema, model } from "mongoose";
-import { AccountConfigurationTypes } from "../types";
+import { SalaryTypes } from "../types";
 
-interface ISalaryModel extends Model<AccountConfigurationTypes.Salary> {}
+interface ISalaryModel extends Model<SalaryTypes.Salary> {}
 
-const schema = new Schema<AccountConfigurationTypes.Salary>({
+const schema = new Schema<SalaryTypes.Salary>({
   id: { type: String, index: true, required: true },
   accountId: { type: String, index: true, required: true },
   amount: { type: Number, index: true, required: true },
@@ -11,9 +11,9 @@ const schema = new Schema<AccountConfigurationTypes.Salary>({
   payDay: { type: Number, index: true, required: true },
 });
 
-const Salary: ISalaryModel = model<
-  AccountConfigurationTypes.Salary,
-  ISalaryModel
->("AccountConfiguration", schema);
+const Salary: ISalaryModel = model<SalaryTypes.Salary, ISalaryModel>(
+  "AccountConfiguration",
+  schema
+);
 
 export default Salary;

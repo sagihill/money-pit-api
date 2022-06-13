@@ -1,6 +1,8 @@
 import { ID, Sync } from "../../../lib/common";
 import {
+  AccountConfigurationTypes,
   AccountTypes,
+  CreditAccountTypes,
   ExpenseProcessorTypes,
   ExpenseSheetsDownloaderTypes,
   LoggerTypes,
@@ -11,6 +13,8 @@ import { BaseTask } from "./base-task";
 export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
   constructor(
     private readonly accountService: AccountTypes.IAccountService,
+    private readonly creditAccountService: CreditAccountTypes.ICreditAccountService,
+    private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly expenseSheetsDownloader: ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader,
     private readonly expenseProcessor: ExpenseProcessorTypes.IExpenseProcessor,
     options: TaskTypes.AddNewExpenseTaskOptions,
@@ -18,19 +22,25 @@ export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
   ) {
     super(ID.get(), options, logger);
   }
+
   async run(): Promise<void> {
     try {
       const options = this.getOptions<TaskTypes.AddNewExpenseTaskOptions>();
-      const configs = await this.accountService.findConfigurations({
-        toggles: { enableAutoExpenseAdd: true },
-      });
-      
+      const configs = await this.accountConfigurationService.findConfigurations(
+        {
+          toggles: { enableAutoExpenseAdd: true },
+        }
+      );
+
       if (!configs) {
         return;
       }
 
       for await (const config of configs) {
-        const creditAccount = config?.creditAccounts ?? [];
+        const creditAccount =
+          await this.creditAccountService.findCreditAccounts({
+            accountId: config.accountId,
+          });
         for await (const account of creditAccount) {
           const creditProviderWebsiteUrl =
             options.creditProvidersUrlMap[account.creditProvider];

@@ -1,10 +1,8 @@
 {
-  "name": "express-typescript-boilerplate",
+  "name": "money-pit-api",
   "version": "1.0.0",
-  "description": "A minimalist TypeScript-Express boilerplate",
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sidhantpanda/express-typescript-boilerplate.git"
+    "type": "git"
   },
   "keywords": [
     "TypeScript",
@@ -18,7 +16,6 @@
   "scripts": {
     "eslint": "eslint src/server.ts",
     "postinstall": "chmod +x ./scripts/dev.sh",
-    "setup-actions": "chmod +x ./scripts/setup-github-actions.sh; ./scripts/setup-github-actions.sh",
     "build": "tsc",
     "lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts",
     "dev": "./scripts/dev.sh",
@@ -75,9 +72,5 @@
     "ts-node": "10.7.0",
     "typescript": "4.6.3"
   },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/sidhantpanda/docker-express-typescript-boilerplate/issues"
-  },
-  "homepage": "https://github.com/sidhantpanda/docker-express-typescript-boilerplate#readme"
+  "license": "MIT"
 }

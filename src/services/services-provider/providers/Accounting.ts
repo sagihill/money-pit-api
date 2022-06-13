@@ -8,6 +8,8 @@ export default async function Accounting(
 ): Promise<AccountingTypes.IAccountingService> {
   const logger = await SP.Logger();
   const account = await SP.Account();
+  const accountConfiguration = await SP.AccountConfiguration();
+  const salary = await SP.Salary();
   const config = await SP.Config();
 
   const configuration: AccountingTypes.AccountingServiceConfiguration = {
@@ -23,6 +25,8 @@ export default async function Accounting(
   const accountingService = new AccountingService(
     account,
     repository,
+    accountConfiguration,
+    salary,
     { configuration, ...options },
     logger
   );

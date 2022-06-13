@@ -129,7 +129,7 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
       throw new Error("Map entry doesn't exists, can't remove it.");
     }
 
-    remove value[request.mapEntry.key];
+    delete value[request.mapEntry.key];
 
     const now = new Date();
 

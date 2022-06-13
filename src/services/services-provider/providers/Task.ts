@@ -10,6 +10,9 @@ export default async function Task(
   const logger = await SP.Logger();
   const account = await SP.Account();
   const accounting = await SP.Accounting();
+  const creditAccount = await SP.CreditAccount();
+  const salary = await SP.Salary();
+  const accountConfiguration = await SP.AccountConfiguration();
   const recurrentExpenses = await SP.RecurrentExpense();
   const expenseSheets = await SP.ExpenseSheetsDownloader();
   const expenseProcessor = await SP.ExpenseProcessor();
@@ -59,9 +62,12 @@ export default async function Task(
   const taskService = new TaskService(
     account,
     accounting,
+    accountConfiguration,
+    creditAccount,
+    salary,
+    recurrentExpenses,
     expenseSheets,
     expenseProcessor,
-    recurrentExpenses,
     config,
     logger,
     configuration

@@ -35,6 +35,7 @@ export namespace RecurrentExpenseTypes {
     recurrence: Recurrence;
   }
 
+  // eslint-disable-next-line no-shadow
   export enum Recurrence {
     Monthly = "monthly",
     Semesterly = "semesterly",

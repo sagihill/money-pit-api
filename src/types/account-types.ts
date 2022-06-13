@@ -29,13 +29,6 @@ export namespace AccountTypes {
     Family = "family",
     Single = "single",
   }
-
-  export class AccountNotFound extends CriticalError {
-    constructor(private readonly accountId: string) {
-      super(`Can't finish operation, account_${accountId} is not found.`);
-    }
-  }
-
   export namespace Requests {
     export interface UpdateRequest {
       type?: AccountType;
@@ -56,6 +49,12 @@ export namespace AccountTypes {
       super(
         `Can't finish operation. account type ${type} is an invalid value.`
       );
+    }
+  }
+
+  export class AccountNotFound extends CriticalError {
+    constructor(protected readonly accountId: string) {
+      super(`Can't finish operation, account_${accountId} is not found.`);
     }
   }
 }

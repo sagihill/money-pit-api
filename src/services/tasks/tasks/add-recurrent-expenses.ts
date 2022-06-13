@@ -26,9 +26,9 @@ export class AddReccurentExpensesTask
       const options =
         this.getOptions<TaskTypes.AddRecurrentExpensesTaskOptions>();
       const recurrentExpenses =
-        await this.recurrentExpensesService.getRecurrentExpenses(
-          options.recurrence
-        );
+        await this.recurrentExpensesService.findRecurrentExpenses({
+          recurrence: options.recurrence,
+        });
 
       const now = new Date();
       const expenses = [];
@@ -37,7 +37,6 @@ export class AddReccurentExpensesTask
         const string = `${now.getFullYear()}-${now.getMonth() + 1}-${
           recurrentExpense.dueDay
         }`;
-        console.log(string);
         const timestamp = Dates.toDate(string, "yyyy-mm-dd");
 
         const id = ID.get(
