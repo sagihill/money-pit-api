@@ -34,13 +34,7 @@ const add: RequestHandler = async (
     description,
     timestamp,
   } = req.body;
-  const userId = await Utils.getUserIdFromRequest(req);
-
-  const user = await userService.get(userId);
-
-  if (accountId !== user?.accountId) {
-    throw new Error("Account doesn't belong to user");
-  }
+  await Utils.validateAccountMembership(req, accountId);
 
   const expense = await accountingService.createNewExpense({
     accountId,

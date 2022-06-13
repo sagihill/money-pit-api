@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
@@ -14,6 +15,8 @@ const remove: RequestHandler = async (req: Request, res) => {
     const SP = ServicesProvider.get();
     const accountConfiguration = await SP.AccountConfiguration();
     const { accountId } = req.params;
+
+    await Utils.validateAccountOwnership(req, accountId);
 
     await accountConfiguration.remove(accountId);
 

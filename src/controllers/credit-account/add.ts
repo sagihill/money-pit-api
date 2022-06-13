@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, CreditAccountTypes, ResponseStatus } from "../../types";
@@ -26,6 +27,7 @@ const add: RequestHandler = async (
     const creditAccountService = await SP.CreditAccount();
 
     const { accountId, creditProvider, credentials } = req.body;
+    await Utils.validateAccountMembership(req,accountId);
 
     const creditAccount = await creditAccountService.add({
       accountId,

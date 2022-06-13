@@ -59,6 +59,26 @@ export namespace Utils {
     return user.id;
   }
 
+  export async function validateAccountMembership(
+    req: Request,
+    accountId: string
+  ): Promise<void> {
+    const SP = ServicesProvider.get();
+    const userId = await getUserIdFromRequest(req);
+    const validationService = await SP.Validation();
+    await validationService.validateAccountMembership(userId, accountId);
+  }
+
+  export async function validateAccountOwnership(
+    req: Request,
+    accountId: string
+  ): Promise<void> {
+    const SP = ServicesProvider.get();
+    const userId = await getUserIdFromRequest(req);
+    const validationService = await SP.Validation();
+    await validationService.validateAccountOwnership(userId, accountId);
+  }
+
   export function getTokenFromRequest(req: Request): string | undefined {
     return req?.headers?.authorization?.split(" ")[1];
   }
@@ -182,7 +202,7 @@ export namespace Objects {
           }
 
           if (res[pn] == undefined) {
-            remove res[pn];
+            delete res[pn];
           }
         }
       }

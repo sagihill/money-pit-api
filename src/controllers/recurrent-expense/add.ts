@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import {
@@ -43,6 +44,8 @@ const add: RequestHandler = async (
       dueDay,
       recurrence,
     } = req.body;
+
+    await Utils.validateAccountMembership(req, accountId);
 
     const recurrentExpense = await recurrentExpenseService.add({
       accountId,

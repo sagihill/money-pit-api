@@ -1,6 +1,7 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import { ParamsDictionary } from "..";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import {
@@ -39,6 +40,8 @@ const update: RequestHandler = async (
   try {
     const SP = ServicesProvider.get();
     const accountConfiguration = await SP.AccountConfiguration();
+
+    await Utils.validateAccountMembership(req, accountId);
 
     await accountConfiguration.update(accountId, {
       budget,

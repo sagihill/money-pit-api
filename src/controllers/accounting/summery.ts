@@ -23,6 +23,7 @@ const summery: RequestHandler = async (
   const SP = ServicesProvider.get();
   const accountingService = await SP.Accounting();
   const userService = await SP.User();
+  const validationService = await SP.Validation();
 
   const { chargeMonth } = req.body;
   const userId = await Utils.getUserIdFromRequest(req);
@@ -32,6 +33,8 @@ const summery: RequestHandler = async (
   if (!user?.accountId) {
     throw new Error("User don't have an account yet.");
   }
+
+  await validationService.validateAccountExist(user?.accountId);
 
   const summery = await accountingService.getAccountSummery(
     user.accountId,

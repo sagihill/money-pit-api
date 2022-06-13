@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import {
@@ -26,8 +27,9 @@ const add: RequestHandler = async (
   try {
     const SP = ServicesProvider.get();
     const accountConfigurationService = await SP.AccountConfiguration();
-
     const { accountId, budget, toggles } = req.body;
+
+    await Utils.validateAccountMembership(req, accountId);
 
     const currentAccountConfiguration = await accountConfigurationService.get(
       accountId

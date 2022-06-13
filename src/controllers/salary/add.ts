@@ -1,5 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, SalaryTypes, ResponseStatus } from "../../types";
@@ -22,6 +23,7 @@ const add: RequestHandler = async (
     const salaryService = await SP.Salary();
 
     const { accountId, amount, currency, payDay } = req.body;
+    await Utils.validateAccountMembership(req, accountId);
 
     const salary = await salaryService.add({
       accountId,
