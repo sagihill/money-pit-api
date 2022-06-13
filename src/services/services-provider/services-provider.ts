@@ -13,16 +13,16 @@ import {
   CriticalError,
   CreditAccountTypes,
   SalaryTypes,
+  ValidationTypes,
 } from "../../types";
 
 import { TaskTypes } from "../../types/task-types";
-import { IContext, CreationMode } from "./types";
+import { CreationMode } from "./types";
 import { Providers } from "./providers";
 
 export class ServicesProvider {
   protected SP: any;
   private static instance: ServicesProvider;
-  private context: IContext;
 
   static get(): ServicesProvider {
     if (!this.instance) {
@@ -33,7 +33,6 @@ export class ServicesProvider {
 
   private constructor() {
     this.initLibrary();
-    this.context = {};
   }
 
   async User(): Promise<UserTypes.IUserService> {
@@ -173,6 +172,18 @@ export class ServicesProvider {
       throw error;
     }
   }
+  async Validation(): Promise<ValidationTypes.IValidationService> {
+    try {
+      return await this.getProvider<ValidationTypes.IValidationService, {}>(
+        "Validation",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
 
   async Logger(): Promise<LoggerTypes.ILogger> {
     try {
@@ -255,13 +266,5 @@ export class ServicesProvider {
   private async log(error: Error): Promise<void> {
     const logger = await this.Logger();
     await logger.error(error);
-  }
-
-  setContext(context: IContext): void {
-    this.context = context;
-  }
-
-  private getContext(context: IContext): IContext {
-    return this.context;
   }
 }

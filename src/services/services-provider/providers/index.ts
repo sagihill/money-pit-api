@@ -12,6 +12,7 @@ import RecurrentExpense from "./RecurrentExpense";
 import Task from "./Task";
 import Salary from "./Salary";
 import User from "./User";
+import Validation from "./Validation";
 
 export const Providers: any = {
   Account,
@@ -28,4 +29,5 @@ export const Providers: any = {
   Task,
   Salary,
   User,
+  Validation,
 };

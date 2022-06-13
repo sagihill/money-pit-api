@@ -11,6 +11,7 @@ export * from "./expense-sheets-types";
 export * from "./recurrent-expense-types";
 export * from "./auth-types";
 export * from "./config-types";
+export * from "./validation-types";
 
 export interface IEntityDetails {
   deleted: boolean;
