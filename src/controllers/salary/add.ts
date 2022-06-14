@@ -5,11 +5,15 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, SalaryTypes, ResponseStatus } from "../../types";
 
-export const salaryRequestBody = {
-  accountId: Joi.string().required().uuid(),
+export const salaryNewAccountRequestBody = {
   amount: Joi.number().required(),
   currency: Joi.string().required(),
   payDay: Joi.number().required(),
+};
+
+export const salaryRequestBody = {
+  accountId: Joi.string().required().uuid(),
+  ...salaryNewAccountRequestBody,
 };
 
 export const addSalaryValidator = Joi.object().keys(salaryRequestBody);
@@ -23,11 +27,10 @@ const add: RequestHandler = async (
     const salaryService = await SP.Salary();
 
     const { accountId, amount, currency, payDay } = req.body;
-    await Utils.validateAccountMembership(req, accountId);
+    await Utils.validateAccountMembership(req, accountId as string);
 
     const salary = await salaryService.add({
       accountId,
-
       amount,
       currency,
       payDay,

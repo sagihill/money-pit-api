@@ -4,7 +4,7 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { AccountingTypes } from "../../types";
 
-export const editExpenseRequestValidator = Joi.object().keys({
+export const updateExpenseRequestValidator = Joi.object().keys({
   name: Joi.string().required(),
   amount: Joi.number().required(),
   category: Joi.string().required(),
@@ -14,8 +14,8 @@ export const editExpenseRequestValidator = Joi.object().keys({
   timestamp: Joi.date(),
 });
 
-const edit: RequestHandler = async (
-  req: Request<any, {}, AccountingTypes.EditExpenseRequest>,
+const update: RequestHandler = async (
+  req: Request<any, {}, AccountingTypes.Requests.UpdateRequest>,
   res
 ) => {
   const SP = ServicesProvider.get();
@@ -38,6 +38,6 @@ const edit: RequestHandler = async (
   });
 };
 
-export default requestMiddleware(edit, {
-  validation: { body: editExpenseRequestValidator },
+export default requestMiddleware(update, {
+  validation: { body: updateExpenseRequestValidator },
 });

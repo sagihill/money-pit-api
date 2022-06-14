@@ -4,21 +4,21 @@ import { Utils } from "../../lib/common";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { AccountTypes, ApiResponse, ResponseStatus } from "../../types";
-import { accountConfigurationRequestBody } from "../account-configuration/update";
-import { creditAccountRequestBody } from "../credit-account/add";
-import { recurrentExpenseRequestBody } from "../recurrent-expense/add";
-import { salaryRequestBody } from "../salary/add";
+import { accountConfigurationNewAccountRequestBody } from "../account-configuration/add";
+import { creditAccountNewAccountRequestBody } from "../credit-account/add";
+import { recurrentExpenseNewAccountRequestBody } from "../recurrent-expense/add";
+import { salaryNewAccountRequestBody } from "../salary/add";
 
 export const addAccountRequestValidation = Joi.object().keys({
   type: Joi.string().required(),
-  configuration: accountConfigurationRequestBody,
-  salaries: [salaryRequestBody],
-  creditAccounts: [creditAccountRequestBody],
-  recurrentExpenses: [recurrentExpenseRequestBody],
+  configuration: accountConfigurationNewAccountRequestBody,
+  salaries: Joi.array().items(salaryNewAccountRequestBody),
+  creditAccounts: Joi.array().items(creditAccountNewAccountRequestBody),
+  recurrentExpenses: Joi.array().items(recurrentExpenseNewAccountRequestBody),
 });
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, AccountTypes.Requests.AddRequest>,
+  req: Request<{}, {}, AccountTypes.Requests.AddNetworkRequest>,
   res
 ) => {
   try {
@@ -37,11 +37,19 @@ const add: RequestHandler = async (
     const account = await accountService.add({
       type,
       adminUserId: userId,
-      configuration,
-      salaries,
-      creditAccounts,
-      recurrentExpenses,
     });
+
+    if (!account) {
+    }
+
+    const accountId = account.id;
+
+    const request = addAccountIdToRequests(
+      { configuration, salaries, creditAccounts, recurrentExpenses },
+      accountId
+    );
+
+    await accountService.addAccountConfigurations(request);
 
     await userService.update(userId, { accountId: account.id });
 
@@ -65,6 +73,35 @@ const add: RequestHandler = async (
     res.status(400).send(response);
   }
 };
+
+function addAccountIdToRequests(
+  request: AccountTypes.Requests.AddAccountConfigurationRequest,
+  accountId: string
+): AccountTypes.Requests.AddAccountConfigurationRequest {
+  const translated: AccountTypes.Requests.AddAccountConfigurationRequest = {
+    ...request,
+  };
+  if (translated.configuration) {
+    translated.configuration = { ...translated.configuration, accountId };
+  }
+
+  if (translated.creditAccounts) {
+    translated.creditAccounts.forEach(
+      (creditAccount) => (creditAccount.accountId = accountId)
+    );
+  }
+
+  if (translated.recurrentExpenses) {
+    translated.recurrentExpenses.forEach(
+      (recurrentExpense) => (recurrentExpense.accountId = accountId)
+    );
+  }
+
+  if (translated.salaries) {
+    translated.salaries.forEach((salary) => (salary.accountId = accountId));
+  }
+  return translated;
+}
 
 export default requestMiddleware(add, {
   validation: { body: addAccountRequestValidation },

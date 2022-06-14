@@ -42,6 +42,12 @@ export class AccountService
       adminUserId: request.adminUserId,
     });
 
+    return account;
+  }
+
+  async addAccountConfigurations(
+    request: AccountTypes.Requests.AddAccountConfigurationRequest
+  ): Promise<void> {
     if (request.configuration) {
       await this.accountConfigurationService.add(request.configuration);
     }
@@ -59,8 +65,6 @@ export class AccountService
     if (request.salaries) {
       await this.salaryService.addSalaries(request.salaries);
     }
-
-    return account;
   }
 
   async createEntityDetails(

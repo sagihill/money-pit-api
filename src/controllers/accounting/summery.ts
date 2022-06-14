@@ -17,7 +17,7 @@ export const getSummeryRequestValidator = Joi.object().keys({
 });
 
 const summery: RequestHandler = async (
-  req: Request<{}, {}, AccountingTypes.GetSummeryRequest>,
+  req: Request<{}, {}, AccountingTypes.Requests.GetSummeryRequest>,
   res
 ) => {
   const SP = ServicesProvider.get();

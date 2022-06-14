@@ -17,6 +17,9 @@ export namespace AccountTypes {
       Requests.UpdateRequest
     > {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
+    addAccountConfigurations(
+      request: AccountTypes.Requests.AddAccountConfigurationRequest
+    ): Promise<void>;
   }
   export interface IAccountReaderService {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
@@ -38,9 +41,21 @@ export namespace AccountTypes {
       type?: AccountType;
     }
 
+    export type AddNetworkRequest = {
+      type: AccountType;
+      adminUserId: string;
+      configuration?: AccountConfigurationTypes.Requests.AddRequest;
+      salaries?: SalaryTypes.Requests.AddRequest[];
+      creditAccounts?: CreditAccountTypes.Requests.AddRequest[];
+      recurrentExpenses?: RecurrentExpenseTypes.Requests.AddRequest[];
+    };
+
     export type AddRequest = {
       type: AccountType;
       adminUserId: string;
+    };
+
+    export type AddAccountConfigurationRequest = {
       configuration?: AccountConfigurationTypes.Requests.AddRequest;
       salaries?: SalaryTypes.Requests.AddRequest[];
       creditAccounts?: CreditAccountTypes.Requests.AddRequest[];

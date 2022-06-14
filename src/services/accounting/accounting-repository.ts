@@ -10,13 +10,13 @@ export const getAccountingRepository = (logger: LoggerTypes.ILogger) => {
 export class AccountingRepository
   extends MongoRepository<
     AccountingTypes.Expense,
-    AccountingTypes.EditExpenseRequest
+    AccountingTypes.Requests.UpdateRequest
   >
   implements
     AccountingTypes.IAccountingRepository,
     MongoTypes.Repository<
       AccountingTypes.Expense,
-      AccountingTypes.EditExpenseRequest
+      AccountingTypes.Requests.UpdateRequest
     >
 {
   constructor(

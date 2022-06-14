@@ -5,13 +5,17 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, CreditAccountTypes, ResponseStatus } from "../../types";
 
-export const creditAccountRequestBody = {
-  accountId: Joi.string().required().uuid(),
+export const creditAccountNewAccountRequestBody = {
   creditProvider: Joi.string().required(),
   credentials: {
-    username: Joi.string().required().lowercase(),
-    password: Joi.string().required().length(16),
+    username: Joi.string().required(),
+    password: Joi.string().required(),
   },
+};
+
+export const creditAccountRequestBody = {
+  accountId: Joi.string().required().uuid(),
+  ...creditAccountNewAccountRequestBody,
 };
 
 export const addCreditAccountValidator = Joi.object().keys(

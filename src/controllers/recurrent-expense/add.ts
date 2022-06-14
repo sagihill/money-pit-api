@@ -9,8 +9,7 @@ import {
   ResponseStatus,
 } from "../../types";
 
-export const recurrentExpenseRequestBody = {
-  accountId: Joi.string().required().uuid(),
+export const recurrentExpenseNewAccountRequestBody = {
   category: Joi.string().required(),
   name: Joi.string().required(),
   type: Joi.string().required(),
@@ -19,6 +18,10 @@ export const recurrentExpenseRequestBody = {
   currency: Joi.string().required(),
   dueDay: Joi.number().required(),
   recurrence: Joi.string().required(),
+};
+export const recurrentExpenseRequestBody = {
+  accountId: Joi.string().required().uuid(),
+  ...recurrentExpenseNewAccountRequestBody,
 };
 
 export const addRecurrentExpenseValidator = Joi.object().keys(
@@ -45,7 +48,7 @@ const add: RequestHandler = async (
       recurrence,
     } = req.body;
 
-    await Utils.validateAccountMembership(req, accountId);
+    await Utils.validateAccountMembership(req, accountId as string);
 
     const recurrentExpense = await recurrentExpenseService.add({
       accountId,

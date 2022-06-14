@@ -9,11 +9,16 @@ import {
   ResponseStatus,
 } from "../../types";
 
-export const accountConfigurationRequestBody = {
+export const accountConfigurationNewAccountRequestBody = {
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
   toggles: {
     enableAutoExpenseAdd: Joi.boolean(),
   },
+};
+
+export const accountConfigurationRequestBody = {
+  accountId: Joi.string().uuid().required(),
+  ...accountConfigurationNewAccountRequestBody,
 };
 
 export const addAccountConfigurationValidator = Joi.object().keys(
@@ -29,10 +34,10 @@ const add: RequestHandler = async (
     const accountConfigurationService = await SP.AccountConfiguration();
     const { accountId, budget, toggles } = req.body;
 
-    await Utils.validateAccountMembership(req, accountId);
+    await Utils.validateAccountMembership(req, accountId as string);
 
     const currentAccountConfiguration = await accountConfigurationService.get(
-      accountId
+      accountId as string
     );
 
     if (currentAccountConfiguration) {

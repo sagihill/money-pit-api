@@ -17,7 +17,7 @@ export const addExpenseRequestValidator = Joi.object().keys({
 });
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, AccountingTypes.AddExpenseRequest>,
+  req: Request<{}, {}, AccountingTypes.Requests.AddRequest>,
   res
 ) => {
   const SP = ServicesProvider.get();
@@ -34,7 +34,7 @@ const add: RequestHandler = async (
     description,
     timestamp,
   } = req.body;
-  await Utils.validateAccountMembership(req, accountId);
+  await Utils.validateAccountMembership(req, accountId as string);
 
   const expense = await accountingService.createNewExpense({
     accountId,

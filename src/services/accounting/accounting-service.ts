@@ -22,7 +22,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
 
   async editExpense(
     id: string,
-    request: AccountingTypes.EditExpenseRequest
+    request: AccountingTypes.Requests.UpdateRequest
   ): Promise<void> {
     try {
       this.logger.info("Editing expense");
@@ -44,7 +44,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
   }
 
   createNewExpense(
-    request: AccountingTypes.AddExpenseRequest
+    request: AccountingTypes.Requests.AddRequest
   ): AccountingTypes.Expense {
     return createNewExpense(request);
   }

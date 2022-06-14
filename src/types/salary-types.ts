@@ -29,7 +29,7 @@ export namespace SalaryTypes {
       payDay?: number;
     }
     export interface FindRequest {
-      accountId?: string;
+      accountId: string;
       payDay?: number;
     }
   }

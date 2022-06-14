@@ -40,13 +40,17 @@ export namespace CreditAccountTypes {
       creditProvider: CreditProvider;
       credentials: Credentials;
     }
+    export interface NewAccountAddRequest {
+      creditProvider: CreditProvider;
+      credentials: Credentials;
+    }
     export interface UpdateRequest {
       creditProvider?: CreditProvider;
       credentials?: Credentials;
     }
 
     export interface FindRequest {
-      accountId?: string;
+      accountId: string;
     }
   }
 }

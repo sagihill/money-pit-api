@@ -12,7 +12,7 @@ export const signUpRequestValidator = Joi.object().keys({
     .required()
     .regex(/^[a-z ,.'-]+$/i),
   email: Joi.string().required().email(),
-  password: Joi.string().required(),
+  password: Joi.string().required().length(16),
 });
 
 const signUp: RequestHandler = async (

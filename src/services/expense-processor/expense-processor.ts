@@ -245,7 +245,7 @@ export class ExpenseProcessor
   ): Promise<void> {
     const expenses = expensesExtracts.map((expenseExtract) => {
       return this.accountingService.createNewExpense({
-        ...(expenseExtract as AccountingTypes.AddExpenseRequest),
+        ...(expenseExtract as AccountingTypes.Requests.AddRequest),
       });
     });
 

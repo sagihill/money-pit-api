@@ -1,5 +1,5 @@
 import add from "./add";
-import edit from "./edit";
+import update from "./update";
 import summery from "./summery";
 
-export { add, edit, summery };
+export { add, update, summery };

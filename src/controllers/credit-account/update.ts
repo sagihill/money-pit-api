@@ -8,8 +8,8 @@ import { ApiResponse, CreditAccountTypes, ResponseStatus } from "../../types";
 export const updateCreditAccountBodyValidator = Joi.object().keys({
   creditProvider: Joi.string(),
   credentials: {
-    username: Joi.string().lowercase(),
-    password: Joi.string().length(16),
+    username: Joi.string(),
+    password: Joi.string(),
   },
 });
 
