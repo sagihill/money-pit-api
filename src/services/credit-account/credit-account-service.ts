@@ -31,6 +31,22 @@ export class CreditAccountService
     super(repository, logger);
   }
 
+  async add(
+    request: CreditAccountTypes.Requests.AddRequest
+  ): Promise<CreditAccountTypes.CreditAccount> {
+    await this.encryptRequest(request);
+    const creditAccount = await super.add(request);
+    return creditAccount;
+  }
+
+  async update(
+    id: string,
+    request: CreditAccountTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    await this.encryptRequest(request);
+    await super.update(id, request);
+  }
+
   async get(id: string): Promise<CreditAccountTypes.CreditAccount | undefined> {
     const creditAccount = await super.get(id);
     if (creditAccount) {
@@ -38,6 +54,7 @@ export class CreditAccountService
       return creditAccount;
     }
   }
+
   async findAccountOne(
     id: string,
     accountId: string
@@ -122,6 +139,22 @@ export class CreditAccountService
     creditAccount.credentials.username = username;
   }
 
+  private async encryptRequest(
+    request:
+      | CreditAccountTypes.Requests.AddRequest
+      | CreditAccountTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    if (request.credentials?.password) {
+      const password = await this.crypto.encrypt(request.credentials.password);
+      request.credentials.password = password;
+    }
+
+    if (request.credentials?.username) {
+      const username = await this.crypto.encrypt(request.credentials.username);
+      request.credentials.username = username;
+    }
+  }
+
   private async decryptCreditAccount(
     creditAccount: CreditAccountTypes.CreditAccount
   ): Promise<void> {
@@ -133,7 +166,6 @@ export class CreditAccountService
     const username = await this.crypto.decrypt(
       creditAccount.credentials.username
     );
-    // console.log(username);
     creditAccount.credentials.username = username;
   }
 

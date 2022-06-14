@@ -28,11 +28,23 @@ Async.IIFE(async () => {
   }
 });
 
+const tests = async () => {
+  const crypto = await SP.Crypto();
+
+  const hash = await crypto.encrypt("Woww");
+
+  console.log(hash);
+
+  console.log(await crypto.decrypt(hash));
+};
+
 const serve = async () => {
   const logger = await SP.Logger();
   const PORT = (await config.get("PORT")) || 3000;
   const Task = await SP.Task();
   // await Task.run();
+
+  await tests();
 
   return app.listen(PORT, async () => {
     logger.info(`🌏 Express server started at http://localhost:${PORT}`);

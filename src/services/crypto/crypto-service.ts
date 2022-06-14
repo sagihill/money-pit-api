@@ -2,34 +2,35 @@ import * as crypto from "crypto";
 import { CryptoTypes } from "../../types";
 
 export class CryptoService implements CryptoTypes.ICryptoService {
-  private cipher: crypto.Cipher;
-  private decipher: crypto.Decipher;
-  private iv: Buffer;
+  private key: string;
 
   constructor(secretKey: string) {
-    this.iv = crypto.randomBytes(16);
-    const key = crypto
+    this.key = crypto
       .createHash("sha256")
       .update(String(secretKey))
       .digest("base64")
-      .substr(0, 32);
-
-    this.cipher = crypto.createCipheriv("aes-256-ctr", key, this.iv);
-    this.decipher = crypto.createDecipheriv("aes-256-ctr", key, this.iv);
+      .substring(0, 32);
   }
 
   async encrypt(string: string): Promise<string> {
-    const encrypted = Buffer.concat([
-      this.cipher.update(string),
-      this.cipher.final(),
-    ]);
-    return encrypted.toString("hex");
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv("aes-256-ctr", this.key, iv);
+    const encrypted = Buffer.concat([cipher.update(string), cipher.final()]);
+    return `${encrypted.toString("hex")}__${iv.toString("hex")}`;
   }
 
   async decrypt(string: string): Promise<string> {
+    const [hash, iv] = string.split("__");
+    console.log(hash, iv);
+    const decipher = crypto.createDecipheriv(
+      "aes-256-ctr",
+      this.key,
+      Buffer.from(iv, "hex")
+    );
+
     const decrpyted = Buffer.concat([
-      this.decipher.update(Buffer.from(string, "hex")),
-      this.decipher.final(),
+      decipher.update(Buffer.from(hash, "hex")),
+      decipher.final(),
     ]);
 
     return decrpyted.toString();
