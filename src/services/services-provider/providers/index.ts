@@ -1,4 +1,5 @@
 import Account from "./Account";
+import AccountReader from "./AccountReader";
 import AccountConfiguration from "./AccountConfiguration";
 import Accounting from "./Accounting";
 import Auth from "./Auth";
@@ -16,6 +17,7 @@ import Validation from "./Validation";
 
 export const Providers: any = {
   Account,
+  AccountReader,
   AccountConfiguration,
   Accounting,
   Auth,

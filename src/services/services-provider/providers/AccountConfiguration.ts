@@ -11,7 +11,7 @@ export default async function AccountConfiguration(
   SP: ServicesProvider
 ): Promise<AccountConfigurationTypes.IAccountConfigurationService> {
   const logger = await SP.Logger();
-  const account = await SP.Account();
+  const account = await SP.AccountReader();
   const repo = getAccountConfigurationRepository();
   const accountConfigurationService = new AccountConfigurationService(
     account,

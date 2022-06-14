@@ -11,7 +11,6 @@ const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
     totalBudget: { type: Number, index: true, required: true },
     categoriesBudget: { type: Schema.Types.Mixed, required: false },
   },
-
   toggles: {
     type: {
       enableAutoExpenseAdd: { type: Boolean, index: true, required: false },

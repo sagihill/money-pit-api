@@ -19,7 +19,7 @@ export class SalaryService
   implements SalaryTypes.ISalaryService
 {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     repository: MongoTypes.Repository<
       SalaryTypes.Salary,
       SalaryTypes.Requests.UpdateRequest
@@ -42,7 +42,7 @@ export class SalaryService
       }
 
       return await this.repository.addMany(salaries);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on addSalaries function of ${this.constructor.name}`
       );
@@ -60,7 +60,7 @@ export class SalaryService
         deleted: false,
       });
       return salaries;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on findSalaries function of ${this.constructor.name}`
       );

@@ -25,17 +25,20 @@ const get: RequestHandler = async (req: Request, res) => {
     } else {
       const response: ApiResponse = {
         status: ResponseStatus.success,
-        message: `Found account.`,
+        message: "Found account.",
         data: { account },
       };
 
       res.send(response);
     }
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
-      status: ResponseStatus.failure,
+      status: ResponseStatus.error,
       message: `finding account ${req.body.id} had an error.`,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

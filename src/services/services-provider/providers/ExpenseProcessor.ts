@@ -12,7 +12,7 @@ export default async function ExpenseProcessor(
 ): Promise<ExpenseProcessorTypes.IExpenseProcessor> {
   const logger = await SP.Logger();
   const accountingService = await SP.Accounting();
-  const accountService = await SP.Account();
+  const accountService = await SP.AccountReader();
   const config = await SP.Config();
   const configuration: ExpenseProcessorTypes.ExpenseProcessorOptions = {
     expenseCategoryCategoryMap: await config.getObject(

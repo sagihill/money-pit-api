@@ -1,10 +1,12 @@
-import SafeMongooseConnection from "../../lib/safe-mongoose-connection";
+/* eslint-disable implicit-arrow-linebreak */
 import util from "util";
+import SafeMongooseConnection from "../../lib/safe-mongoose-connection";
 import { LoggerTypes } from "../../types";
 import { MongoTypes } from "../../types/mongo-types";
 
 export class Mongo implements MongoTypes.IMongo {
   private safeConnetion: SafeMongooseConnection;
+
   constructor(private readonly logger: LoggerTypes.ILogger, mongoUrl: string) {
     let debugCallback;
     if (process.env.NODE_ENV === "development") {

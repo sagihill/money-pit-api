@@ -16,6 +16,7 @@ const schema = new Schema<UserTypes.UserDetails>(
       trim: true,
       required: [true, "email not provided"],
       validate: {
+        // eslint-disable-next-line object-shorthand
         validator: function (v: string) {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
         },

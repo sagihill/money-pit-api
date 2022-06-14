@@ -1,3 +1,5 @@
+import { CriticalError } from "../errors/service-error";
+
 export * from "./user-types";
 export * from "./logger-types";
 export * from "./mongo-types";
@@ -46,26 +48,6 @@ export enum ResponseStatus {
   success = "sucesss",
   failure = "failure",
   error = "error",
-}
-
-export class CriticalError extends Error {
-  constructor(
-    msg: string,
-    private readonly reason?: any,
-    private readonly data?: any
-  ) {
-    super(msg);
-  }
-}
-
-export class ValidationError extends Error {
-  constructor(
-    msg: string,
-    private readonly reason?: any,
-    private readonly data?: any
-  ) {
-    super(msg);
-  }
 }
 
 export interface ISimpleService<T, A, E> {

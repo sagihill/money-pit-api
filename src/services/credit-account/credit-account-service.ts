@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-param-reassign */
 import { ID } from "../../lib";
 import { SimpleService } from "../../lib/service";
 import {
@@ -7,6 +9,7 @@ import {
   MongoTypes,
   RequiredParameterError,
 } from "../../types";
+
 const Cryptr = require("cryptr");
 
 export class CreditAccountService
@@ -18,7 +21,7 @@ export class CreditAccountService
   implements CreditAccountTypes.ICreditAccountService
 {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     private readonly cryptr: typeof Cryptr,
     repository: MongoTypes.Repository<
       CreditAccountTypes.CreditAccount,
@@ -50,7 +53,7 @@ export class CreditAccountService
         creditAccounts.push(creditAccount);
       }
       return await this.repository.addMany(creditAccounts);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on addCreditAccounts function of ${this.constructor.name}`
       );
@@ -74,7 +77,7 @@ export class CreditAccountService
         await this.decryptCreditAccount(creditAccount);
       }
       return creditAccounts;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on findRecurrentExpenses function of ${this.constructor.name}`
       );
@@ -121,6 +124,7 @@ export class CreditAccountService
   ): Promise<void> {
     await this.isAccountExistValidation(request.accountId);
   }
+
   async updateValidation(
     id: string,
     request: CreditAccountTypes.Requests.UpdateRequest

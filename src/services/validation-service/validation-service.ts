@@ -5,7 +5,9 @@ import {
 } from "../../types";
 
 export class ValidationService implements ValidationTypes.IValidationService {
-  constructor(private readonly accountService: AccountTypes.IAccountService) {}
+  constructor(
+    private readonly accountService: AccountTypes.IAccountReaderService
+  ) {}
 
   async validateAccountMembership(
     userId: string,

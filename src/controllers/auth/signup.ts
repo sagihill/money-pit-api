@@ -37,11 +37,14 @@ const signUp: RequestHandler = async (
         userId: response.id,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     res.send({
       message: "An error occured on signup",
       responseCode: 400,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     });
   }
 };

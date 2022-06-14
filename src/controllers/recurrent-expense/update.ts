@@ -68,11 +68,14 @@ const update: RequestHandler = async (
     };
 
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
       message: "Unable to update recurrent expense",
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

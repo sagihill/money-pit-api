@@ -34,14 +34,14 @@ export namespace FS {
   export function move(org: fs.PathLike, dest: fs.PathLike): void {
     try {
       fs.renameSync(org, dest);
-    } catch (error) {}
+    } catch (error: any) {}
   }
 
   export function countNumOfFiles(path: fs.PathLike): number {
     try {
       const files = fs.readdirSync(path);
       return files.length;
-    } catch (error) {
+    } catch (error: any) {
       return 0;
     }
   }

@@ -12,7 +12,6 @@ import { BaseTask } from "./base-task";
 
 export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
     private readonly creditAccountService: CreditAccountTypes.ICreditAccountService,
     private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly expenseSheetsDownloader: ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader,
@@ -59,12 +58,12 @@ export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
             });
 
             await Sync.sleep(5000);
-          } catch (error) {
+          } catch (error: any) {
             this.logger.error(error);
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(error);
     }
   }

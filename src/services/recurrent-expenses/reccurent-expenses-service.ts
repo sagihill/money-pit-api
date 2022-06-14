@@ -18,7 +18,7 @@ export class ReccurentExpensesService
   implements RecurrentExpenseTypes.IReccurentExpensesService
 {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     repository: MongoTypes.Repository<
       RecurrentExpenseTypes.RecurrentExpense,
       RecurrentExpenseTypes.Requests.UpdateRequest
@@ -43,7 +43,7 @@ export class ReccurentExpensesService
       }
 
       return await this.repository.addMany(recurrentExpenses);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on addRecurrentExpenses function of ${this.constructor.name}`
       );
@@ -63,7 +63,7 @@ export class ReccurentExpensesService
         deleted: false,
       });
       return recurrentExpenses;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on findRecurrentExpenses function of ${this.constructor.name}`
       );

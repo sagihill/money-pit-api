@@ -25,17 +25,20 @@ const get: RequestHandler = async (req: Request, res) => {
     } else {
       const response: ApiResponse = {
         status: ResponseStatus.success,
-        message: `Found recurrent expense.`,
+        message: "Found recurrent expense.",
         data: { recurrentExpense },
       };
 
       res.send(response);
     }
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
-      status: ResponseStatus.failure,
+      status: ResponseStatus.error,
       message: `finding recurrent expense ${req.body.id} had an error.`,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

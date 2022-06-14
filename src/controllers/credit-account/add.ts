@@ -27,7 +27,7 @@ const add: RequestHandler = async (
     const creditAccountService = await SP.CreditAccount();
 
     const { accountId, creditProvider, credentials } = req.body;
-    await Utils.validateAccountMembership(req,accountId);
+    await Utils.validateAccountMembership(req, accountId);
 
     const creditAccount = await creditAccountService.add({
       accountId,
@@ -42,11 +42,14 @@ const add: RequestHandler = async (
     };
 
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
       message: "Unable to add new credit account",
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

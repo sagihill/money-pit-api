@@ -26,11 +26,14 @@ const remove: RequestHandler = async (req: Request, res) => {
     };
 
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
       message: `removing account configuration for account ${req.params.accountId} had an error.`,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

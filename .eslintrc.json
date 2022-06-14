@@ -38,6 +38,7 @@
         "properties": "never"
       }
     ],
+
     "no-restricted-syntax": "off",
     "brace-style": "off",
     "operator-linebreak": "off",
@@ -54,6 +55,8 @@
         "devDependencies": ["**/*.test.ts", "**/*.spec.ts"]
       }
     ],
+    "no-shadow": "off",
+    "object-curly-newline": "off",
     "no-useless-constructor": "off",
     "max-len": "off",
     "no-empty-function": "off",
@@ -63,7 +66,11 @@
     "linebreak-style": "off",
     "comma-dangle": "off",
     "handle-callback-err": "error",
-    "quotes": ["warn", "double"]
+    "quotes": ["warn", "double"],
+    "max-classes-per-file": "off",
+    "implicit-arrow-linebreak": "off",
+    "consistent-return": "off",
+    "arrow-body-style": "off"
   },
   "overrides": [
     {

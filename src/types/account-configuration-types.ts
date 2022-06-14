@@ -1,4 +1,5 @@
-import { Credentials, CriticalError, IEntityDetails, ISimpleService } from ".";
+import { IEntityDetails, ISimpleService } from ".";
+import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountConfigurationTypes {

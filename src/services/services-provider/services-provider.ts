@@ -10,7 +10,6 @@ import {
   ExpenseSheetsDownloaderTypes,
   RecurrentExpenseTypes,
   AccountConfigurationTypes,
-  CriticalError,
   CreditAccountTypes,
   SalaryTypes,
   ValidationTypes,
@@ -19,9 +18,11 @@ import {
 import { TaskTypes } from "../../types/task-types";
 import { CreationMode } from "./types";
 import { Providers } from "./providers";
+import { CriticalError } from "../../errors/service-error";
 
 export class ServicesProvider {
   protected SP: any;
+
   private static instance: ServicesProvider;
 
   static get(): ServicesProvider {
@@ -53,7 +54,7 @@ export class ServicesProvider {
       return await this.getProvider<AuthTypes.IAuthService, {}>(
         "Auth",
         {},
-        CreationMode.singleton
+        CreationMode.instance
       );
     } catch (error: any) {
       await this.log(error);
@@ -66,7 +67,7 @@ export class ServicesProvider {
       return await this.getProvider<AccountTypes.IAccountService, {}>(
         "Account",
         {},
-        CreationMode.singleton
+        CreationMode.instance
       );
     } catch (error: any) {
       await this.log(error);
@@ -79,7 +80,7 @@ export class ServicesProvider {
       return await this.getProvider<
         AccountConfigurationTypes.IAccountConfigurationService,
         {}
-      >("AccountConfiguration", {}, CreationMode.singleton);
+      >("AccountConfiguration", {}, CreationMode.instance);
     } catch (error: any) {
       await this.log(error);
       throw error;
@@ -103,7 +104,7 @@ export class ServicesProvider {
       return await this.getProvider<AccountingTypes.IAccountingService, {}>(
         "Accounting",
         {},
-        CreationMode.singleton
+        CreationMode.instance
       );
     } catch (error: any) {
       await this.log(error);
@@ -172,12 +173,26 @@ export class ServicesProvider {
       throw error;
     }
   }
+
+  async AccountReader(): Promise<AccountTypes.IAccountReaderService> {
+    try {
+      return await this.getProvider<AccountTypes.IAccountReaderService, {}>(
+        "AccountReader",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
   async Validation(): Promise<ValidationTypes.IValidationService> {
     try {
       return await this.getProvider<ValidationTypes.IValidationService, {}>(
         "Validation",
         {},
-        CreationMode.singleton
+        CreationMode.instance
       );
     } catch (error: any) {
       await this.log(error);
@@ -245,6 +260,7 @@ export class ServicesProvider {
         if (provider) {
           return provider;
         }
+      // eslint-disable-next-line no-fallthrough
       case CreationMode.instance:
         provider = await Providers[name](options, this);
         await this.setLibrary<T>(name, provider);
@@ -260,7 +276,9 @@ export class ServicesProvider {
   }
 
   private async setLibrary<T>(name: string, provider: T): Promise<void> {
-    this.SP[name] = provider;
+    if (!this.SP[name]) {
+      this.SP[name] = provider;
+    }
   }
 
   private async log(error: Error): Promise<void> {

@@ -25,11 +25,14 @@ const signIn: RequestHandler = async (
         token: response.token,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     res.send({
       message: "Failed to sign in",
       responseCode: 400,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     });
   }
 };

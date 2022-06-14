@@ -1,3 +1,4 @@
+/* eslint-disable import/newline-after-import */
 import { ID, Validate } from "../../lib";
 import { SimpleService } from "../../lib/service";
 import {
@@ -103,7 +104,7 @@ export class AccountService
     try {
       this.logger.info(`Getting account by admin user id : ${{ adminUserId }}`);
       return (await this.repository.find({ adminUserId, deleted: false }))[0];
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't get account: ${{ adminUserId, error }}`);
     }
   }

@@ -1,10 +1,5 @@
-import {
-  AccountingTypes,
-  CriticalError,
-  Currency,
-  IEntityDetails,
-  ISimpleService,
-} from ".";
+import { AccountingTypes, Currency, IEntityDetails, ISimpleService } from ".";
+import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace RecurrentExpenseTypes {

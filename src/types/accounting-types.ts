@@ -1,4 +1,5 @@
-import { ChargeMonth, CriticalError, Currency, IEntityDetails } from ".";
+import { ChargeMonth, Currency, IEntityDetails } from ".";
+import { CriticalError } from "../errors/service-error";
 import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace

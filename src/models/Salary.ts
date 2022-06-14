@@ -12,7 +12,7 @@ const schema = new Schema<SalaryTypes.Salary>({
 });
 
 const Salary: ISalaryModel = model<SalaryTypes.Salary, ISalaryModel>(
-  "AccountConfiguration",
+  "Salary",
   schema
 );
 

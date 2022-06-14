@@ -1,3 +1,6 @@
+import xlsx from "node-xlsx";
+import * as fs from "fs";
+import * as path from "path";
 import {
   AccountConfigurationTypes,
   AccountingTypes,
@@ -7,18 +10,15 @@ import {
   LoggerTypes,
   RecurrentExpenseTypes,
 } from "../../types";
+import { FS, ID, UsingMiddleware } from "../../lib";
 
-import xlsx from "node-xlsx";
-import * as fs from "fs";
-import * as path from "path";
-import { FS, ID } from "../../lib";
-import { UsingMiddleware } from "../../lib";
 import {
   formatName,
   formatStrings,
   formatCategory,
   formatAmount,
 } from "./middleware";
+
 export class ExpenseProcessor
   extends UsingMiddleware<
     ExpenseProcessorTypes.ExpenseExtract,
@@ -28,7 +28,7 @@ export class ExpenseProcessor
 {
   constructor(
     private readonly accountingService: AccountingTypes.IAccountingService,
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     private readonly logsRepo: ExpenseProcessorTypes.IProcessorLogsRepository,
     private readonly options: ExpenseProcessorTypes.ExpenseProcessorOptions,
     private readonly logger: LoggerTypes.ILogger
@@ -103,7 +103,7 @@ export class ExpenseProcessor
 
     // Loop through each file that was retrieved and process
     for await (const file of files) {
-      if (!fs.lstatSync(filesDirPath + `/${file}`).isDirectory()) {
+      if (!fs.lstatSync(`${filesDirPath}/${file}`).isDirectory()) {
         await this.processFile(filesDirPath, file, params.accountId);
       }
     }
@@ -236,7 +236,7 @@ export class ExpenseProcessor
     );
 
     if (this.options.skipAllreadyProcessed) {
-      await this.logsRepo.add({ fileId: fileId, processedAt: new Date() });
+      await this.logsRepo.add({ fileId, processedAt: new Date() });
     }
   }
 
@@ -276,7 +276,7 @@ export class ExpenseProcessor
     );
 
     const timestamp = this.getDate(expenseData[0]);
-    const chargeDate = !!expenseData[9]
+    const chargeDate = expenseData[9]
       ? this.getDate(expenseData[9])
       : undefined;
     let expenseExtract: ExpenseProcessorTypes.ExpenseExtract = {
@@ -332,9 +332,8 @@ export class ExpenseProcessor
       )
     ) {
       return string as AccountingTypes.ExpenseType;
-    } else {
-      return expenseTypeMap[string];
     }
+    return expenseTypeMap[string];
   }
 
   private getCurrency(string: string): Currency {
@@ -344,8 +343,7 @@ export class ExpenseProcessor
 
     if (Object.values(Currency).includes(string as Currency)) {
       return string as Currency;
-    } else {
-      return expenseCurrencyMap[string];
     }
+    return expenseCurrencyMap[string];
   }
 }

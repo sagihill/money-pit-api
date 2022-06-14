@@ -1,7 +1,7 @@
+import { Model } from "mongoose";
 import { MongoRepository } from "../../lib/repository";
 import Expense from "../../models/Expense";
 import { MongoTypes, AccountingTypes, LoggerTypes } from "../../types";
-import { Model } from "mongoose";
 
 export const getAccountingRepository = (logger: LoggerTypes.ILogger) => {
   return new AccountingRepository(Expense, logger);

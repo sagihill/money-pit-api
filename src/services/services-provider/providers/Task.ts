@@ -8,10 +8,8 @@ export default async function Task(
   SP: ServicesProvider
 ): Promise<TaskTypes.ITaskService> {
   const logger = await SP.Logger();
-  const account = await SP.Account();
   const accounting = await SP.Accounting();
   const creditAccount = await SP.CreditAccount();
-  const salary = await SP.Salary();
   const accountConfiguration = await SP.AccountConfiguration();
   const recurrentExpenses = await SP.RecurrentExpense();
   const expenseSheets = await SP.ExpenseSheetsDownloader();
@@ -60,11 +58,9 @@ export default async function Task(
     ...options,
   };
   const taskService = new TaskService(
-    account,
     accounting,
     accountConfiguration,
     creditAccount,
-    salary,
     recurrentExpenses,
     expenseSheets,
     expenseProcessor,

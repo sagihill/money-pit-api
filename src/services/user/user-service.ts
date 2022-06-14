@@ -12,7 +12,7 @@ export class UserService implements UserTypes.IUserService {
       this.logger.info(`Creating user : ${{ request }}`);
       const userDetails = createNewUserDetails(request);
       return await this.userRepository.add(userDetails);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't create new user: ${{ request, error }}`);
       throw error;
     }
@@ -22,7 +22,7 @@ export class UserService implements UserTypes.IUserService {
     try {
       this.logger.info(`Editing user : ${{ id, request }}`);
       await this.userRepository.update(id, request);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't edit user: ${{ id, request, error }}`);
       throw error;
     }
@@ -32,7 +32,7 @@ export class UserService implements UserTypes.IUserService {
     try {
       this.logger.info(`Getting user : ${{ id }}`);
       return await this.userRepository.get(id);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't get user: ${{ id, error }}`);
       throw error;
     }
@@ -42,7 +42,7 @@ export class UserService implements UserTypes.IUserService {
     try {
       this.logger.info(`Deleting user : ${{ id }}`);
       return await this.userRepository.remove(id);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't remove user: ${{ id, error }}`);
       throw error;
     }
@@ -52,7 +52,7 @@ export class UserService implements UserTypes.IUserService {
     try {
       this.logger.info(`Finding users by: ${{ query }}`);
       return await this.userRepository.find(query);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't find users: ${{ query, error }}`);
       throw error;
     }
@@ -62,7 +62,7 @@ export class UserService implements UserTypes.IUserService {
       this.logger.info(`Finding users by: ${{ query }}`);
       const users = await this.userRepository.find(query, null, 1);
       return users[0];
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't find users: ${{ query, error }}`);
       throw error;
     }

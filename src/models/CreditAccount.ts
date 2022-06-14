@@ -16,6 +16,6 @@ const schema = new Schema<CreditAccountTypes.CreditAccount>({
 const CreditAccount: ICreditAccountModel = model<
   CreditAccountTypes.CreditAccount,
   ICreditAccountModel
->("AccountConfiguration", schema);
+>("CreditAccount", schema);
 
 export default CreditAccount;

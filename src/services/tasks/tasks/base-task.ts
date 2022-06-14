@@ -1,5 +1,5 @@
-import { TaskTypes } from "../../../types/task-types";
 import { parseExpression } from "cron-parser";
+import { TaskTypes } from "../../../types/task-types";
 import { LoggerTypes } from "../../../types";
 import { Async } from "../../../lib";
 
@@ -15,7 +15,6 @@ export abstract class BaseTask implements TaskTypes.ITask {
   protected isEnabled(): void {
     if (!this.options.isEnabled) {
       this.logger.info("Task is not enabled, skipping.");
-      return;
     }
   }
 
@@ -43,9 +42,10 @@ export abstract class BaseTask implements TaskTypes.ITask {
       this.logger.error(
         "Could not start task runner, could not parse cron interval"
       );
-      throw new Error(`Cron interval is invalid`);
+      throw new Error("Cron interval is invalid");
     }
     if (!interval || !interval.hasNext()) {
+      throw new Error("Cron interval is invalid");
     }
     return interval.next().getTime() - Date.now();
   }

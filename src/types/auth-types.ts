@@ -1,5 +1,3 @@
-import { IEntityDetails } from ".";
-
 export namespace AuthTypes {
   export interface IAuthService {
     signIn(request: SignInRequest): Promise<SignInResponse>;

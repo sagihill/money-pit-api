@@ -1,12 +1,12 @@
 import {
   IEntityDetails,
   AccountConfigurationTypes,
-  CriticalError,
   SalaryTypes,
   CreditAccountTypes,
   ISimpleService,
   RecurrentExpenseTypes,
 } from ".";
+import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountTypes {
@@ -17,6 +17,10 @@ export namespace AccountTypes {
       Requests.UpdateRequest
     > {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
+  }
+  export interface IAccountReaderService {
+    getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
+    get(id: string): Promise<AccountDetails | undefined>;
   }
   export interface AccountDetails extends IEntityDetails {
     id: string;

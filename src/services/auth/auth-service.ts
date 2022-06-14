@@ -50,7 +50,7 @@ export class AuthService implements AuthTypes.IAuthService {
       });
 
       return { token };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't signin user: ${{ error }}`);
       throw error;
     }
@@ -71,7 +71,7 @@ export class AuthService implements AuthTypes.IAuthService {
       });
 
       return { id: userDetails.id };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Can't find users: ${{ error }}`);
       throw error;
     }

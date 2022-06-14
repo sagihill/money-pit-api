@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-expressions */
 import mongoose, { ConnectOptions } from "mongoose";
 
 /** Callback for establishing or re-stablishing mongo connection */
@@ -101,7 +103,9 @@ export default class SafeMongooseConnection {
     }
     mongoose
       .connect(this.options.mongoUrl, this.mongoConnectionOptions)
-      .catch(() => {});
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   /**

@@ -1,18 +1,18 @@
 import moment from "moment";
+import { CriticalError } from "../../errors/service-error";
 import {
   LoggerTypes,
   AccountingTypes,
   AccountTypes,
   ChargeMonth,
   AccountConfigurationTypes,
-  CriticalError,
   SalaryTypes,
 } from "../../types";
 import { createNewExpense } from "./expense-factory";
 
 export class AccountingService implements AccountingTypes.IAccountingService {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     private readonly accountingRepository: AccountingTypes.IAccountingRepository,
     private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly salaryService: SalaryTypes.ISalaryService,
@@ -27,7 +27,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     try {
       this.logger.info("Editing expense");
       await this.accountingRepository.update(id, request);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error("Can't edit expense");
       throw error;
     }
@@ -37,7 +37,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     try {
       this.logger.info("Adding expenses");
       await this.accountingRepository.addExpenses(expenses);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error("Can't add expenses");
       throw error;
     }

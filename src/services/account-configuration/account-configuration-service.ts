@@ -7,7 +7,6 @@ import {
   MongoTypes,
   AccountingTypes,
   RequiredParameterError,
-  IContext,
 } from "../../types";
 
 export class AccountConfigurationService
@@ -19,7 +18,7 @@ export class AccountConfigurationService
   implements AccountConfigurationTypes.IAccountConfigurationService
 {
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
+    private readonly accountService: AccountTypes.IAccountReaderService,
     repository: MongoTypes.Repository<
       AccountConfigurationTypes.AccountConfiguration,
       AccountConfigurationTypes.Requests.UpdateRequest
@@ -41,7 +40,7 @@ export class AccountConfigurationService
         deleted: false,
       });
       return configs;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error on findConfigurations function of ${this.constructor.name}`
       );

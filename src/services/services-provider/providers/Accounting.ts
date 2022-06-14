@@ -7,7 +7,7 @@ export default async function Accounting(
   SP: ServicesProvider
 ): Promise<AccountingTypes.IAccountingService> {
   const logger = await SP.Logger();
-  const account = await SP.Account();
+  const account = await SP.AccountReader();
   const accountConfiguration = await SP.AccountConfiguration();
   const salary = await SP.Salary();
   const config = await SP.Config();

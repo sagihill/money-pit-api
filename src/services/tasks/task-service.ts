@@ -21,11 +21,9 @@ export class TaskService implements TaskTypes.ITaskService {
   private tasks: TaskTypes.ITask[] = [];
 
   constructor(
-    private readonly accountService: AccountTypes.IAccountService,
     private readonly accountingService: AccountingTypes.IAccountingService,
     private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly creditAccountService: CreditAccountTypes.ICreditAccountService,
-    private readonly salaryService: SalaryTypes.ISalaryService,
     private readonly recurrentExpensesService: RecurrentExpenseTypes.IReccurentExpensesService,
     private readonly expenseSheets: ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader,
     private readonly expenseProcessor: ExpenseProcessorTypes.IExpenseProcessor,
@@ -44,7 +42,6 @@ export class TaskService implements TaskTypes.ITaskService {
 
   initTasks(): void {
     const addNewExpensesTask = new AddNewExpensesTask(
-      this.accountService,
       this.creditAccountService,
       this.accountConfigurationService,
       this.expenseSheets,

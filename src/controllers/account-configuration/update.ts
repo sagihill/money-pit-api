@@ -54,11 +54,14 @@ const update: RequestHandler = async (
     };
 
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
       message: `Updating account_${accountId} configuration had an error.`,
-      error,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
     res.status(400).send(response);
   }

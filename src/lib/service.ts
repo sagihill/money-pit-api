@@ -15,7 +15,7 @@ export abstract class SimpleService<T, A, U>
     protected readonly repository: MongoTypes.Repository<T, U>,
     protected readonly logger: LoggerTypes.ILogger
   ) {
-    ///
+    // /
   }
 
   async add(request: A): Promise<T> {
@@ -24,7 +24,7 @@ export abstract class SimpleService<T, A, U>
       await this.createValidation(request);
       const details = await this.createEntityDetails(request);
       return await this.repository.add(details);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error on create function of ${this.constructor.name}`);
       throw error;
     }
@@ -35,26 +35,28 @@ export abstract class SimpleService<T, A, U>
       this.logger.info(`Running update on ${this.constructor.name}`);
       await this.updateValidation(id, request);
       await this.repository.update(id, request);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error on update function of ${this.constructor.name}`);
       throw error;
     }
   }
+
   async remove(id: string): Promise<void> {
     try {
       this.logger.info(`Running remove on ${this.constructor.name}`);
       await this.repository.remove(id);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error on remove function of ${this.constructor.name}`);
       throw error;
     }
   }
+
   async get(id: string): Promise<T | undefined> {
     try {
       this.logger.info(`Running remove on ${this.constructor.name}`);
       const result = await this.repository.get(id);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error on get function of ${this.constructor.name}`);
       throw error;
     }

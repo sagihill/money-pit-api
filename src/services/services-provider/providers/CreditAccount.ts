@@ -11,7 +11,7 @@ export default async function CreditAccount(
   SP: ServicesProvider
 ): Promise<CreditAccountTypes.ICreditAccountService> {
   const logger = await SP.Logger();
-  const account = await SP.Account();
+  const account = await SP.AccountReader();
   const repo = getCreditAccountRepository();
   const config = await SP.Config();
   const crypter = new Cryptr(await config.get("CREDIT_ACCOUNTS_SECRET"));

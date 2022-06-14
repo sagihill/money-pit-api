@@ -68,7 +68,7 @@ export class AddReccurentExpensesTask
       }
 
       await this.accountingService.addExpenses(expenses);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(error);
     }
   }

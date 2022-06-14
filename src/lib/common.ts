@@ -1,7 +1,20 @@
+/* eslint-disable prefer-spread */
+/* eslint-disable prefer-arrow-callback */
+/* eslint-disable prefer-exponentiation-operator */
+/* eslint-disable no-restricted-properties */
+/* eslint-disable vars-on-top */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable no-var */
+/* eslint-disable prefer-const */
+/* eslint-disable default-param-last */
+/* eslint-disable no-param-reassign */
+/* eslint-disable guard-for-in */
+/* eslint-disable eqeqeq */
+/* eslint-disable no-continue */
 import * as UUID from "uuid";
 import * as UUIDFromString from "uuid-by-string";
-import { ServicesProvider } from "../services/services-provider";
 import { RequestHandler, Request, Response, NextFunction } from "express";
+import { ServicesProvider } from "../services/services-provider";
 import { Masks } from "./masks";
 import {
   AccountingTypes,
@@ -32,9 +45,8 @@ export namespace ID {
   export function get(input?: string | undefined): string {
     if (!input) {
       return UUID.v4();
-    } else {
-      return uuidFromString(input as string) as string;
     }
+    return uuidFromString(input as string) as string;
   }
 }
 
@@ -162,6 +174,7 @@ export namespace Objects {
     if (depth) {
       if ((depth.current || 0) > depth.limit) {
         return o;
+        // eslint-disable-next-line no-else-return
       } else {
         next = { limit: depth.limit, current: (depth.current || 0) + 1 };
       }
@@ -171,6 +184,7 @@ export namespace Objects {
     if (typeof o === "object") {
       stack = [...stack, o];
       for (let pn in o) {
+        // eslint-disable-next-line prefer-const
         let pv = o[pn];
         if (pv !== null || pv !== undefined) {
           if (Array.isArray(pv)) {
@@ -209,9 +223,9 @@ export namespace Objects {
     }
 
     // This means no processing happened & we should return o.
-    // if (Object.getOwnPropertyNames(res).length === 0) {
-    //   res = o;
-    // }
+    if (Object.getOwnPropertyNames(res).length === 0) {
+      res = o;
+    }
 
     return res;
   }

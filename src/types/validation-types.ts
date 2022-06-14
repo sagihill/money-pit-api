@@ -1,4 +1,4 @@
-import { CriticalError } from ".";
+import { CriticalError } from "../errors/service-error";
 
 export namespace ValidationTypes {
   export interface IValidationService {

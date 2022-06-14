@@ -33,7 +33,7 @@ export class ExpenseSheetsDownloader
       await this.downloadFiles(page, params.accountId);
       await this.logout(page);
       await this.close(page);
-    } catch (error) {
+    } catch (error: any) {
       await this.logger.error(
         "Somthing happend while downloading expense sheets"
       );
@@ -100,7 +100,7 @@ export class ExpenseSheetsDownloader
         }
       );
       await closeButton?.click();
-    } catch (error) {
+    } catch (error: any) {
       await Sync.sleep(1000);
     }
 

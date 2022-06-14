@@ -1,5 +1,5 @@
 import { Request, RequestHandler } from "express";
-import Joi from "joi";
+import Joi, { Err } from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
@@ -14,7 +14,6 @@ const get: RequestHandler = async (req: Request, res) => {
     const SP = ServicesProvider.get();
     const accountConfigurationService = await SP.AccountConfiguration();
     const { accountId } = req.params;
-
     await Utils.validateAccountMembership(req, accountId);
 
     const accountConfiguration = await accountConfigurationService.get(
@@ -30,17 +29,20 @@ const get: RequestHandler = async (req: Request, res) => {
     } else {
       const response: ApiResponse = {
         status: ResponseStatus.success,
-        message: `Found account configuration.`,
+        message: "Found account configuration.",
         data: { accountConfiguration },
       };
 
       res.send(response);
     }
-  } catch (error) {
+  } catch (error: any) {
     const response: ApiResponse = {
-      status: ResponseStatus.failure,
-      message: `finding account configuration for account ${req.body.accountId} had an error.`,
-      error,
+      status: ResponseStatus.error,
+      message: `finding account configuration for account ${req.params.accountId} had an error.`,
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
     };
 
     res.status(400).send(response);

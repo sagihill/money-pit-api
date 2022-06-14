@@ -7,7 +7,7 @@ export default async function Salary(
   SP: ServicesProvider
 ): Promise<SalaryTypes.ISalaryService> {
   const logger = await SP.Logger();
-  const account = await SP.Account();
+  const account = await SP.AccountReader();
   const repo = getSalaryRepository();
   const salaryService = new SalaryService(account, repo, logger);
 

@@ -1,5 +1,5 @@
-import { MongoTypes } from "../types";
 import { Model } from "mongoose";
+import { MongoTypes } from "../types";
 import { Objects } from "./common";
 
 /**
@@ -7,7 +7,7 @@ import { Objects } from "./common";
  */
 export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
   constructor(protected readonly model: Model<T>) {
-    ///
+    // /
   }
 
   async add(data: T): Promise<T> {
@@ -49,13 +49,13 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
    * @param limit Max number of objects for cursor to retrieve
    */
   async find(qry: any, sortObj?: any, limit?: number): Promise<T[]> {
-    let query = sortObj
+    const query = sortObj
       ? this.model.find({ ...qry, deleted: false }).sort(sortObj)
       : this.model.find({ ...qry, deleted: false });
 
     if (limit) query.limit(limit);
 
-    let a = await (await query).map((v) => this.deserialize(v.toObject()));
+    const a = await (await query).map((v) => this.deserialize(v.toObject()));
     return a;
   }
 

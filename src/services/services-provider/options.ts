@@ -1,4 +1,4 @@
 export interface UserServiceOptions {
-    dbName: string,
-    collectionName: string;
+  dbName: string;
+  collectionName: string;
 }
