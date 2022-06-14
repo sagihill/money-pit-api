@@ -60,7 +60,7 @@ export abstract class SimpleService<T, A, U>
 
   async removeAccountOne(id: string, accountId: string): Promise<void> {
     try {
-      this.logger.info(`Running remove on ${this.constructor.name}`);
+      this.logger.info(`Running removeAccountOne on ${this.constructor.name}`);
       const res = await this.repository.removeOne({ id, accountId });
       if (!res) {
         throw new MongoTypes.EntityRemoveError(id);
@@ -73,9 +73,9 @@ export abstract class SimpleService<T, A, U>
     }
   }
 
-  async findAccountOne(id: string, accountId: string): Promise<T> {
+  async findAccountOne(id: string, accountId: string): Promise<T | undefined> {
     try {
-      this.logger.info(`Running remove on ${this.constructor.name}`);
+      this.logger.info(`Running findAccountOne on ${this.constructor.name}`);
       const result = (await this.repository.find({ id, accountId }, {}, 1))[0];
       return result;
     } catch (error: any) {
@@ -88,7 +88,7 @@ export abstract class SimpleService<T, A, U>
 
   async get(id: string): Promise<T | undefined> {
     try {
-      this.logger.info(`Running remove on ${this.constructor.name}`);
+      this.logger.info(`Running get on ${this.constructor.name}`);
       const result = await this.repository.get(id);
       return result;
     } catch (error: any) {

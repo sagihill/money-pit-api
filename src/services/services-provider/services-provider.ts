@@ -13,6 +13,7 @@ import {
   CreditAccountTypes,
   SalaryTypes,
   ValidationTypes,
+  CryptoTypes,
 } from "../../types";
 
 import { TaskTypes } from "../../types/task-types";
@@ -217,6 +218,19 @@ export class ServicesProvider {
     try {
       return await this.getProvider<ConfigTypes.IConfigService, {}>(
         "Config",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
+  async Crypto(): Promise<CryptoTypes.ICryptoService> {
+    try {
+      return await this.getProvider<CryptoTypes.ICryptoService, {}>(
+        "Crypto",
         {},
         CreationMode.singleton
       );

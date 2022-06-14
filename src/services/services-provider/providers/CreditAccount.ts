@@ -1,4 +1,3 @@
-import Cryptr from "cryptr";
 import { CreditAccountTypes } from "../../../types";
 import {
   CreditAccountService,
@@ -13,15 +12,8 @@ export default async function CreditAccount(
   const logger = await SP.Logger();
   const account = await SP.AccountReader();
   const repo = getCreditAccountRepository();
-  const config = await SP.Config();
-  const crypter = new Cryptr(await config.get("CREDIT_ACCOUNTS_SECRET"));
-
-  const salaryService = new CreditAccountService(
-    account,
-    crypter,
-    repo,
-    logger
-  );
+  const crypto = await SP.Crypto();
+  const salaryService = new CreditAccountService(account, crypto, repo, logger);
 
   return salaryService;
 }

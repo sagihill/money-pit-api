@@ -5,12 +5,11 @@ import { SimpleService } from "../../lib/service";
 import {
   AccountTypes,
   CreditAccountTypes,
+  CryptoTypes,
   LoggerTypes,
   MongoTypes,
   RequiredParameterError,
 } from "../../types";
-
-const Cryptr = require("cryptr");
 
 export class CreditAccountService
   extends SimpleService<
@@ -22,7 +21,7 @@ export class CreditAccountService
 {
   constructor(
     private readonly accountService: AccountTypes.IAccountReaderService,
-    private readonly cryptr: typeof Cryptr,
+    private readonly crypto: CryptoTypes.ICryptoService,
     repository: MongoTypes.Repository<
       CreditAccountTypes.CreditAccount,
       CreditAccountTypes.Requests.UpdateRequest
@@ -34,6 +33,16 @@ export class CreditAccountService
 
   async get(id: string): Promise<CreditAccountTypes.CreditAccount | undefined> {
     const creditAccount = await super.get(id);
+    if (creditAccount) {
+      await this.decryptCreditAccount(creditAccount);
+      return creditAccount;
+    }
+  }
+  async findAccountOne(
+    id: string,
+    accountId: string
+  ): Promise<CreditAccountTypes.CreditAccount | undefined> {
+    const creditAccount = await super.findAccountOne(id, accountId);
     if (creditAccount) {
       await this.decryptCreditAccount(creditAccount);
       return creditAccount;
@@ -99,23 +108,32 @@ export class CreditAccountService
     return creditAccount;
   }
 
-  private encryptCreditAccount(
+  private async encryptCreditAccount(
     creditAccount: CreditAccountTypes.CreditAccount
-  ): void {
-    const password = this.cryptr.encrypt(creditAccount.credentials.password, 8);
+  ): Promise<void> {
+    const password = await this.crypto.encrypt(
+      creditAccount.credentials.password
+    );
     creditAccount.credentials.password = password;
 
-    const username = this.cryptr.encrypt(creditAccount.credentials.username, 8);
+    const username = await this.crypto.encrypt(
+      creditAccount.credentials.username
+    );
     creditAccount.credentials.username = username;
   }
 
-  private decryptCreditAccount(
+  private async decryptCreditAccount(
     creditAccount: CreditAccountTypes.CreditAccount
-  ): void {
-    const password = this.cryptr.decrypt(creditAccount.credentials.password, 8);
+  ): Promise<void> {
+    const password = await this.crypto.decrypt(
+      creditAccount.credentials.password
+    );
     creditAccount.credentials.password = password;
 
-    const username = this.cryptr.decrypt(creditAccount.credentials.username, 8);
+    const username = await this.crypto.decrypt(
+      creditAccount.credentials.username
+    );
+    // console.log(username);
     creditAccount.credentials.username = username;
   }
 

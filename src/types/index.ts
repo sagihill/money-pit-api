@@ -14,6 +14,7 @@ export * from "./recurrent-expense-types";
 export * from "./auth-types";
 export * from "./config-types";
 export * from "./validation-types";
+export * from "./crypto-types";
 
 export interface IEntityDetails {
   deleted: boolean;
@@ -59,7 +60,7 @@ export interface ISimpleService<T, A, E> {
 export interface IAccountSimpleService<T, A, E>
   extends ISimpleService<T, A, E> {
   removeAccountOne(id: string, accountId: string): Promise<void>;
-  findAccountOne(id: string, accountId: string): Promise<T>;
+  findAccountOne(id: string, accountId: string): Promise<T | undefined>;
 }
 
 export interface IContext {

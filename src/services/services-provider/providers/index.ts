@@ -5,6 +5,7 @@ import Accounting from "./Accounting";
 import Auth from "./Auth";
 import Config from "./Config";
 import CreditAccount from "./CreditAccount";
+import Crypto from "./Crypto";
 import ExpenseProcessor from "./ExpenseProcessor";
 import ExpenseSheetsDownloader from "./ExpenseSheetsDownloader";
 import Logger from "./Logger";
@@ -22,6 +23,7 @@ export const Providers: any = {
   Accounting,
   Auth,
   Config,
+  Crypto,
   CreditAccount,
   ExpenseProcessor,
   ExpenseSheetsDownloader,
