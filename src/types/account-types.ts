@@ -76,4 +76,9 @@ export namespace AccountTypes {
       super(`Can't finish operation, account_${accountId} is not found.`);
     }
   }
+  export class AccountAdditionError extends CriticalError {
+    constructor() {
+      super(`Can't finish account adding, somthing went wrong.`);
+    }
+  }
 }

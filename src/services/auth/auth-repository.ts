@@ -1,6 +1,6 @@
+import { Model } from "mongoose";
 import Auth from "../../models/Auth";
 import { AuthTypes } from "../../types";
-import { Model } from "mongoose";
 
 export const getAuthRepository = () => {
   return new AuthRepository(Auth);

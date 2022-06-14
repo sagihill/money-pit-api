@@ -1,5 +1,6 @@
 import { Model, Schema, model } from "mongoose";
 import { AccountConfigurationTypes } from "../types";
+import BaseEntitySchema from "./Base";
 import RecurrentExpense, { RecurrentExpenseFields } from "./RecurrentExpense";
 
 interface IAccountConfigurationModel
@@ -18,6 +19,7 @@ const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
     index: true,
     required: false,
   },
+  ...BaseEntitySchema,
 });
 
 const AccountConfiguration: IAccountConfigurationModel = model<

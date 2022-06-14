@@ -17,40 +17,39 @@
         "ignorePackages": true
       }
     ],
-    "spaced-comment": ["error", "always"],
+    "spaced-comment": ["off", "always"],
     "eqeqeq": [
-      "error",
+      "off",
       "always",
       {
         "null": "ignore"
       }
     ],
     "no-underscore-dangle": [
-      "error",
+      "off",
       {
         "allow": ["_id"]
       }
     ],
     "camelcase": [
-      "error",
+      "off",
       {
         "allow": ["oauth2_v2", "user_id"],
         "properties": "never"
       }
     ],
-
     "no-restricted-syntax": "off",
     "brace-style": "off",
     "operator-linebreak": "off",
-    "func-names": ["error", "never"],
+    "func-names": ["off", "never"],
     "arrow-parens": "off",
     "no-use-before-define": "off",
-    "semi": "error",
+    "semi": "off",
     "no-extra-semi": 0,
     "import/no-unresolved": "off",
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": [
-      "error",
+      "off",
       {
         "devDependencies": ["**/*.test.ts", "**/*.spec.ts"]
       }
@@ -65,7 +64,7 @@
     "class-methods-use-this": "off",
     "linebreak-style": "off",
     "comma-dangle": "off",
-    "handle-callback-err": "error",
+    "handle-callback-err": "off",
     "quotes": ["warn", "double"],
     "max-classes-per-file": "off",
     "implicit-arrow-linebreak": "off",
@@ -75,6 +74,7 @@
   "overrides": [
     {
       // "files": ["**/*.ts"],
+      "files": [""],
       "parser": "@typescript-eslint/parser",
       "rules": {
         "no-undef": "off"

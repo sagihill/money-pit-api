@@ -28,18 +28,22 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
     return docs;
   }
 
-  async update(id: string, editRequest: U): Promise<void> {
-    await this.model.findOneAndUpdate(
+  async update(id: string, editRequest: U): Promise<boolean> {
+    const res = await this.model.updateOne(
       { id },
       { ...editRequest, updatedAt: new Date() }
     );
+
+    return res.modifiedCount === 1;
   }
 
-  async remove(id: string): Promise<void> {
-    await this.model.findOneAndUpdate(
+  async remove(id: string): Promise<boolean> {
+    const res = await this.model.updateOne(
       { id },
       { deleted: true, updatedAt: new Date() }
     );
+
+    return res.modifiedCount === 1;
   }
 
   /**
@@ -70,10 +74,20 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
     }
   }
 
-  async removeMany(qry: any): Promise<void> {
-    await this.model.updateMany(qry, {
+  async removeMany(qry: any): Promise<number> {
+    const result = await this.model.updateMany(qry, {
       $set: { deleted: true, updatedAt: new Date() },
     });
+
+    return result.modifiedCount;
+  }
+
+  async removeOne(qry: any): Promise<boolean> {
+    const result = await this.model.updateOne(qry, {
+      $set: { deleted: true, updatedAt: new Date() },
+    });
+
+    return result.modifiedCount === 1;
   }
 
   /**
@@ -94,6 +108,7 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
       "_id",
       "__v",
       "updatedAt",
+      "createdAt",
     ]);
     return { ...deserialized } as T;
   }

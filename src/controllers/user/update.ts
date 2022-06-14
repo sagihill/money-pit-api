@@ -4,37 +4,34 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus, UserTypes } from "../../types";
 
-export const signUpRequestValidator = Joi.object().keys({
-  firstName: Joi.string()
-    .required()
-    .regex(/^[a-z ,.'-]+$/i),
-  lastName: Joi.string()
-    .required()
-    .regex(/^[a-z ,.'-]+$/i),
-  email: Joi.string().required().email(),
-  password: Joi.string().required().length(16),
+export const updateUserRequestValidator = Joi.object().keys({
+  accountId: Joi.string().uuid(),
+  lastName: Joi.string().regex(/^[a-z ,.'-]+$/i),
+  firstName: Joi.string().regex(/^[a-z ,.'-]+$/i),
+  email: Joi.string().email(),
 });
 
-const signUp: RequestHandler = async (
-  req: Request<{}, {}, UserTypes.Requests.AddRequest>,
+const update: RequestHandler = async (
+  req: Request<any, {}, UserTypes.Requests.UpdateRequest>,
   res
 ) => {
   try {
     const SP = ServicesProvider.get();
-    const authService = await SP.Auth();
-    const { firstName, lastName, email, password } = req.body;
-    const result = await authService.signUp({
+    const userService = await SP.User();
+
+    const { firstName, lastName, email, accountId } = req.body;
+    await userService.update(req.params.id, {
       firstName,
       lastName,
       email,
-      password,
+      accountId,
     });
 
     const response: ApiResponse = {
       status: ResponseStatus.success,
-      message: "New user signed up.",
+      message: "User data updated.",
       data: {
-        userId: result.id,
+        userId: req.params.id,
       },
     };
 
@@ -42,7 +39,7 @@ const signUp: RequestHandler = async (
   } catch (error: any) {
     const response: ApiResponse = {
       status: ResponseStatus.error,
-      message: "An error occured on signup",
+      message: "Unable to update user data",
       error: {
         name: error.constructor.name,
         message: error.message,
@@ -53,6 +50,6 @@ const signUp: RequestHandler = async (
   }
 };
 
-export default requestMiddleware(signUp, {
-  validation: { body: signUpRequestValidator },
+export default requestMiddleware(update, {
+  validation: { body: updateUserRequestValidator },
 });

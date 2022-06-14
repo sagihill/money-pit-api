@@ -27,7 +27,7 @@ export default async function Accounting(
     repository,
     accountConfiguration,
     salary,
-    { configuration, ...options },
+    { ...configuration, ...options },
     logger
   );
 

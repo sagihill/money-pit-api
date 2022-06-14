@@ -1,9 +1,9 @@
-import { AccountingTypes, Currency, ISimpleService } from ".";
+import { AccountingTypes, Currency, IAccountSimpleService } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace SalaryTypes {
   export interface ISalaryService
-    extends ISimpleService<
+    extends IAccountSimpleService<
       Salary,
       Requests.AddRequest,
       Requests.UpdateRequest

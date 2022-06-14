@@ -1,5 +1,6 @@
 import { Model, Schema, model } from "mongoose";
 import { AccountingTypes } from "../types";
+import BaseEntitySchema from "./Base";
 
 interface IExpenseModel extends Model<AccountingTypes.Expense> {}
 
@@ -15,9 +16,7 @@ const schema = new Schema<AccountingTypes.Expense>(
     currency: { type: String, index: true, required: true },
     description: { type: String, index: true, required: false },
     type: { type: String, index: true, required: true },
-    deleted: { type: Boolean, index: true, required: true },
-    createdAt: { type: Date, index: true, required: true },
-    updatedAt: { type: Date, index: true, required: true },
+    ...BaseEntitySchema,
   },
   { timestamps: true }
 );

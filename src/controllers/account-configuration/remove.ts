@@ -5,16 +5,17 @@ import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
 
-export const removeAccountConfigurationRequestParamsValidator =
-  Joi.object().keys({
+export const removeAccountConfigurationRequestBodyValidator = Joi.object().keys(
+  {
     accountId: Joi.string().uuid().required(),
-  });
+  }
+);
 
 const remove: RequestHandler = async (req: Request, res) => {
   try {
     const SP = ServicesProvider.get();
     const accountConfiguration = await SP.AccountConfiguration();
-    const { accountId } = req.params;
+    const { accountId } = req.body;
 
     await Utils.validateAccountOwnership(req, accountId);
 
@@ -42,6 +43,6 @@ const remove: RequestHandler = async (req: Request, res) => {
 
 export default requestMiddleware(remove, {
   validation: {
-    params: removeAccountConfigurationRequestParamsValidator,
+    body: removeAccountConfigurationRequestBodyValidator,
   },
 });

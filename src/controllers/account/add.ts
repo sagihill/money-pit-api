@@ -31,7 +31,14 @@ const add: RequestHandler = async (
 
     const currentAccount = await accountService.getByAdminUserId(userId);
     if (currentAccount) {
-      await accountService.remove(currentAccount.id);
+      const response: ApiResponse = {
+        status: ResponseStatus.failure,
+        message:
+          "Can't add new account. An account for current user allready exists.",
+      };
+
+      res.send(response);
+      return;
     }
 
     const account = await accountService.add({
@@ -40,6 +47,7 @@ const add: RequestHandler = async (
     });
 
     if (!account) {
+      throw new AccountTypes.AccountAdditionError();
     }
 
     const accountId = account.id;

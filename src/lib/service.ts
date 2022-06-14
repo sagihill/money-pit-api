@@ -1,4 +1,5 @@
 import {
+  IAccountSimpleService,
   IEntityDetails,
   ISimpleService,
   LoggerTypes,
@@ -9,7 +10,7 @@ import {
  * A generic base class for Service repositories.
  */
 export abstract class SimpleService<T, A, U>
-  implements ISimpleService<T, A, U>
+  implements ISimpleService<T, A, U>, IAccountSimpleService<T, A, U>
 {
   constructor(
     protected readonly repository: MongoTypes.Repository<T, U>,
@@ -34,7 +35,10 @@ export abstract class SimpleService<T, A, U>
     try {
       this.logger.info(`Running update on ${this.constructor.name}`);
       await this.updateValidation(id, request);
-      await this.repository.update(id, request);
+      const res = await this.repository.update(id, request);
+      if (!res) {
+        throw new MongoTypes.EntityRemoveError(id);
+      }
     } catch (error: any) {
       this.logger.error(`Error on update function of ${this.constructor.name}`);
       throw error;
@@ -44,9 +48,40 @@ export abstract class SimpleService<T, A, U>
   async remove(id: string): Promise<void> {
     try {
       this.logger.info(`Running remove on ${this.constructor.name}`);
-      await this.repository.remove(id);
+      const res = await this.repository.remove(id);
+      if (!res) {
+        throw new MongoTypes.EntityRemoveError(id);
+      }
     } catch (error: any) {
       this.logger.error(`Error on remove function of ${this.constructor.name}`);
+      throw error;
+    }
+  }
+
+  async removeAccountOne(id: string, accountId: string): Promise<void> {
+    try {
+      this.logger.info(`Running remove on ${this.constructor.name}`);
+      const res = await this.repository.removeOne({ id, accountId });
+      if (!res) {
+        throw new MongoTypes.EntityRemoveError(id);
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Error on removeOne function of ${this.constructor.name}`
+      );
+      throw error;
+    }
+  }
+
+  async findAccountOne(id: string, accountId: string): Promise<T> {
+    try {
+      this.logger.info(`Running remove on ${this.constructor.name}`);
+      const result = (await this.repository.find({ id, accountId }, {}, 1))[0];
+      return result;
+    } catch (error: any) {
+      this.logger.error(
+        `Error on findOne function of ${this.constructor.name}`
+      );
       throw error;
     }
   }

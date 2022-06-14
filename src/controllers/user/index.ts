@@ -1,5 +1,5 @@
 import get from "./get";
-import edit from "./edit";
+import update from "./update";
 import remove from "./remove";
 
-export { get, remove, edit };
+export { get, remove, update };

@@ -9,7 +9,7 @@ const router = Router();
 // Account configuration routes
 router.post("/add", AccountConfigurationController.add);
 router.get("/accountId/:accountId", AccountConfigurationController.get);
-router.delete("/accountId/:accountId", AccountConfigurationController.remove);
+router.delete("/", AccountConfigurationController.remove);
 router.post("/accountId/:accountId", AccountConfigurationController.update);
 
 // Other configurations routes

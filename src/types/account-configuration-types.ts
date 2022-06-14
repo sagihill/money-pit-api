@@ -1,10 +1,10 @@
-import { IEntityDetails, ISimpleService } from ".";
+import { IEntityDetails, IAccountSimpleService } from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountConfigurationTypes {
   export interface IAccountConfigurationService
-    extends ISimpleService<
+    extends IAccountSimpleService<
       AccountConfiguration,
       Requests.AddRequest,
       Requests.UpdateRequest

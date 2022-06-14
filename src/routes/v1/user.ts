@@ -6,6 +6,6 @@ const router = Router();
 // User routes
 router.get("/id/:id", UserController.get);
 router.delete("/id/:id", UserController.remove);
-router.put("/id/:id", UserController.edit);
+router.put("/id/:id", UserController.update);
 
 export default router;

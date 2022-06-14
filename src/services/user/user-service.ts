@@ -1,70 +1,71 @@
-import { LoggerTypes, UserTypes } from "../../types";
-import { createNewUserDetails } from "./user-factory";
+import { ID } from "../../lib";
+import { SimpleService } from "../../lib/service";
+import {
+  AccountTypes,
+  UserTypes,
+  LoggerTypes,
+  MongoTypes,
+  Currency,
+  InvalidCurrency,
+  RequiredParameterError,
+} from "../../types";
 
-export class UserService implements UserTypes.IUserService {
+export class UserService
+  extends SimpleService<
+    UserTypes.UserDetails,
+    UserTypes.Requests.AddRequest,
+    UserTypes.Requests.UpdateRequest
+  >
+  implements UserTypes.IUserService
+{
   constructor(
-    private readonly userRepository: UserTypes.IUserRepository,
-    private readonly logger: LoggerTypes.ILogger
-  ) {}
-
-  async add(request: UserTypes.AddUserRequest): Promise<UserTypes.UserDetails> {
-    try {
-      this.logger.info(`Creating user : ${{ request }}`);
-      const userDetails = createNewUserDetails(request);
-      return await this.userRepository.add(userDetails);
-    } catch (error: any) {
-      this.logger.error(`Can't create new user: ${{ request, error }}`);
-      throw error;
-    }
+    repository: MongoTypes.Repository<
+      UserTypes.UserDetails,
+      UserTypes.Requests.UpdateRequest
+    >,
+    logger: LoggerTypes.ILogger
+  ) {
+    super(repository, logger);
   }
 
-  async update(id: string, request: UserTypes.EditUserRequest): Promise<void> {
+  async findOne(
+    request: UserTypes.Requests.FindRequest
+  ): Promise<UserTypes.UserDetails | undefined> {
     try {
-      this.logger.info(`Editing user : ${{ id, request }}`);
-      await this.userRepository.update(id, request);
-    } catch (error: any) {
-      this.logger.error(`Can't edit user: ${{ id, request, error }}`);
-      throw error;
-    }
-  }
-
-  async get(id: string): Promise<UserTypes.UserDetails | undefined> {
-    try {
-      this.logger.info(`Getting user : ${{ id }}`);
-      return await this.userRepository.get(id);
-    } catch (error: any) {
-      this.logger.error(`Can't get user: ${{ id, error }}`);
-      throw error;
-    }
-  }
-
-  async remove(id: string): Promise<void> {
-    try {
-      this.logger.info(`Deleting user : ${{ id }}`);
-      return await this.userRepository.remove(id);
-    } catch (error: any) {
-      this.logger.error(`Can't remove user: ${{ id, error }}`);
-      throw error;
-    }
-  }
-
-  async find(query: any): Promise<UserTypes.UserDetails[]> {
-    try {
-      this.logger.info(`Finding users by: ${{ query }}`);
-      return await this.userRepository.find(query);
-    } catch (error: any) {
-      this.logger.error(`Can't find users: ${{ query, error }}`);
-      throw error;
-    }
-  }
-  async findOne(query: any): Promise<UserTypes.UserDetails | undefined> {
-    try {
-      this.logger.info(`Finding users by: ${{ query }}`);
-      const users = await this.userRepository.find(query, null, 1);
+      this.logger.info(`Finding users by: ${{ request }}`);
+      const users = await this.repository.find(request, null, 1);
       return users[0];
     } catch (error: any) {
-      this.logger.error(`Can't find users: ${{ query, error }}`);
+      this.logger.error(`Can't find users: ${{ request, error }}`);
       throw error;
     }
+  }
+
+  async createValidation(
+    request: UserTypes.Requests.AddRequest
+  ): Promise<void> {
+    await this.logger.info("Not user add validation yet");
+  }
+  async updateValidation(
+    id: string,
+    request: UserTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    await this.logger.info("Not user update validation yet");
+  }
+
+  async createEntityDetails(
+    request: UserTypes.Requests.AddRequest
+  ): Promise<UserTypes.UserDetails> {
+    const now = new Date();
+    const userDetails: UserTypes.UserDetails = {
+      ...request,
+      role: UserTypes.UserRole.Regular,
+      id: ID.get(),
+      deleted: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    return userDetails;
   }
 }

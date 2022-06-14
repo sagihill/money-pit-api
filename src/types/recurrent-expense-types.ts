@@ -1,10 +1,15 @@
-import { AccountingTypes, Currency, IEntityDetails, ISimpleService } from ".";
+import {
+  AccountingTypes,
+  Currency,
+  IEntityDetails,
+  IAccountSimpleService,
+} from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace RecurrentExpenseTypes {
   export interface IReccurentExpensesService
-    extends ISimpleService<
+    extends IAccountSimpleService<
       RecurrentExpense,
       Requests.AddRequest,
       Requests.UpdateRequest

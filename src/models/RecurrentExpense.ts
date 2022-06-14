@@ -1,5 +1,6 @@
 import { Model, Schema, model } from "mongoose";
 import { RecurrentExpenseTypes } from "../types";
+import BaseEntitySchema from "./Base";
 
 interface IReccurentExpenseModel
   extends Model<RecurrentExpenseTypes.RecurrentExpense> {}
@@ -15,9 +16,7 @@ export const RecurrentExpenseFields = {
   description: { type: String, index: true, required: false },
   recurrence: { type: String, index: true, required: true },
   type: { type: String, index: true, required: true },
-  deleted: { type: Boolean, index: true, required: true },
-  createdAt: { type: Date, index: true, required: true },
-  updatedAt: { type: Date, index: true, required: true },
+  ...BaseEntitySchema,
 };
 
 const schema = new Schema<RecurrentExpenseTypes.RecurrentExpense>(

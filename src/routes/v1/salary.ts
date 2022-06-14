@@ -6,8 +6,8 @@ const router = Router();
 
 // Salary routes
 router.post("/add", SalaryController.add);
-router.get("/id/:id", SalaryController.get);
-router.delete("/id/:id", SalaryController.remove);
+router.get("/", SalaryController.get);
+router.delete("/", SalaryController.remove);
 router.post("/id/:id", SalaryController.update);
 
 export default router;

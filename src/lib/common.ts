@@ -90,6 +90,15 @@ export namespace Utils {
     const validationService = await SP.Validation();
     await validationService.validateAccountOwnership(userId, accountId);
   }
+  export async function validateEntityOwnership(
+    req: Request,
+    accountId: string
+  ): Promise<void> {
+    const SP = ServicesProvider.get();
+    const userId = await getUserIdFromRequest(req);
+    const validationService = await SP.Validation();
+    await validationService.validateAccountOwnership(userId, accountId);
+  }
 
   export function getTokenFromRequest(req: Request): string | undefined {
     return req?.headers?.authorization?.split(" ")[1];
@@ -232,9 +241,6 @@ export namespace Objects {
 
   export function Sanitize(object: any, santizeConfig: string[]): any {
     return MapObject(object, (k: string, v: any) => {
-      v = v || "";
-      k = k || "";
-
       if (!k || v instanceof Function) {
         return v;
       }

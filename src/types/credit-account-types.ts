@@ -1,10 +1,10 @@
-import { Credentials, IEntityDetails, ISimpleService } from ".";
+import { Credentials, IEntityDetails, IAccountSimpleService } from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace CreditAccountTypes {
   export interface ICreditAccountService
-    extends ISimpleService<
+    extends IAccountSimpleService<
       CreditAccount,
       Requests.AddRequest,
       Requests.UpdateRequest

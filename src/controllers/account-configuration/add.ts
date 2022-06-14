@@ -48,6 +48,7 @@ const add: RequestHandler = async (
       };
 
       res.send(response);
+      return;
     } else {
       const accountConfiguration = await accountConfigurationService.add({
         accountId,

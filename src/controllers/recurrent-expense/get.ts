@@ -1,20 +1,26 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
+import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
 import { ApiResponse, ResponseStatus } from "../../types";
 
-export const getRecurrentExpenseRequestParamsValidator = Joi.object().keys({
+export const getRecurrentExpenseRequestBodyValidator = Joi.object().keys({
   id: Joi.string().uuid().required(),
+  accountId: Joi.string().uuid().required(),
 });
 
 const get: RequestHandler = async (req: Request, res) => {
   try {
     const SP = ServicesProvider.get();
     const recurrentExpenseService = await SP.RecurrentExpense();
-    const { id } = req.params;
+    const { id, accountId } = req.body;
+    await Utils.validateAccountMembership(req, accountId as string);
+    const recurrentExpense = await recurrentExpenseService.findAccountOne(
+      id,
+      accountId
+    );
 
-    const recurrentExpense = await recurrentExpenseService.get(id);
     if (!recurrentExpense) {
       const response: ApiResponse = {
         status: ResponseStatus.failure,
@@ -47,6 +53,6 @@ const get: RequestHandler = async (req: Request, res) => {
 
 export default requestMiddleware(get, {
   validation: {
-    params: getRecurrentExpenseRequestParamsValidator,
+    body: getRecurrentExpenseRequestBodyValidator,
   },
 });

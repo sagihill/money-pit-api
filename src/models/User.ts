@@ -1,5 +1,6 @@
 import { Model, Schema, model } from "mongoose";
 import { UserTypes } from "../types";
+import BaseEntitySchema from "./Base";
 
 interface IUserModel extends Model<UserTypes.UserDetails> {}
 
@@ -30,9 +31,7 @@ const schema = new Schema<UserTypes.UserDetails>(
       required: true,
       default: UserTypes.UserRole.Regular,
     },
-    deleted: { type: Boolean, index: true, required: true },
-    createdAt: { type: Date, index: true, required: true },
-    updatedAt: { type: Date, index: true, required: true },
+    ...BaseEntitySchema,
   },
   { timestamps: true }
 );

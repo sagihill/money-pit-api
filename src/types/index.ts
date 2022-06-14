@@ -56,6 +56,11 @@ export interface ISimpleService<T, A, E> {
   remove(id: string): Promise<void>;
   get(id: string): Promise<T | undefined>;
 }
+export interface IAccountSimpleService<T, A, E>
+  extends ISimpleService<T, A, E> {
+  removeAccountOne(id: string, accountId: string): Promise<void>;
+  findAccountOne(id: string, accountId: string): Promise<T>;
+}
 
 export interface IContext {
   currentUserId?: string;

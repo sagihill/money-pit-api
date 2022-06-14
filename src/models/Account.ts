@@ -1,7 +1,11 @@
 import { Model, Schema, model } from "mongoose";
 import { AccountTypes } from "../types";
+import BaseEntitySchema from "./Base";
+import Base from "./Base";
 
 interface IAccountModel extends Model<AccountTypes.AccountDetails> {}
+
+const another = new Schema(Base)
 
 const schema = new Schema<AccountTypes.AccountDetails>(
   {
@@ -9,9 +13,7 @@ const schema = new Schema<AccountTypes.AccountDetails>(
     type: { type: String, index: true, required: true },
     adminUserId: { type: String, index: true, required: true },
     members: { type: [String], index: true, required: true },
-    deleted: { type: Boolean, index: true, required: true },
-    createdAt: { type: Date, index: true, required: true },
-    updatedAt: { type: Date, index: true, required: true },
+    ...BaseEntitySchema
   },
   { timestamps: true }
 );
