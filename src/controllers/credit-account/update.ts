@@ -3,7 +3,7 @@ import Joi from "joi";
 import { ParamsDictionary } from "..";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, CreditAccountTypes, ResponseStatus } from "../../types";
+import { CreditAccountTypes, TechTypes } from "../../types";
 
 export const updateCreditAccountBodyValidator = Joi.object().keys({
   creditProvider: Joi.string(),
@@ -32,15 +32,15 @@ const update: RequestHandler = async (
       credentials,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Updated credit account",
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to update credit account",
       error: {
         name: error.constructor.name,

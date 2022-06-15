@@ -19,13 +19,9 @@ import { Masks } from "./masks";
 import {
   AccountingTypes,
   AccountTypes,
-  Currency,
-  InvalidAmount,
-  InvalidCurrency,
-  InvalidDay,
-  InvalidStringValue,
+  DomainTypes,
   RecurrentExpenseTypes,
-  RequiredParameterError,
+  TechTypes,
 } from "../types";
 
 const uuidFromString = UUIDFromString.default;
@@ -318,9 +314,9 @@ export namespace Validate {
     };
   }
 
-  export function currency(currency?: Currency) {
-    if (currency && !Object.values(Currency).includes(currency)) {
-      throw new InvalidCurrency(currency);
+  export function currency(currency?: DomainTypes.Currency) {
+    if (currency && !Object.values(DomainTypes.Currency).includes(currency)) {
+      throw new DomainTypes.InvalidCurrency(currency);
     }
 
     return {
@@ -337,7 +333,7 @@ export namespace Validate {
         day <= 0 ||
         day > 31)
     ) {
-      throw new InvalidDay(day);
+      throw new DomainTypes.InvalidDay(day);
     }
 
     return {
@@ -362,7 +358,7 @@ export namespace Validate {
 
   export function amount(amount?: number) {
     if (amount && !isValidAmount(amount)) {
-      throw new InvalidAmount(amount);
+      throw new DomainTypes.InvalidAmount(amount);
     }
 
     return {
@@ -372,7 +368,7 @@ export namespace Validate {
 
   export function string(fieldName: string, str?: string) {
     if (str && typeof str !== "string") {
-      throw new InvalidStringValue(str, fieldName);
+      throw new DomainTypes.InvalidStringValue(str, fieldName);
     }
 
     return {
@@ -392,7 +388,7 @@ export namespace Validate {
 
   export function required(value: any, fieldName: string) {
     if (!value) {
-      throw new RequiredParameterError(fieldName);
+      throw new TechTypes.RequiredParameterError(fieldName);
     }
   }
 }

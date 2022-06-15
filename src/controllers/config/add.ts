@@ -2,7 +2,7 @@ import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ConfigTypes, ResponseStatus } from "../../types";
+import { ConfigTypes, TechTypes } from "../../types";
 
 export const addConfigRequestValidation = Joi.object().keys({
   key: Joi.string().required(),
@@ -21,15 +21,15 @@ const add: RequestHandler = async (
 
     await config.add({ key, value });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Added new config.",
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new config",
       error: {
         name: error.constructor.name,

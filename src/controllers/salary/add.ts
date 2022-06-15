@@ -3,7 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, SalaryTypes, ResponseStatus } from "../../types";
+import { SalaryTypes, TechTypes } from "../../types";
 
 export const salaryNewAccountRequestBody = {
   amount: Joi.number().required(),
@@ -36,16 +36,16 @@ const add: RequestHandler = async (
       payDay,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Added new salary",
       data: { salary },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new salary",
       error: {
         name: error.constructor.name,

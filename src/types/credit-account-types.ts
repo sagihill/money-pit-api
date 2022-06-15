@@ -1,10 +1,10 @@
-import { Credentials, IEntityDetails, IAccountSimpleService } from ".";
+import { DomainTypes, TechTypes } from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace CreditAccountTypes {
   export interface ICreditAccountService
-    extends IAccountSimpleService<
+    extends DomainTypes.IAccountSimpleService<
       CreditAccount,
       Requests.AddRequest,
       Requests.UpdateRequest
@@ -15,11 +15,11 @@ export namespace CreditAccountTypes {
     findCreditAccounts(request: Requests.FindRequest): Promise<CreditAccount[]>;
   }
 
-  export interface CreditAccount extends IEntityDetails {
+  export interface CreditAccount extends DomainTypes.IEntityDetails {
     id?: string;
     accountId: string;
     creditProvider: CreditProvider;
-    credentials: Credentials;
+    credentials: TechTypes.Credentials;
   }
 
   export enum CreditProvider {
@@ -38,15 +38,15 @@ export namespace CreditAccountTypes {
     export interface AddRequest {
       accountId: string;
       creditProvider: CreditProvider;
-      credentials: Credentials;
+      credentials: TechTypes.Credentials;
     }
     export interface NewAccountAddRequest {
       creditProvider: CreditProvider;
-      credentials: Credentials;
+      credentials: TechTypes.Credentials;
     }
     export interface UpdateRequest {
       creditProvider?: CreditProvider;
-      credentials?: Credentials;
+      credentials?: TechTypes.Credentials;
     }
 
     export interface FindRequest {

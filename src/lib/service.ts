@@ -1,22 +1,21 @@
-import {
-  IAccountSimpleService,
-  IEntityDetails,
-  ISimpleService,
-  LoggerTypes,
-  MongoTypes,
-} from "../types";
+import { DomainTypes, LoggerTypes, MongoTypes } from "../types";
 
 /**
  * A generic base class for Service repositories.
  */
 export abstract class SimpleService<T, A, U>
-  implements ISimpleService<T, A, U>, IAccountSimpleService<T, A, U>
+  implements
+    DomainTypes.ISimpleService<T, A, U>,
+    DomainTypes.IAccountSimpleService<T, A, U>
 {
   constructor(
     protected readonly repository: MongoTypes.Repository<T, U>,
     protected readonly logger: LoggerTypes.ILogger
   ) {
     // /
+  }
+  updateAccountOne(id: string, accountId: string, request: U): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   async add(request: A): Promise<T> {
@@ -103,7 +102,7 @@ export abstract class SimpleService<T, A, U>
 
   abstract createEntityDetails(request: A): Promise<T>;
 
-  protected async getBaseEntityDetails(): Promise<IEntityDetails> {
+  protected async getBaseEntityDetails(): Promise<DomainTypes.IEntityDetails> {
     const now = new Date();
     return {
       deleted: false,

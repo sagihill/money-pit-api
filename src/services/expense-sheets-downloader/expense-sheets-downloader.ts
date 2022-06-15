@@ -3,8 +3,8 @@ import * as path from "path";
 import { FS, Sync } from "../../lib";
 import {
   ExpenseSheetsDownloaderTypes,
-  Credentials,
   LoggerTypes,
+  TechTypes,
 } from "../../types";
 
 type Page = puppeteer.Page;
@@ -52,7 +52,7 @@ export class ExpenseSheetsDownloader
     return page;
   }
 
-  async login(page: Page, credentials: Credentials): Promise<void> {
+  async login(page: Page, credentials: TechTypes.Credentials): Promise<void> {
     //Load login form
     const element = await page.waitForSelector(
       '[class="go-to-personal-area log-in-status d-none d-sm-none d-md-block ng-star-inserted"]'

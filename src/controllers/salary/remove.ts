@@ -3,7 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ResponseStatus } from "../../types";
+import { TechTypes } from "../../types";
 
 export const removeSalaryRequestBodyValidator = Joi.object().keys({
   id: Joi.string().uuid().required(),
@@ -19,15 +19,15 @@ const remove: RequestHandler = async (req: Request, res) => {
 
     await salaryService.removeAccountOne(id, accountId);
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: `Salary ${id} deleted successfully.`,
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: `removing salary ${req.body.id} had an error.`,
       error: {
         name: error.constructor.name,

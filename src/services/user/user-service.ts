@@ -1,14 +1,6 @@
 import { ID } from "../../lib";
 import { SimpleService } from "../../lib/service";
-import {
-  AccountTypes,
-  UserTypes,
-  LoggerTypes,
-  MongoTypes,
-  Currency,
-  InvalidCurrency,
-  RequiredParameterError,
-} from "../../types";
+import { UserTypes, LoggerTypes, MongoTypes } from "../../types";
 
 export class UserService
   extends SimpleService<

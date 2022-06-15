@@ -2,7 +2,7 @@ import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ResponseStatus } from "../../types";
+import { TechTypes } from "../../types";
 
 export const removeAccountRequestParamsValidator = Joi.object().keys({
   id: Joi.string().uuid().required(),
@@ -16,15 +16,15 @@ const remove: RequestHandler = async (req: Request, res) => {
 
     await account.remove(id);
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: `Account ${id} deleted successfully.`,
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: `removing account ${req.params.id} had an error.`,
       error: {
         name: error.constructor.name,

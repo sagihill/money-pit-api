@@ -6,7 +6,7 @@ import {
   LoggerTypes,
   MongoTypes,
   AccountingTypes,
-  RequiredParameterError,
+  TechTypes,
 } from "../../types";
 
 export class AccountConfigurationService
@@ -79,7 +79,7 @@ export class AccountConfigurationService
 
   private async isAccountExistValidation(accountId: string): Promise<void> {
     if (!accountId) {
-      throw new RequiredParameterError("accountId");
+      throw new TechTypes.RequiredParameterError("accountId");
     }
     const account = await this.accountService.get(accountId);
 

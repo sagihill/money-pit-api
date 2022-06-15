@@ -5,9 +5,8 @@ import {
   SalaryTypes,
   LoggerTypes,
   MongoTypes,
-  Currency,
-  InvalidCurrency,
-  RequiredParameterError,
+  DomainTypes,
+  TechTypes,
 } from "../../types";
 
 export class SalaryService
@@ -91,15 +90,15 @@ export class SalaryService
   ): Promise<void> {
     if (
       request.currency &&
-      !Object.values(Currency).includes(request.currency)
+      !Object.values(DomainTypes.Currency).includes(request.currency)
     ) {
-      throw new InvalidCurrency(request.currency);
+      throw new DomainTypes.InvalidCurrency(request.currency);
     }
   }
 
   private async isAccountExistValidation(accountId: string): Promise<void> {
     if (!accountId) {
-      throw new RequiredParameterError("accountId");
+      throw new TechTypes.RequiredParameterError("accountId");
     }
 
     const account = await this.accountService.get(accountId);

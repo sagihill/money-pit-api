@@ -1,8 +1,4 @@
-import {
-  AccountTypes,
-  RequiredParameterError,
-  ValidationTypes,
-} from "../../types";
+import { AccountTypes, TechTypes, ValidationTypes } from "../../types";
 
 export class ValidationService implements ValidationTypes.IValidationService {
   constructor(
@@ -37,7 +33,7 @@ export class ValidationService implements ValidationTypes.IValidationService {
 
   async validateAccountExist(accountId: string): Promise<void> {
     if (!accountId) {
-      throw new RequiredParameterError("accountId");
+      throw new TechTypes.RequiredParameterError("accountId");
     }
 
     const account = await this.accountService.get(accountId);

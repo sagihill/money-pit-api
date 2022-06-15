@@ -3,11 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import {
-  ApiResponse,
-  AccountConfigurationTypes,
-  ResponseStatus,
-} from "../../types";
+import { TechTypes, AccountConfigurationTypes } from "../../types";
 
 export const accountConfigurationNewAccountRequestBody = {
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
@@ -41,8 +37,8 @@ const add: RequestHandler = async (
     );
 
     if (currentAccountConfiguration) {
-      const response: ApiResponse = {
-        status: ResponseStatus.failure,
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.failure,
         message:
           "Can't add new account configuration. configuration allready exist for this account.",
       };
@@ -56,8 +52,8 @@ const add: RequestHandler = async (
         toggles,
       });
 
-      const response: ApiResponse = {
-        status: ResponseStatus.success,
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.success,
         message: "Added new account configuration",
         data: { accountConfiguration },
       };
@@ -65,8 +61,8 @@ const add: RequestHandler = async (
       res.send(response);
     }
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new account configuration",
       error: {
         name: error.constructor.name,

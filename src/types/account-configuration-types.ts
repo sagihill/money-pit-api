@@ -1,10 +1,10 @@
-import { IEntityDetails, IAccountSimpleService } from ".";
+import { DomainTypes } from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountConfigurationTypes {
   export interface IAccountConfigurationService
-    extends IAccountSimpleService<
+    extends DomainTypes.IAccountSimpleService<
       AccountConfiguration,
       Requests.AddRequest,
       Requests.UpdateRequest
@@ -14,7 +14,7 @@ export namespace AccountConfigurationTypes {
     ): Promise<AccountConfiguration[] | undefined>;
   }
 
-  export interface AccountConfiguration extends IEntityDetails {
+  export interface AccountConfiguration extends DomainTypes.IEntityDetails {
     accountId: string;
     budget?: Budget;
     toggles?: {

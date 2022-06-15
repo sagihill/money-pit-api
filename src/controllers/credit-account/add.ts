@@ -3,7 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, CreditAccountTypes, ResponseStatus } from "../../types";
+import { TechTypes, CreditAccountTypes } from "../../types";
 
 export const creditAccountNewAccountRequestBody = {
   creditProvider: Joi.string().required(),
@@ -39,16 +39,16 @@ const add: RequestHandler = async (
       credentials,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Added new credit account",
       data: { creditAccountId: creditAccount.id },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new credit account",
       error: {
         name: error.constructor.name,

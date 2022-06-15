@@ -1,4 +1,4 @@
-import { ChargeMonth, Currency, IEntityDetails } from ".";
+import { DomainTypes } from ".";
 import { CriticalError } from "../errors/service-error";
 import { MongoTypes } from "./mongo-types";
 
@@ -9,7 +9,7 @@ export namespace AccountingTypes {
     editExpense(id: string, request: Requests.UpdateRequest): Promise<void>;
     getAccountSummery(
       accountId: string,
-      chargeMonth: ChargeMonth
+      chargeMonth: DomainTypes.ChargeMonth
     ): Promise<AccountSummery>;
     createNewExpense(request: Requests.AddRequest): Expense;
   }
@@ -45,7 +45,7 @@ export namespace AccountingTypes {
     budget?: number;
     balance?: number;
   };
-  export interface Expense extends IEntityDetails {
+  export interface Expense extends DomainTypes.IEntityDetails {
     id: string;
     accountId: string;
     category: ExpenseCategory;
@@ -53,7 +53,7 @@ export namespace AccountingTypes {
     type: ExpenseType;
     description?: string;
     amount: number;
-    currency: Currency;
+    currency: DomainTypes.Currency;
     timestamp: Date;
     chargeDate?: Date;
   }
@@ -64,12 +64,12 @@ export namespace AccountingTypes {
     Subscription = "subscription",
   }
 
-  export interface Income extends IEntityDetails {
+  export interface Income extends DomainTypes.IEntityDetails {
     id?: string;
     accountId: string;
     amount: number;
     timestamp?: Date;
-    currency: Currency;
+    currency: DomainTypes.Currency;
   }
 
   export enum ExpenseCategory {
@@ -94,7 +94,7 @@ export namespace AccountingTypes {
       category: ExpenseCategory;
       name: string;
       amount: number;
-      currency: Currency;
+      currency: DomainTypes.Currency;
       type: ExpenseType;
       description: string;
       timestamp: Date;
@@ -105,13 +105,13 @@ export namespace AccountingTypes {
       category: ExpenseCategory;
       name: string;
       amount: number;
-      currency: Currency;
+      currency: DomainTypes.Currency;
       type: ExpenseType;
       timestamp: Date;
       description?: string;
     }
     export interface GetSummeryRequest {
-      chargeMonth: ChargeMonth;
+      chargeMonth: DomainTypes.ChargeMonth;
     }
   }
 

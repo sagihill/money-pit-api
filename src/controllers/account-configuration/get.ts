@@ -3,7 +3,7 @@ import Joi, { Err } from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ResponseStatus } from "../../types";
+import { TechTypes } from "../../types/tech-types";
 
 export const getAccountConfigurationRequestParamsValidator = Joi.object().keys({
   accountId: Joi.string().uuid().required(),
@@ -20,15 +20,15 @@ const get: RequestHandler = async (req: Request, res) => {
       accountId
     );
     if (!accountConfiguration) {
-      const response: ApiResponse = {
-        status: ResponseStatus.failure,
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.failure,
         message: `account configuration for account ${accountId} not found.`,
       };
 
       res.send(response);
     } else {
-      const response: ApiResponse = {
-        status: ResponseStatus.success,
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.success,
         message: "Found account configuration.",
         data: { accountConfiguration },
       };
@@ -36,8 +36,8 @@ const get: RequestHandler = async (req: Request, res) => {
       res.send(response);
     }
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: `finding account configuration for account ${req.params.accountId} had an error.`,
       error: {
         name: error.constructor.name,

@@ -1,9 +1,9 @@
-import { IEntityDetails, ISimpleService, MongoTypes } from ".";
+import { DomainTypes } from ".";
 
 // tslint:disable-next-line: no-namespace
 export namespace UserTypes {
   export interface IUserService
-    extends ISimpleService<
+    extends DomainTypes.ISimpleService<
       UserDetails,
       Requests.AddRequest,
       Requests.UpdateRequest
@@ -11,7 +11,7 @@ export namespace UserTypes {
     findOne(request: Requests.FindRequest): Promise<UserDetails | undefined>;
   }
 
-  export interface UserDetails extends IEntityDetails {
+  export interface UserDetails extends DomainTypes.IEntityDetails {
     id: string;
     accountId?: string;
     firstName: string;

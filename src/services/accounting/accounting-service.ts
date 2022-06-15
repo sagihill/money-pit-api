@@ -1,12 +1,11 @@
-import moment from "moment";
 import { CriticalError } from "../../errors/service-error";
 import {
   LoggerTypes,
   AccountingTypes,
   AccountTypes,
-  ChargeMonth,
   AccountConfigurationTypes,
   SalaryTypes,
+  DomainTypes,
 } from "../../types";
 import { createNewExpense } from "./expense-factory";
 
@@ -51,10 +50,10 @@ export class AccountingService implements AccountingTypes.IAccountingService {
 
   async getAccountSummery(
     accountId: string,
-    chargeMonth: ChargeMonth
+    chargeMonth: DomainTypes.ChargeMonth
   ): Promise<AccountingTypes.AccountSummery> {
     try {
-      console.log(this.config)
+      console.log(this.config);
       const account = await this.accountService.get(accountId);
 
       if (!account) {
@@ -135,7 +134,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     }
   }
 
-  private getDatesForAccountSummer(chargeMonth: ChargeMonth): {
+  private getDatesForAccountSummer(chargeMonth: DomainTypes.ChargeMonth): {
     chargeLowerBoundary: Date;
     chargeUpperBoundary: Date;
     timestampLowerBoundary: Date;

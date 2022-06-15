@@ -3,7 +3,7 @@ import Joi from "joi";
 import { ParamsDictionary } from "..";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, SalaryTypes, ResponseStatus } from "../../types";
+import { SalaryTypes, TechTypes } from "../../types";
 
 export const updateSalaryBodyValidator = Joi.object().keys({
   amount: Joi.number(),
@@ -31,16 +31,16 @@ const update: RequestHandler = async (
       payDay,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Updated salary.",
       data: { salary },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to update salary",
       error: {
         name: error.constructor.name,

@@ -2,7 +2,7 @@ import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ResponseStatus, UserTypes } from "../../types";
+import { TechTypes, UserTypes } from "../../types";
 
 export const updateUserRequestValidator = Joi.object().keys({
   accountId: Joi.string().uuid(),
@@ -27,8 +27,8 @@ const update: RequestHandler = async (
       accountId,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "User data updated.",
       data: {
         userId: req.params.id,
@@ -37,8 +37,8 @@ const update: RequestHandler = async (
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to update user data",
       error: {
         name: error.constructor.name,

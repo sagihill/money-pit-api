@@ -3,11 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import {
-  ApiResponse,
-  RecurrentExpenseTypes,
-  ResponseStatus,
-} from "../../types";
+import { RecurrentExpenseTypes, TechTypes } from "../../types";
 
 export const recurrentExpenseNewAccountRequestBody = {
   category: Joi.string().required(),
@@ -62,16 +58,16 @@ const add: RequestHandler = async (
       recurrence,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Added new recurrent expense",
       data: { recurrentExpense },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new recurrent expense",
       error: {
         name: error.constructor.name,

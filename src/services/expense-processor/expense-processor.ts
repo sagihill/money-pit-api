@@ -2,10 +2,9 @@ import xlsx from "node-xlsx";
 import * as fs from "fs";
 import * as path from "path";
 import {
-  AccountConfigurationTypes,
   AccountingTypes,
   AccountTypes,
-  Currency,
+  DomainTypes,
   ExpenseProcessorTypes,
   LoggerTypes,
   RecurrentExpenseTypes,
@@ -336,13 +335,17 @@ export class ExpenseProcessor
     return expenseTypeMap[string];
   }
 
-  private getCurrency(string: string): Currency {
-    const expenseCurrencyMap: { [key: string]: Currency } = {
-      "₪": Currency.ILS,
+  private getCurrency(string: string): DomainTypes.Currency {
+    const expenseCurrencyMap: { [key: string]: DomainTypes.Currency } = {
+      "₪": DomainTypes.Currency.ILS,
     };
 
-    if (Object.values(Currency).includes(string as Currency)) {
-      return string as Currency;
+    if (
+      Object.values(DomainTypes.Currency).includes(
+        string as DomainTypes.Currency
+      )
+    ) {
+      return string as DomainTypes.Currency;
     }
     return expenseCurrencyMap[string];
   }

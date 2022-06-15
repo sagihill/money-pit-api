@@ -4,12 +4,7 @@ import { ParamsDictionary } from "..";
 import { Utils } from "../../lib";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import {
-  AccountConfigurationTypes,
-  ApiResponse,
-  Currency,
-  ResponseStatus,
-} from "../../types";
+import { AccountConfigurationTypes, TechTypes } from "../../types";
 
 export const accountConfigurationRequestBody = {
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
@@ -48,15 +43,15 @@ const update: RequestHandler = async (
       toggles,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: `Updated account_${accountId} configuration.`,
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: `Updating account_${accountId} configuration had an error.`,
       error: {
         name: error.constructor.name,

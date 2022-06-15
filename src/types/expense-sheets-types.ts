@@ -1,4 +1,4 @@
-import { Credentials } from ".";
+import { TechTypes } from ".";
 
 export namespace ExpenseSheetsDownloaderTypes {
   export interface IExpenseSheetsDownloader {
@@ -8,7 +8,7 @@ export namespace ExpenseSheetsDownloaderTypes {
   export type ExpesnseSheetsParams = {
     accountId: string;
     creditProviderWebsiteUrl: string;
-    credentials: Credentials;
+    credentials: TechTypes.Credentials;
   };
 
   export type ExpenseSheetsOptions = {

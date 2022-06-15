@@ -5,8 +5,6 @@ import {
   LoggerTypes,
   MongoTypes,
   AccountTypes,
-  RequiredParameterError,
-  AccountingTypes,
 } from "../../types";
 
 export class ReccurentExpensesService

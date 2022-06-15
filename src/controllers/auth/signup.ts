@@ -2,7 +2,7 @@ import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { ApiResponse, ResponseStatus, UserTypes } from "../../types";
+import { TechTypes, UserTypes } from "../../types";
 
 export const signUpRequestValidator = Joi.object().keys({
   firstName: Joi.string()
@@ -30,8 +30,8 @@ const signUp: RequestHandler = async (
       password,
     });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "New user signed up.",
       data: {
         userId: result.id,
@@ -40,8 +40,8 @@ const signUp: RequestHandler = async (
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "An error occured on signup",
       error: {
         name: error.constructor.name,

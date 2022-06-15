@@ -1,15 +1,10 @@
-import {
-  AccountingTypes,
-  Currency,
-  IEntityDetails,
-  IAccountSimpleService,
-} from ".";
+import { AccountingTypes, DomainTypes } from ".";
 import { CriticalError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace RecurrentExpenseTypes {
   export interface IReccurentExpensesService
-    extends IAccountSimpleService<
+    extends DomainTypes.IAccountSimpleService<
       RecurrentExpense,
       Requests.AddRequest,
       Requests.UpdateRequest
@@ -22,7 +17,7 @@ export namespace RecurrentExpenseTypes {
     ): Promise<RecurrentExpense[]>;
   }
 
-  export interface RecurrentExpense extends IEntityDetails {
+  export interface RecurrentExpense extends DomainTypes.IEntityDetails {
     id?: string;
     accountId: string;
     category: AccountingTypes.ExpenseCategory;
@@ -30,7 +25,7 @@ export namespace RecurrentExpenseTypes {
     type: AccountingTypes.ExpenseType;
     description?: string;
     amount: number;
-    currency: Currency;
+    currency: DomainTypes.Currency;
     dueDay: number;
     recurrence: Recurrence;
   }
@@ -59,7 +54,7 @@ export namespace RecurrentExpenseTypes {
       type: AccountingTypes.ExpenseType;
       description?: string;
       amount: number;
-      currency: Currency;
+      currency: DomainTypes.Currency;
       dueDay: number;
       recurrence: Recurrence;
     }
@@ -69,7 +64,7 @@ export namespace RecurrentExpenseTypes {
       type?: AccountingTypes.ExpenseType;
       description?: string;
       amount?: number;
-      currency?: Currency;
+      currency?: DomainTypes.Currency;
       dueDay?: number;
       recurrence?: Recurrence;
     }

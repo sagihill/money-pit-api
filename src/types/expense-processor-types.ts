@@ -1,4 +1,4 @@
-import { AccountingTypes, Currency } from ".";
+import { AccountingTypes, DomainTypes } from ".";
 import { RecurrentExpenseTypes } from "./recurrent-expense-types";
 
 export namespace ExpenseProcessorTypes {
@@ -12,6 +12,7 @@ export namespace ExpenseProcessorTypes {
   }
 
   export type ExpenseProcessorParams = { accountId: string };
+
   export type ExpenseProcessorReccurentParams = {
     accountId: string;
     recurrentExpenses: RecurrentExpenseTypes.RecurrentExpense[];
@@ -34,7 +35,7 @@ export namespace ExpenseProcessorTypes {
     timestamp: Date;
     description?: string;
     chargeDate?: Date;
-    currency: Currency;
+    currency: DomainTypes.Currency;
     accountId: string;
   };
 

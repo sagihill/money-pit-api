@@ -8,7 +8,7 @@ import {
   CryptoTypes,
   LoggerTypes,
   MongoTypes,
-  RequiredParameterError,
+  TechTypes,
 } from "../../types";
 
 export class CreditAccountService
@@ -193,7 +193,7 @@ export class CreditAccountService
 
   private async isAccountExistValidation(accountId: string): Promise<void> {
     if (!accountId) {
-      throw new RequiredParameterError("accountId");
+      throw new TechTypes.RequiredParameterError("accountId");
     }
     const account = await this.accountService.get(accountId);
 

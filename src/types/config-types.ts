@@ -1,4 +1,4 @@
-import { IEntityDetails } from ".";
+import { DomainTypes } from ".";
 
 export namespace ConfigTypes {
   export interface IConfigService {
@@ -31,7 +31,7 @@ export namespace ConfigTypes {
     getObject<T>(key: string): Promise<T | undefined>;
   }
 
-  export interface IConfig extends IEntityDetails {
+  export interface IConfig extends DomainTypes.IEntityDetails {
     id: string;
     key: string;
     value: string;

@@ -3,7 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib/common";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { AccountTypes, ApiResponse, ResponseStatus } from "../../types";
+import { AccountTypes, TechTypes } from "../../types";
 import { accountConfigurationNewAccountRequestBody } from "../account-configuration/add";
 import { creditAccountNewAccountRequestBody } from "../credit-account/add";
 import { recurrentExpenseNewAccountRequestBody } from "../recurrent-expense/add";
@@ -31,8 +31,8 @@ const add: RequestHandler = async (
 
     const currentAccount = await accountService.getByAdminUserId(userId);
     if (currentAccount) {
-      const response: ApiResponse = {
-        status: ResponseStatus.failure,
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.failure,
         message:
           "Can't add new account. An account for current user allready exists.",
       };
@@ -61,16 +61,16 @@ const add: RequestHandler = async (
 
     await userService.update(userId, { accountId: account.id });
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Added new account.",
       data: { account },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to add new account.",
       error: {
         name: error.constructor.name,

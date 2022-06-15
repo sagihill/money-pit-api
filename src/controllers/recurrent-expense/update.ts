@@ -3,11 +3,7 @@ import Joi from "joi";
 import { ParamsDictionary } from "..";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import {
-  ApiResponse,
-  RecurrentExpenseTypes,
-  ResponseStatus,
-} from "../../types";
+import { RecurrentExpenseTypes, TechTypes } from "../../types";
 
 export const updateRecurrentExpenseBodyValidator = Joi.object().keys({
   category: Joi.string(),
@@ -61,16 +57,16 @@ const update: RequestHandler = async (
       }
     );
 
-    const response: ApiResponse = {
-      status: ResponseStatus.success,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
       message: "Updated recurrent expense.",
       data: { recurrentExpense },
     };
 
     res.send(response);
   } catch (error: any) {
-    const response: ApiResponse = {
-      status: ResponseStatus.error,
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
       message: "Unable to update recurrent expense",
       error: {
         name: error.constructor.name,
