@@ -28,6 +28,15 @@ export class MongoRepository<T, U> implements MongoTypes.Repository<T, U> {
     return docs;
   }
 
+  async updateOne(qry: any, editRequest: U): Promise<boolean> {
+    const res = await this.model.updateOne(
+      { qry },
+      { ...editRequest, updatedAt: new Date() }
+    );
+
+    return res.modifiedCount === 1;
+  }
+
   async update(id: string, editRequest: U): Promise<boolean> {
     const res = await this.model.updateOne(
       { id },

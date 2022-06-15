@@ -12,6 +12,7 @@ export namespace MongoTypes {
     add(data: T): Promise<T>;
     addMany(data: T[]): Promise<T[]>;
     update(id: string, editRequest: U): Promise<boolean>;
+    updateOne(qry: any, editRequest: U): Promise<boolean>;
     get(id: string): Promise<T | undefined>;
     remove(id: string): Promise<boolean>;
     removeOne(qry: any): Promise<boolean>;
@@ -21,12 +22,12 @@ export namespace MongoTypes {
 
   export class EntityRemoveError extends CriticalError {
     constructor(private readonly id: string) {
-      super(`Entity of id ${id} wasn't removed. it was not found.`);
+      super(`Entity of id ${id} wasn't removed. couldn't perform operation.`);
     }
   }
   export class EntityUpdateError extends CriticalError {
     constructor(private readonly id: string) {
-      super(`Entity of id ${id} wasn't updated. it was not found.`);
+      super(`Entity of id ${id} wasn't updated. couldn't perform operation.`);
     }
   }
 }

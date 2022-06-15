@@ -14,9 +14,6 @@ export abstract class SimpleService<T, A, U>
   ) {
     // /
   }
-  updateAccountOne(id: string, accountId: string, request: U): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
 
   async add(request: A): Promise<T> {
     try {
@@ -26,6 +23,17 @@ export abstract class SimpleService<T, A, U>
       return await this.repository.add(details);
     } catch (error: any) {
       this.logger.error(`Error on create function of ${this.constructor.name}`);
+      throw error;
+    }
+  }
+
+  async get(id: string): Promise<T | undefined> {
+    try {
+      this.logger.info(`Running get on ${this.constructor.name}`);
+      const result = await this.repository.get(id);
+      return result;
+    } catch (error: any) {
+      this.logger.error(`Error on get function of ${this.constructor.name}`);
       throw error;
     }
   }
@@ -57,6 +65,39 @@ export abstract class SimpleService<T, A, U>
     }
   }
 
+  async findAccountOne(id: string, accountId: string): Promise<T | undefined> {
+    try {
+      this.logger.info(`Running findAccountOne on ${this.constructor.name}`);
+      const result = (await this.repository.find({ id, accountId }, {}, 1))[0];
+      return result;
+    } catch (error: any) {
+      this.logger.error(
+        `Error on findAccountOne function of ${this.constructor.name}`
+      );
+      throw error;
+    }
+  }
+
+  async updateAccountOne(
+    id: string,
+    accountId: string,
+    request: U
+  ): Promise<void> {
+    try {
+      this.logger.info(`Running updateAccountOne on ${this.constructor.name}`);
+      await this.updateValidation(id, request);
+      const res = await this.repository.updateOne({ id, accountId }, request);
+      if (!res) {
+        throw new MongoTypes.EntityUpdateError(id);
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Error on updateAccountOne function of ${this.constructor.name}`
+      );
+      throw error;
+    }
+  }
+
   async removeAccountOne(id: string, accountId: string): Promise<void> {
     try {
       this.logger.info(`Running removeAccountOne on ${this.constructor.name}`);
@@ -66,32 +107,8 @@ export abstract class SimpleService<T, A, U>
       }
     } catch (error: any) {
       this.logger.error(
-        `Error on removeOne function of ${this.constructor.name}`
+        `Error on removeAccountOne function of ${this.constructor.name}`
       );
-      throw error;
-    }
-  }
-
-  async findAccountOne(id: string, accountId: string): Promise<T | undefined> {
-    try {
-      this.logger.info(`Running findAccountOne on ${this.constructor.name}`);
-      const result = (await this.repository.find({ id, accountId }, {}, 1))[0];
-      return result;
-    } catch (error: any) {
-      this.logger.error(
-        `Error on findOne function of ${this.constructor.name}`
-      );
-      throw error;
-    }
-  }
-
-  async get(id: string): Promise<T | undefined> {
-    try {
-      this.logger.info(`Running get on ${this.constructor.name}`);
-      const result = await this.repository.get(id);
-      return result;
-    } catch (error: any) {
-      this.logger.error(`Error on get function of ${this.constructor.name}`);
       throw error;
     }
   }
