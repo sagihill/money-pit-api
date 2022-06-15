@@ -31,6 +31,11 @@ export namespace AccountTypes {
     members: string[];
   }
 
+  export interface AccountUserPair extends DomainTypes.IEntityDetails {
+    accountId: string;
+    userId: AccountType;
+  }
+
   export enum AccountType {
     Family = "family",
     Single = "single",

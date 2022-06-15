@@ -18,7 +18,7 @@ const schema = new Schema<AccountingTypes.Expense>(
     type: { type: String, index: true, required: true },
     ...BaseEntitySchema,
   },
-  { timestamps: true }
+  { timestamps: true, collection: "Expense" }
 );
 
 const Expense: IExpenseModel = model<AccountingTypes.Expense, IExpenseModel>(

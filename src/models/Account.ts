@@ -5,17 +5,15 @@ import Base from "./Base";
 
 interface IAccountModel extends Model<AccountTypes.AccountDetails> {}
 
-const another = new Schema(Base)
-
 const schema = new Schema<AccountTypes.AccountDetails>(
   {
     id: { type: String, index: true, required: true },
     type: { type: String, index: true, required: true },
     adminUserId: { type: String, index: true, required: true },
     members: { type: [String], index: true, required: true },
-    ...BaseEntitySchema
+    ...BaseEntitySchema,
   },
-  { timestamps: true }
+  { timestamps: true, collection: "Account" }
 );
 
 const Account: IAccountModel = model<

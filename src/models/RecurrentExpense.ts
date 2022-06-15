@@ -21,7 +21,7 @@ export const RecurrentExpenseFields = {
 
 const schema = new Schema<RecurrentExpenseTypes.RecurrentExpense>(
   RecurrentExpenseFields,
-  { timestamps: true }
+  { timestamps: true, collection: "RecurrentExpense" }
 );
 
 const RecurrentExpense: IReccurentExpenseModel = model<

@@ -9,7 +9,7 @@ const schema = new Schema<ExpenseProcessorTypes.ProcessorLog>(
     fileId: { type: String, index: true, required: true, unique: true },
     processedAt: { type: Date, index: true, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "ProcessorLog" }
 );
 
 const ProcessorLog: IProcessorLogModel = model<

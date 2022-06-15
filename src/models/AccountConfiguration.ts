@@ -6,21 +6,24 @@ import RecurrentExpense, { RecurrentExpenseFields } from "./RecurrentExpense";
 interface IAccountConfigurationModel
   extends Model<AccountConfigurationTypes.AccountConfiguration> {}
 
-const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>({
-  accountId: { type: String, index: true, required: true },
-  budget: {
-    totalBudget: { type: Number, index: true, required: true },
-    categoriesBudget: { type: Schema.Types.Mixed, required: false },
-  },
-  toggles: {
-    type: {
-      enableAutoExpenseAdd: { type: Boolean, index: true, required: false },
+const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>(
+  {
+    accountId: { type: String, index: true, required: true },
+    budget: {
+      totalBudget: { type: Number, index: true, required: true },
+      categoriesBudget: { type: Schema.Types.Mixed, required: false },
     },
-    index: true,
-    required: false,
+    toggles: {
+      type: {
+        enableAutoExpenseAdd: { type: Boolean, index: true, required: false },
+      },
+      index: true,
+      required: false,
+    },
+    ...BaseEntitySchema,
   },
-  ...BaseEntitySchema,
-});
+  { timestamps: true, collection: "AccountConfiguration" }
+);
 
 const AccountConfiguration: IAccountConfigurationModel = model<
   AccountConfigurationTypes.AccountConfiguration,

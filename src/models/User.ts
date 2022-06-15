@@ -33,7 +33,7 @@ const schema = new Schema<UserTypes.UserDetails>(
     },
     ...BaseEntitySchema,
   },
-  { timestamps: true }
+  { timestamps: true, collection: "User" }
 );
 
 const User: IUserModel = model<UserTypes.UserDetails, IUserModel>(

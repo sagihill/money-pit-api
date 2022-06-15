@@ -4,16 +4,19 @@ import BaseEntitySchema from "./Base";
 
 interface ICreditAccountModel extends Model<CreditAccountTypes.CreditAccount> {}
 
-const schema = new Schema<CreditAccountTypes.CreditAccount>({
-  id: { type: String, index: true, required: true },
-  accountId: { type: String, index: true, required: true },
-  creditProvider: { type: String, index: true, required: true },
-  credentials: {
-    username: { type: String, index: true, required: true },
-    password: { type: String, index: true, required: true },
+const schema = new Schema<CreditAccountTypes.CreditAccount>(
+  {
+    id: { type: String, index: true, required: true },
+    accountId: { type: String, index: true, required: true },
+    creditProvider: { type: String, index: true, required: true },
+    credentials: {
+      username: { type: String, index: true, required: true },
+      password: { type: String, index: true, required: true },
+    },
+    ...BaseEntitySchema,
   },
-  ...BaseEntitySchema,
-});
+  { timestamps: true, collection: "CreditAccount" }
+);
 
 const CreditAccount: ICreditAccountModel = model<
   CreditAccountTypes.CreditAccount,

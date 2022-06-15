@@ -11,7 +11,7 @@ const schema = new Schema<ConfigTypes.IConfig>(
     value: { type: String, index: false, required: true },
     ...BaseEntitySchema,
   },
-  { timestamps: true }
+  { timestamps: true, collection: "Config" }
 );
 
 const Config: IConfigModel = model<ConfigTypes.IConfig, IConfigModel>(

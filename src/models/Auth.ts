@@ -10,7 +10,7 @@ const schema = new Schema<AuthTypes.Auth>(
     expiration: { type: Number, index: true, required: true },
     createdAt: { type: Date, index: true, required: true },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "Auth" }
 );
 
 const Auth: IAuthModel = model<AuthTypes.Auth, IAuthModel>("Auth", schema);
