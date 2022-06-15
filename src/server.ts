@@ -28,15 +28,7 @@ Async.IIFE(async () => {
   }
 });
 
-const tests = async () => {
-  const crypto = await SP.Crypto();
-
-  const hash = await crypto.encrypt("Woww");
-
-  console.log(hash);
-
-  console.log(await crypto.decrypt(hash));
-};
+const tests = async () => {};
 
 const serve = async () => {
   const logger = await SP.Logger();

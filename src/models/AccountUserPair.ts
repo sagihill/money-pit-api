@@ -6,6 +6,7 @@ interface IAccountUserPairModel extends Model<AccountTypes.AccountUserPair> {}
 
 const schema = new Schema<AccountTypes.AccountUserPair>(
   {
+    id: { type: String, index: true, required: true },
     accountId: { type: String, index: true, required: true },
     userId: { type: String, index: true, required: true },
     ...BaseEntitySchema,

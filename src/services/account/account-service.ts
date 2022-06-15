@@ -25,6 +25,10 @@ export class AccountService
     private readonly recurrentExpenseService: RecurrentExpenseTypes.IReccurentExpensesService,
     private readonly salaryService: SalaryTypes.ISalaryService,
     private readonly creditAccountService: CreditAccountTypes.ICreditAccountService,
+    private readonly accountUserRepository: MongoTypes.Repository<
+      AccountTypes.AccountUserPair,
+      {}
+    >,
     repository: MongoTypes.Repository<
       AccountTypes.AccountDetails,
       AccountTypes.Requests.UpdateRequest
@@ -42,7 +46,21 @@ export class AccountService
       adminUserId: request.adminUserId,
     });
 
+    const pair = {
+      ...(await this.getBaseEntityDetails()),
+      id: ID.get(),
+      accountId: account.id,
+      userId: request.adminUserId,
+    };
+
+    await this.accountUserRepository.add(pair);
+
     return account;
+  }
+
+  async remove(id: string): Promise<void> {
+    await super.remove(id);
+    await this.accountUserRepository.removeMany({ accountId: id });
   }
 
   async addAccountConfigurations(
@@ -110,6 +128,18 @@ export class AccountService
       return (await this.repository.find({ adminUserId, deleted: false }))[0];
     } catch (error: any) {
       this.logger.error(`Can't get account: ${{ adminUserId, error }}`);
+    }
+  }
+
+  async getAccountIdByUserId(userId: string): Promise<string | undefined> {
+    try {
+      this.logger.info(`Getting account id by user id : ${{ userId }}`);
+      const pair = (
+        await this.accountUserRepository.find({ userId, deleted: false })
+      )[0];
+      return pair?.accountId;
+    } catch (error: any) {
+      this.logger.error(`Can't get account id: ${{ userId, error }}`);
     }
   }
 }

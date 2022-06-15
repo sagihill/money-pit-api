@@ -1,3 +1,4 @@
+import { string } from "joi";
 import {
   AccountConfigurationTypes,
   SalaryTypes,
@@ -19,6 +20,7 @@ export namespace AccountTypes {
     addAccountConfigurations(
       request: AccountTypes.Requests.AddAccountConfigurationRequest
     ): Promise<void>;
+    getAccountIdByUserId(userId: string): Promise<string | undefined>;
   }
   export interface IAccountReaderService {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
@@ -32,8 +34,9 @@ export namespace AccountTypes {
   }
 
   export interface AccountUserPair extends DomainTypes.IEntityDetails {
+    id: string;
     accountId: string;
-    userId: AccountType;
+    userId: string;
   }
 
   export enum AccountType {

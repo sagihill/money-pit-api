@@ -1,5 +1,9 @@
 import { AccountTypes } from "../../../types";
-import { AccountService, getAccountRepository } from "../../account";
+import {
+  AccountService,
+  getAccountRepository,
+  getAccountUserRepository,
+} from "../../account";
 import { ServicesProvider } from "../services-provider";
 
 export default async function Account(
@@ -13,12 +17,14 @@ export default async function Account(
   const salaryService = await SP.Salary();
   const creditAccountService = await SP.CreditAccount();
   const accountRepo = getAccountRepository();
+  const accountUserRepo = getAccountUserRepository();
   const accountService = new AccountService(
     userService,
     accountConfiguration,
     recurrentExpense,
     salaryService,
     creditAccountService,
+    accountUserRepo,
     accountRepo,
     logger
   );
