@@ -3,7 +3,7 @@ import Joi from "joi";
 import { Utils } from "../../lib/common";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { AccountingTypes } from "../../types";
+import { AccountingTypes, TechTypes } from "../../types";
 
 export const addExpenseRequestValidator = Joi.object().keys({
   accountId: Joi.string().required().uuid(),
@@ -17,44 +17,55 @@ export const addExpenseRequestValidator = Joi.object().keys({
 });
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, AccountingTypes.Requests.AddRequest>,
+  req: Request<{}, {}, AccountingTypes.Requests.AddRequest, any>,
   res
 ) => {
-  const SP = ServicesProvider.get();
-  const accountingService = await SP.Accounting();
-  const userService = await SP.User();
+  try {
+    const SP = ServicesProvider.get();
+    const accountingService = await SP.Accounting();
 
-  const {
-    accountId,
-    amount,
-    category,
-    currency,
-    name,
-    type,
-    description,
-    timestamp,
-  } = req.body;
-  await Utils.validateAccountMembership(req, accountId as string);
+    const {
+      accountId,
+      amount,
+      category,
+      currency,
+      name,
+      type,
+      description,
+      timestamp,
+    } = req.body;
+    await Utils.validateAccountMembership(req, accountId as string);
 
-  const expense = await accountingService.createNewExpense({
-    accountId,
-    name,
-    amount,
-    category,
-    currency,
-    type,
-    description,
-    timestamp,
-  });
+    const expense = await accountingService.add({
+      accountId,
+      name,
+      amount,
+      category,
+      currency,
+      type,
+      description,
+      timestamp,
+    });
 
-  await accountingService.addExpenses([expense]);
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
+      message: "Added new expense",
+      data: { expense },
+    };
 
-  res.send({
-    message: "Saved",
-    data: {
-      expense,
-    },
-  });
+    res.send(response);
+  } catch (error: any) {
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
+      message: "Unable to add new expense",
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
+    };
+
+    res.status(400).send(response);
+  }
 };
 
 export default requestMiddleware(add, {

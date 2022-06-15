@@ -2,9 +2,9 @@ import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import requestMiddleware from "../../middleware/request-middleware";
 import { ServicesProvider } from "../../services/services-provider";
-import { AccountingTypes } from "../../types";
+import { AccountingTypes, TechTypes } from "../../types";
 
-export const updateExpenseRequestValidator = Joi.object().keys({
+export const updateExpenseBodyValidator = Joi.object().keys({
   name: Joi.string().required(),
   amount: Joi.number().required(),
   category: Joi.string().required(),
@@ -14,30 +14,57 @@ export const updateExpenseRequestValidator = Joi.object().keys({
   timestamp: Joi.date(),
 });
 
+export const updateExpenseQueryValidator = Joi.object().keys({
+  id: Joi.string().required().uuid(),
+  accountId: Joi.string().required().uuid(),
+});
+
 const update: RequestHandler = async (
-  req: Request<any, {}, AccountingTypes.Requests.UpdateRequest>,
+  req: Request<any, {}, AccountingTypes.Requests.UpdateRequest, any>,
   res
 ) => {
-  const SP = ServicesProvider.get();
-  const accountingService = await SP.Accounting();
+  try {
+    const SP = ServicesProvider.get();
+    const accountingService = await SP.Accounting();
 
-  const { name, amount, category, currency, type, description, timestamp } =
-    req.body;
-  await accountingService.editExpense(req.params.id, {
-    name,
-    amount,
-    category,
-    currency,
-    type,
-    description,
-    timestamp,
-  });
+    const { name, amount, category, currency, type, description, timestamp } =
+      req.body;
 
-  res.send({
-    message: "Edited",
-  });
+    const { id, accountId } = req.query;
+
+    await accountingService.updateAccountOne(id, accountId, {
+      name,
+      amount,
+      category,
+      currency,
+      type,
+      description,
+      timestamp,
+    });
+
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
+      message: "Updated expense",
+    };
+
+    res.send(response);
+  } catch (error: any) {
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.error,
+      message: "Unable to update expense",
+      error: {
+        name: error.constructor.name,
+        message: error.message,
+      },
+    };
+
+    res.status(400).send(response);
+  }
 };
 
 export default requestMiddleware(update, {
-  validation: { body: updateExpenseRequestValidator },
+  validation: {
+    body: updateExpenseBodyValidator,
+    query: updateExpenseQueryValidator,
+  },
 });

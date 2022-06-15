@@ -19,7 +19,7 @@ export const salaryRequestBody = {
 export const addSalaryValidator = Joi.object().keys(salaryRequestBody);
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, SalaryTypes.Requests.AddRequest>,
+  req: Request<{}, {}, SalaryTypes.Requests.AddRequest, any>,
   res
 ) => {
   try {

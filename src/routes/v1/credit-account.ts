@@ -8,6 +8,6 @@ const router = Router();
 router.post("/add", CreditAccountController.add);
 router.delete("/", CreditAccountController.remove);
 router.get("/", CreditAccountController.get);
-router.post("/id/:id", CreditAccountController.update);
+router.post("/", CreditAccountController.update);
 
 export default router;

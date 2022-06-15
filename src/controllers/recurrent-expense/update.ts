@@ -16,15 +16,17 @@ export const updateRecurrentExpenseBodyValidator = Joi.object().keys({
   recurrence: Joi.string(),
 });
 
-export const updateRecurrentExpenseParamsValidator = Joi.object().keys({
+export const updateRecurrentExpenseQueryValidator = Joi.object().keys({
   id: Joi.string().required().uuid(),
+  accountId: Joi.string().required().uuid(),
 });
 
 const update: RequestHandler = async (
   req: Request<
     ParamsDictionary,
     {},
-    RecurrentExpenseTypes.Requests.UpdateRequest
+    RecurrentExpenseTypes.Requests.UpdateRequest,
+    any
   >,
   res
 ) => {
@@ -43,8 +45,9 @@ const update: RequestHandler = async (
       recurrence,
     } = req.body;
 
-    const recurrentExpense = await recurrentExpenseService.update(
-      req.params.id,
+    const recurrentExpense = await recurrentExpenseService.updateAccountOne(
+      req.query.id,
+      req.query.accountId,
       {
         category,
         name,
@@ -81,6 +84,6 @@ const update: RequestHandler = async (
 export default requestMiddleware(update, {
   validation: {
     body: updateRecurrentExpenseBodyValidator,
-    params: updateRecurrentExpenseParamsValidator,
+    query: updateRecurrentExpenseQueryValidator,
   },
 });

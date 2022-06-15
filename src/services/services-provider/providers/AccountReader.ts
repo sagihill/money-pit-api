@@ -1,5 +1,9 @@
 import { AccountTypes } from "../../../types";
-import { AccountReaderService, getAccountRepository } from "../../account";
+import {
+  AccountReaderService,
+  getAccountRepository,
+  getAccountUserRepository,
+} from "../../account";
 import { ServicesProvider } from "../services-provider";
 
 export default async function AccountReader(
@@ -8,7 +12,12 @@ export default async function AccountReader(
 ): Promise<AccountTypes.IAccountReaderService> {
   const logger = await SP.Logger();
   const accountRepo = getAccountRepository();
-  const accountReaderService = new AccountReaderService(accountRepo, logger);
+  const accountUserRepo = getAccountUserRepository();
+  const accountReaderService = new AccountReaderService(
+    accountUserRepo,
+    accountRepo,
+    logger
+  );
 
   return accountReaderService;
 }

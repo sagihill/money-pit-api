@@ -8,6 +8,6 @@ const router = Router();
 router.post("/add", RecurrentExpenseController.add);
 router.get("/", RecurrentExpenseController.get);
 router.delete("/", RecurrentExpenseController.remove);
-router.post("/id/:id", RecurrentExpenseController.update);
+router.post("/", RecurrentExpenseController.update);
 
 export default router;

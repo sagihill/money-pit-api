@@ -242,11 +242,14 @@ export class ExpenseProcessor
   private async addExpenses(
     expensesExtracts: ExpenseProcessorTypes.ExpenseExtract[]
   ): Promise<void> {
-    const expenses = expensesExtracts.map((expenseExtract) => {
-      return this.accountingService.createNewExpense({
+    const expenses = [];
+    for await (const expenseExtract of expensesExtracts) {
+      const expense = await this.accountingService.createNewExpense({
         ...(expenseExtract as AccountingTypes.Requests.AddRequest),
       });
-    });
+
+      expenses.push(expense);
+    }
 
     await this.accountingService.addExpenses(expenses);
   }

@@ -1,4 +1,6 @@
 import { CriticalError } from "../../errors/service-error";
+import { ID, MongoRepository } from "../../lib";
+import { SimpleService } from "../../lib/service";
 import {
   LoggerTypes,
   AccountingTypes,
@@ -7,45 +9,43 @@ import {
   SalaryTypes,
   DomainTypes,
 } from "../../types";
-import { createNewExpense } from "./expense-factory";
 
-export class AccountingService implements AccountingTypes.IAccountingService {
+export class AccountingService
+  extends SimpleService<
+    AccountingTypes.Expense,
+    AccountingTypes.Requests.AddRequest,
+    AccountingTypes.Requests.UpdateRequest
+  >
+  implements AccountingTypes.IAccountingService
+{
   constructor(
     private readonly accountService: AccountTypes.IAccountReaderService,
-    private readonly accountingRepository: AccountingTypes.IAccountingRepository,
     private readonly accountConfigurationService: AccountConfigurationTypes.IAccountConfigurationService,
     private readonly salaryService: SalaryTypes.ISalaryService,
     private readonly config: AccountingTypes.AccountingServiceConfiguration,
-    private readonly logger: LoggerTypes.ILogger
-  ) {}
-
-  async editExpense(
-    id: string,
-    request: AccountingTypes.Requests.UpdateRequest
-  ): Promise<void> {
-    try {
-      this.logger.info("Editing expense");
-      await this.accountingRepository.update(id, request);
-    } catch (error: any) {
-      this.logger.error("Can't edit expense");
-      throw error;
-    }
+    repository: MongoRepository<
+      AccountingTypes.Expense,
+      AccountingTypes.Requests.UpdateRequest
+    >,
+    logger: LoggerTypes.ILogger
+  ) {
+    super(repository, logger);
   }
 
   async addExpenses(expenses: AccountingTypes.Expense[]): Promise<void> {
     try {
       this.logger.info("Adding expenses");
-      await this.accountingRepository.addExpenses(expenses);
+      await this.repository.addMany(expenses);
     } catch (error: any) {
       this.logger.error("Can't add expenses");
       throw error;
     }
   }
 
-  createNewExpense(
+  async createNewExpense(
     request: AccountingTypes.Requests.AddRequest
-  ): AccountingTypes.Expense {
-    return createNewExpense(request);
+  ): Promise<AccountingTypes.Expense> {
+    return this.createEntityDetails(request);
   }
 
   async getAccountSummery(
@@ -81,7 +81,7 @@ export class AccountingService implements AccountingTypes.IAccountingService {
       }
 
       const dates = this.getDatesForAccountSummer(chargeMonth);
-      const expenses = await this.accountingRepository.find({
+      const expenses = await this.repository.find({
         $or: [
           {
             accountId,
@@ -205,5 +205,34 @@ export class AccountingService implements AccountingTypes.IAccountingService {
     });
 
     return summery;
+  }
+
+  async createEntityDetails(
+    request: AccountingTypes.Requests.AddRequest
+  ): Promise<AccountingTypes.Expense> {
+    const now = new Date();
+    const expense: AccountingTypes.Expense = {
+      ...request,
+      accountId: request.accountId as string,
+      id: request.id ?? ID.get(),
+      timestamp: request.timestamp ?? now,
+      deleted: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    return expense;
+  }
+
+  createValidation(
+    request: AccountingTypes.Requests.AddRequest
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  updateValidation(
+    id: string,
+    request: AccountingTypes.Requests.UpdateRequest
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 }

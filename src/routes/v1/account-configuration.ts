@@ -10,7 +10,7 @@ const router = Router();
 router.post("/add", AccountConfigurationController.add);
 router.get("/accountId/:accountId", AccountConfigurationController.get);
 router.delete("/", AccountConfigurationController.remove);
-router.post("/accountId/:accountId", AccountConfigurationController.update);
+router.post("/", AccountConfigurationController.update);
 
 // Other configurations routes
 router.use("/creditAccount", creditAccount);

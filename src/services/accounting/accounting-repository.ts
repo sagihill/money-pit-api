@@ -7,18 +7,10 @@ export const getAccountingRepository = (logger: LoggerTypes.ILogger) => {
   return new AccountingRepository(Expense, logger);
 };
 
-export class AccountingRepository
-  extends MongoRepository<
-    AccountingTypes.Expense,
-    AccountingTypes.Requests.UpdateRequest
-  >
-  implements
-    AccountingTypes.IAccountingRepository,
-    MongoTypes.Repository<
-      AccountingTypes.Expense,
-      AccountingTypes.Requests.UpdateRequest
-    >
-{
+export class AccountingRepository extends MongoRepository<
+  AccountingTypes.Expense,
+  AccountingTypes.Requests.UpdateRequest
+> {
   constructor(
     model: Model<AccountingTypes.Expense>,
     private readonly logger: LoggerTypes.ILogger
@@ -26,10 +18,12 @@ export class AccountingRepository
     super(model);
   }
 
-  async addExpenses(expenses: AccountingTypes.Expense[]): Promise<void> {
+  async addMany(
+    data: AccountingTypes.Expense[]
+  ): Promise<AccountingTypes.Expense[]> {
     const needInsert = [];
 
-    for await (const expense of expenses) {
+    for await (const expense of data) {
       const res = await this.model.updateOne(
         { id: expense.id, chargeDate: null },
         {
@@ -43,21 +37,21 @@ export class AccountingRepository
       }
     }
 
-    if (needInsert.length !== expenses.length) {
-      this.logger.info(
-        `Updated ${expenses.length - needInsert.length} expenses`
-      );
+    if (needInsert.length !== data.length) {
+      this.logger.info(`Updated ${data.length - needInsert.length} data`);
     }
 
     if (needInsert.length) {
       await this.model
-        .insertMany(expenses, { ordered: false })
+        .insertMany(data, { ordered: false })
         .then(() => {
-          this.logger.info(`Added ${expenses.length} expenses`);
+          this.logger.info(`Added ${data.length} data`);
         })
         .catch((err) => {
-          this.logger.info(`Added ${err.result.result.nInserted} expenses`);
+          this.logger.info(`Added ${err.result.result.nInserted} data`);
         });
     }
+
+    return needInsert;
   }
 }

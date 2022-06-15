@@ -22,7 +22,7 @@ export const addAccountConfigurationValidator = Joi.object().keys(
 );
 
 const add: RequestHandler = async (
-  req: Request<{}, {}, AccountConfigurationTypes.Requests.AddRequest>,
+  req: Request<{}, {}, AccountConfigurationTypes.Requests.AddRequest, {}>,
   res
 ) => {
   try {

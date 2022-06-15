@@ -17,7 +17,7 @@ export const updateAccountConfigurationRequestBodyValidator = Joi.object().keys(
   accountConfigurationRequestBody
 );
 
-export const updateAccountConfigurationRequestParamsValidator =
+export const updateAccountConfigurationRequestQueryValidator =
   Joi.object().keys({
     accountId: Joi.string().uuid().required(),
   });
@@ -26,12 +26,13 @@ const update: RequestHandler = async (
   req: Request<
     ParamsDictionary,
     {},
-    AccountConfigurationTypes.Requests.UpdateRequest
+    AccountConfigurationTypes.Requests.UpdateRequest,
+    any
   >,
   res
 ) => {
   const { budget, toggles } = req.body;
-  const { accountId } = req.params;
+  const { accountId } = req.query;
   try {
     const SP = ServicesProvider.get();
     const accountConfiguration = await SP.AccountConfiguration();
@@ -65,6 +66,6 @@ const update: RequestHandler = async (
 export default requestMiddleware(update, {
   validation: {
     body: updateAccountConfigurationRequestBodyValidator,
-    params: updateAccountConfigurationRequestParamsValidator,
+    query: updateAccountConfigurationRequestQueryValidator,
   },
 });

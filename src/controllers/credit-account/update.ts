@@ -13,12 +13,18 @@ export const updateCreditAccountBodyValidator = Joi.object().keys({
   },
 });
 
-export const updateCreditAccountParamsValidator = Joi.object().keys({
+export const updateCreditAccountQueryValidator = Joi.object().keys({
   id: Joi.string().required().uuid(),
+  accountId: Joi.string().required().uuid(),
 });
 
 const update: RequestHandler = async (
-  req: Request<ParamsDictionary, {}, CreditAccountTypes.Requests.UpdateRequest>,
+  req: Request<
+    ParamsDictionary,
+    {},
+    CreditAccountTypes.Requests.UpdateRequest,
+    any
+  >,
   res
 ) => {
   try {
@@ -27,10 +33,14 @@ const update: RequestHandler = async (
 
     const { creditProvider, credentials } = req.body;
 
-    await creditAccountService.update(req.params.id, {
-      creditProvider,
-      credentials,
-    });
+    await creditAccountService.updateAccountOne(
+      req.query.id,
+      req.query.accountId,
+      {
+        creditProvider,
+        credentials,
+      }
+    );
 
     const response: TechTypes.ApiResponse = {
       status: TechTypes.ResponseStatus.success,
@@ -55,6 +65,6 @@ const update: RequestHandler = async (
 export default requestMiddleware(update, {
   validation: {
     body: updateCreditAccountBodyValidator,
-    params: updateCreditAccountParamsValidator,
+    query: updateCreditAccountQueryValidator,
   },
 });

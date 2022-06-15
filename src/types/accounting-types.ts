@@ -4,14 +4,18 @@ import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
 export namespace AccountingTypes {
-  export interface IAccountingService {
+  export interface IAccountingService
+    extends DomainTypes.IAccountSimpleService<
+      Expense,
+      Requests.AddRequest,
+      Requests.UpdateRequest
+    > {
     addExpenses(expenses: Expense[]): Promise<void>;
-    editExpense(id: string, request: Requests.UpdateRequest): Promise<void>;
     getAccountSummery(
       accountId: string,
       chargeMonth: DomainTypes.ChargeMonth
     ): Promise<AccountSummery>;
-    createNewExpense(request: Requests.AddRequest): Expense;
+    createNewExpense(request: Requests.AddRequest): Promise<Expense>;
   }
 
   export interface IAccountingRepository
@@ -107,7 +111,7 @@ export namespace AccountingTypes {
       amount: number;
       currency: DomainTypes.Currency;
       type: ExpenseType;
-      timestamp: Date;
+      timestamp?: Date;
       description?: string;
     }
     export interface GetSummeryRequest {

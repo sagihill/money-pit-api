@@ -11,12 +11,13 @@ export const updateSalaryBodyValidator = Joi.object().keys({
   payDay: Joi.number(),
 });
 
-export const updateSalaryParamsValidator = Joi.object().keys({
+export const updateSalaryQueryValidator = Joi.object().keys({
   id: Joi.string().required().uuid(),
+  accountId: Joi.string().required().uuid(),
 });
 
 const update: RequestHandler = async (
-  req: Request<ParamsDictionary, {}, SalaryTypes.Requests.UpdateRequest>,
+  req: Request<ParamsDictionary, {}, SalaryTypes.Requests.UpdateRequest, any>,
   res
 ) => {
   try {
@@ -24,8 +25,9 @@ const update: RequestHandler = async (
     const salaryService = await SP.Salary();
 
     const { amount, currency, payDay } = req.body;
+    const { id, accountId } = req.query;
 
-    const salary = await salaryService.update(req.params.id, {
+    const salary = await salaryService.updateAccountOne(id, accountId, {
       amount,
       currency,
       payDay,
@@ -55,6 +57,6 @@ const update: RequestHandler = async (
 export default requestMiddleware(update, {
   validation: {
     body: updateSalaryBodyValidator,
-    params: updateSalaryParamsValidator,
+    query: updateSalaryQueryValidator,
   },
 });

@@ -9,11 +9,10 @@ export class ValidationService implements ValidationTypes.IValidationService {
     userId: string,
     accountId: string
   ): Promise<void> {
-    const account = await this.accountService.get(accountId);
-    if (!account) {
-      throw new AccountTypes.AccountNotFound(accountId);
-    }
-    if (!account.members.includes(userId)) {
+    const accountIdFetch = await this.accountService.getAccountIdByUserId(
+      userId
+    );
+    if (!accountIdFetch || accountId !== accountIdFetch) {
       throw new ValidationTypes.AccountMembershipError(accountId);
     }
   }

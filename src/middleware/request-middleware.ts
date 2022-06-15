@@ -23,6 +23,7 @@ interface HandlerOptions {
   validation?: {
     body?: Joi.ObjectSchema;
     params?: Joi.ObjectSchema;
+    query?: Joi.ObjectSchema;
   };
 }
 
@@ -45,6 +46,13 @@ export const requestMiddleware =
 
     if (options?.validation?.params) {
       const { error } = options?.validation?.params.validate(req.params);
+      if (error != null) {
+        next(new BadRequest(getMessageFromJoiError(error)));
+        return;
+      }
+    }
+    if (options?.validation?.query) {
+      const { error } = options?.validation?.query.validate(req.query);
       if (error != null) {
         next(new BadRequest(getMessageFromJoiError(error)));
         return;

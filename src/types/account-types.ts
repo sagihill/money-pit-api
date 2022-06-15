@@ -24,6 +24,7 @@ export namespace AccountTypes {
   }
   export interface IAccountReaderService {
     getByAdminUserId(adminUserId: string): Promise<AccountDetails | undefined>;
+    getAccountIdByUserId(userId: string): Promise<string | undefined>;
     get(id: string): Promise<AccountDetails | undefined>;
   }
   export interface AccountDetails extends DomainTypes.IEntityDetails {

@@ -24,10 +24,10 @@ export default async function Accounting(
   const repository = getAccountingRepository(logger);
   const accountingService = new AccountingService(
     account,
-    repository,
     accountConfiguration,
     salary,
     { ...configuration, ...options },
+    repository,
     logger
   );
 

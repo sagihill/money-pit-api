@@ -8,6 +8,6 @@ const router = Router();
 router.post("/add", SalaryController.add);
 router.get("/", SalaryController.get);
 router.delete("/", SalaryController.remove);
-router.post("/id/:id", SalaryController.update);
+router.post("/", SalaryController.update);
 
 export default router;
