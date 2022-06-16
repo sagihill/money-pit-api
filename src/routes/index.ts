@@ -1,2 +1,2 @@
-export * from "./v1/root-router";
+export * from "./api/apiRouter";
 export * from "./admin/adminRouter";
