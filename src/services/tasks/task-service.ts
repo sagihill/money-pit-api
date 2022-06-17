@@ -8,7 +8,6 @@ import {
   RecurrentExpenseTypes,
   AccountConfigurationTypes,
   CreditAccountTypes,
-  SalaryTypes,
 } from "../../types";
 import { TaskTypes } from "../../types/task-types";
 import {

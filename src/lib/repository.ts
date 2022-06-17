@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 import { MongoTypes } from "../types";
-import { Objects } from "./common";
+import { Objects } from "../lib";
 
 /**
  * A generic base class for Mongo-backed repositories.

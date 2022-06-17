@@ -1,6 +1,6 @@
 /* eslint-disable import/first */
 import app from "./app";
-import { Async } from "./lib/common";
+import { Async } from "./lib";
 import { ServicesProvider } from "./services/services-provider";
 import { ConfigTypes } from "./types";
 
@@ -32,7 +32,11 @@ const tests = async () => {};
 
 const serve = async () => {
   const logger = await SP.Logger();
+  const migration = await SP.Migrate();
+  await migration.migrate();
+
   const PORT = (await config.get("PORT")) || 3000;
+
   const Task = await SP.Task();
   // await Task.run();
 

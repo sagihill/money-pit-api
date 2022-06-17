@@ -53,7 +53,6 @@ export class AccountingService
     chargeMonth: DomainTypes.ChargeMonth
   ): Promise<AccountingTypes.AccountSummery> {
     try {
-      console.log(this.config);
       const account = await this.accountService.get(accountId);
 
       if (!account) {

@@ -6,6 +6,16 @@ export class ConfigService implements ConfigTypes.IConfigService {
     private readonly logger: LoggerTypes.ILogger
   ) {}
 
+  async addMany(request: ConfigTypes.AddConfigRequest[]): Promise<void> {
+    try {
+      this.logger.info(`add configs`);
+      await this.configRepository.addMany(request);
+    } catch (error: any) {
+      this.logger.error(`Can't add configs`);
+      throw error;
+    }
+  }
+
   async add(request: ConfigTypes.AddConfigRequest): Promise<void> {
     try {
       this.logger.info(`add config`);

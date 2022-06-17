@@ -23,6 +23,23 @@ export namespace TechTypes {
     currentUserId?: string;
   }
 
+  export interface IMigrationService {
+    migrate(): Promise<void>;
+  }
+
+  export interface IMigrationRepository {
+    save(migration: Migration): Promise<void>;
+    isMigrated(id: string): Promise<boolean>;
+  }
+
+  export interface MigrationServiceOptions {}
+
+  export interface Migration {
+    id: string;
+    name: string;
+    migratedAt?: Date;
+  }
+
   export class RequiredParameterError extends CriticalError {
     constructor(protected readonly parameter: string) {
       super(`Can't finish operation, ${parameter} is a required parameter.`);

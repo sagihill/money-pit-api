@@ -1,6 +1,6 @@
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
-import { Utils } from "../../../lib/common";
+import { Utils } from "../../../lib/utils";
 import requestMiddleware from "../../../middleware/request-middleware";
 import { ServicesProvider } from "../../../services/services-provider";
 import { AccountingTypes, TechTypes } from "../../../types";

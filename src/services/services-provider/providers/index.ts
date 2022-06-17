@@ -10,6 +10,7 @@ import ExpenseProcessor from "./ExpenseProcessor";
 import ExpenseSheetsDownloader from "./ExpenseSheetsDownloader";
 import Logger from "./Logger";
 import Mongo from "./Mongo";
+import Migrate from "./Migrate";
 import RecurrentExpense from "./RecurrentExpense";
 import Task from "./Task";
 import Salary from "./Salary";
@@ -29,6 +30,7 @@ export const Providers: any = {
   ExpenseSheetsDownloader,
   Logger,
   Mongo,
+  Migrate,
   RecurrentExpense,
   Task,
   Salary,

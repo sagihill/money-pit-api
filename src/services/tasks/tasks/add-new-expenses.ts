@@ -1,7 +1,6 @@
-import { ID, Sync } from "../../../lib/common";
+import { ID, Sync } from "../../../lib";
 import {
   AccountConfigurationTypes,
-  AccountTypes,
   CreditAccountTypes,
   ExpenseProcessorTypes,
   ExpenseSheetsDownloaderTypes,

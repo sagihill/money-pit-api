@@ -1,5 +1,4 @@
-import { AccountingTypes, ExpenseProcessorTypes } from "../../../types";
-import { AccountingService, getAccountingRepository } from "../../accounting";
+import { ExpenseProcessorTypes } from "../../../types";
 import {
   getProcessorLogsRepository,
   ExpenseProcessor as ExpenseProcessorService,

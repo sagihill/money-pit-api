@@ -3,6 +3,7 @@ import { DomainTypes } from ".";
 export namespace ConfigTypes {
   export interface IConfigService {
     add(request: AddConfigRequest): Promise<void>;
+    addMany(request: AddConfigRequest[]): Promise<void>;
     edit(request: EditConfigRequest): Promise<void>;
     addMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
     editMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
@@ -18,6 +19,7 @@ export namespace ConfigTypes {
 
   export interface IConfigRepository {
     add(request: AddConfigRequest): Promise<void>;
+    addMany(requests: ConfigTypes.AddConfigRequest[]): Promise<void>;
     edit(request: EditConfigRequest): Promise<void>;
     addMapEntry(request: ConfigureMapEntryRequest): Promise<void>;
     editMapEntry(request: ConfigureMapEntryRequest): Promise<void>;

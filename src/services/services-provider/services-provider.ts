@@ -14,6 +14,7 @@ import {
   SalaryTypes,
   ValidationTypes,
   CryptoTypes,
+  TechTypes,
 } from "../../types";
 
 import { TaskTypes } from "../../types/task-types";
@@ -244,6 +245,19 @@ export class ServicesProvider {
     try {
       return await this.getProvider<MongoTypes.IMongo, {}>(
         "Mongo",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
+  async Migrate(): Promise<TechTypes.IMigrationService> {
+    try {
+      return await this.getProvider<TechTypes.IMigrationService, {}>(
+        "Migrate",
         {},
         CreationMode.singleton
       );

@@ -9,17 +9,12 @@ import {
   LoggerTypes,
   RecurrentExpenseTypes,
 } from "../../types";
-import { FS, ID, UsingMiddleware } from "../../lib";
-
-import {
-  formatName,
-  formatStrings,
-  formatCategory,
-  formatAmount,
-} from "./middleware";
+import { FS, ID } from "../../lib";
+import { Middleware } from "../../middleware/entities-middleware";
+import { formatName, formatCategory, formatAmount } from "./middleware";
 
 export class ExpenseProcessor
-  extends UsingMiddleware<
+  extends Middleware.UsingMiddleware<
     ExpenseProcessorTypes.ExpenseExtract,
     ExpenseProcessorTypes.ExpenseProcessorOptions
   >

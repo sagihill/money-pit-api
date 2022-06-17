@@ -21,7 +21,6 @@ export class CryptoService implements CryptoTypes.ICryptoService {
 
   async decrypt(string: string): Promise<string> {
     const [hash, iv] = string.split("__");
-    console.log(hash, iv);
     const decipher = crypto.createDecipheriv(
       "aes-256-ctr",
       this.key,

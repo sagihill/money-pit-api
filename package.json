@@ -23,7 +23,8 @@
     "ts-node-server": "ts-node src/server.ts",
     "start": "nodemon --watch ./**/*.ts --exec ts-node src/server.ts",
     "test": "jest",
-    "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix"
+    "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix",
+    "migration": "bash ./scripts/migration.sh"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

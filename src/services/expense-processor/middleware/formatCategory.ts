@@ -1,7 +1,8 @@
-import { IMiddleware, Utils } from "../../../lib";
+import { Utils } from "../../../lib";
+import { Middleware } from "../../../middleware/entities-middleware";
 import { AccountingTypes, ExpenseProcessorTypes } from "../../../types";
 
-export const formatCategory: IMiddleware<
+export const formatCategory: Middleware.IMiddleware<
   ExpenseProcessorTypes.ExpenseExtract,
   ExpenseProcessorTypes.ExpenseProcessorOptions
 > = (

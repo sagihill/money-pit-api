@@ -1,0 +1,9 @@
+export namespace Sync {
+  export function sleep(ms: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
+    });
+  }
+}

@@ -1,4 +1,4 @@
-import { ID } from "../../../lib/common";
+import { ID } from "../../../lib";
 import { ConfigTypes, LoggerTypes } from "../../../types";
 import { TaskTypes } from "../../../types/task-types";
 import { BaseTask } from "./base-task";

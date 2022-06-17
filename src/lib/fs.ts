@@ -7,6 +7,46 @@ export namespace FS {
     }
   }
 
+  export function copyFile(
+    srcPath: fs.PathLike,
+    newPath: fs.PathLike
+  ): boolean {
+    // if (!fs.existsSync(srcPath)) {
+    //   console.log(srcPath);
+    //   console.log("Source file doesn't exists.");
+    //   return false;
+    // }
+    if (!fs.existsSync(newPath)) {
+      try {
+        fs.copyFileSync(srcPath, newPath);
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  export function replaceInFile(
+    filePath: fs.PathLike,
+    toReplace: string,
+    replacement: string
+  ) {
+    fs.readFile(filePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+
+      const regex = new RegExp(toReplace);
+      const result = data.replace(regex, replacement);
+
+      fs.writeFile(filePath, result, "utf8", function (err) {
+        if (err) return console.log(err);
+      });
+    });
+  }
+
   export function deletedirOrFile(path: fs.PathLike): void {
     if (fs.existsSync(path)) {
       fs.rmSync(path, { recursive: true });

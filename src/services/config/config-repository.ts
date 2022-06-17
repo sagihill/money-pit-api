@@ -5,7 +5,7 @@ import Config from "../../models/Config";
 /* eslint-disable import/first */
 import dotenv from "dotenv";
 import * as path from "path";
-import { ID } from "../../lib/common";
+import { createNewConfig } from "./config-factory";
 
 export const getConfigRepository = () => {
   return new ConfigRepository(Config);
@@ -28,16 +28,21 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
     if (exists) {
       throw new Error("Configuration allready exists.");
     }
-    const now = new Date();
-    const details: ConfigTypes.ConfigDetails = {
-      ...request,
-      id: ID.get(),
-      deleted: false,
-      createdAt: now,
-      updatedAt: now,
-    };
+    const details: ConfigTypes.ConfigDetails = await createNewConfig(request);
     const modelInstance = new this.ConfigModel(details);
     await modelInstance.save();
+  }
+
+  async addMany(requests: ConfigTypes.AddConfigRequest[]): Promise<void> {
+    const data = [];
+
+    for await (const request of requests) {
+      const config = await createNewConfig(request);
+      data.push(config);
+    }
+
+    const modelInstance = new this.ConfigModel(data);
+    await modelInstance.collection.insertMany(data);
   }
 
   async edit(request: ConfigTypes.EditConfigRequest): Promise<void> {

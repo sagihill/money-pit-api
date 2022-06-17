@@ -1,4 +1,4 @@
-import { ID, Dates } from "../../../lib/common";
+import { ID, Dates } from "../../../lib";
 import {
   AccountingTypes,
   RecurrentExpenseTypes,
