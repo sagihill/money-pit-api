@@ -5,26 +5,24 @@ import { ServicesProvider } from "../../../services/services-provider";
 import { TechTypes, UserTypes } from "../../../types";
 
 export const updateUserRequestValidator = Joi.object().keys({
-  accountId: Joi.string().uuid(),
   lastName: Joi.string().regex(/^[a-z ,.'-]+$/i),
   firstName: Joi.string().regex(/^[a-z ,.'-]+$/i),
   email: Joi.string().email(),
 });
 
 const update: RequestHandler = async (
-  req: Request<any, {}, UserTypes.Requests.UpdateRequest>,
+  req: Request<any, {}, UserTypes.Requests.UpdateUserDetailsRequest>,
   res
 ) => {
   try {
     const SP = ServicesProvider.get();
     const userService = await SP.User();
 
-    const { firstName, lastName, email, accountId } = req.body;
+    const { firstName, lastName, email } = req.body;
     await userService.update(req.params.id, {
       firstName,
       lastName,
       email,
-      accountId,
     });
 
     const response: TechTypes.ApiResponse = {

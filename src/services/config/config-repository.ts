@@ -6,6 +6,7 @@ import Config from "../../models/Config";
 import dotenv from "dotenv";
 import * as path from "path";
 import { createNewConfig } from "./config-factory";
+import { Validate } from "../../lib";
 
 export const getConfigRepository = () => {
   return new ConfigRepository(Config);
@@ -192,7 +193,9 @@ class ConfigRepository implements ConfigTypes.IConfigRepository {
     const value = await this.getValue(key);
     let object;
     if (value) {
-      object = JSON.parse(value);
+      if (Validate.isJsonString(value)) {
+        object = JSON.parse(value);
+      }
     }
     if (typeof object === "object") {
       return object as T;

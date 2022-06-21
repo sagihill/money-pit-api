@@ -18,7 +18,7 @@ export class AddReccurentExpensesTask
     options: TaskTypes.AddRecurrentExpensesTaskOptions,
     logger: LoggerTypes.ILogger
   ) {
-    super(ID.get(), options, logger);
+    super("AddReccurentExpensesTask", options, logger);
   }
 
   async run(): Promise<void> {

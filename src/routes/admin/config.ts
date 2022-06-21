@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { ConfigController } from "../../controllers";
-
+import { Admin } from "../../controllers";
+const { ConfigController } = Admin;
 const router = Router();
 
 // Config routes

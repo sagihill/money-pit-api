@@ -1,4 +1,5 @@
 import { CriticalError } from "../errors/service-error";
+import { Types } from "mongoose";
 
 export namespace MongoTypes {
   export interface IMongo {
@@ -19,6 +20,8 @@ export namespace MongoTypes {
     serialize(data: T): any;
     deserialize(data: any): T;
   }
+
+  export type ObjectId = Types.ObjectId;
 
   export class EntityRemoveError extends CriticalError {
     constructor(private readonly id: string) {

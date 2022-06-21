@@ -6,8 +6,8 @@ const { UserController } = V1;
 const router = Router();
 
 // User routes
-router.get("/id/:id", UserController.get);
-router.delete("/id/:id", UserController.remove);
-router.put("/id/:id", UserController.update);
+router.get("/", UserController.get);
+router.delete("/", UserController.remove);
+router.put("/update", UserController.update);
 
 export default router;

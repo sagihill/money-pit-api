@@ -7,6 +7,15 @@ import {
 } from "../types";
 
 export namespace Validate {
+  export function isJsonString(str: string) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   export function isValidAmount(amount?: number): boolean {
     return (
       !Number.isNaN(amount) &&

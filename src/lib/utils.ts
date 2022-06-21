@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { ServicesProvider } from "../services/services-provider";
+import { TechTypes, UserTypes } from "../types";
 
 export namespace Utils {
   export async function getUserIdFromRequest(req: Request): Promise<string> {
@@ -8,7 +9,7 @@ export namespace Utils {
     const userService = await SP.User();
     const token = getTokenFromRequest(req);
     if (!token) {
-      throw new Error("token is missing");
+      throw new TechTypes.AuthTokenMissingError();
     }
 
     const auth = await authService.getAuth(token);
@@ -16,7 +17,7 @@ export namespace Utils {
     const user = await userService.get(auth.userId);
 
     if (!user) {
-      throw new Error("Can't get user from token");
+      throw new UserTypes.UserNotFound();
     }
 
     return user.id;

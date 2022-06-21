@@ -18,19 +18,23 @@ export class AddNewExpensesTask extends BaseTask implements TaskTypes.ITask {
     options: TaskTypes.AddNewExpenseTaskOptions,
     logger: LoggerTypes.ILogger
   ) {
-    super(ID.get(), options, logger);
+    super("AddNewExpensesTask", options, logger);
   }
 
   async run(): Promise<void> {
     try {
+      this.logger.info("Running add new expenses task.");
       const options = this.getOptions<TaskTypes.AddNewExpenseTaskOptions>();
       const configs = await this.accountConfigurationService.findConfigurations(
         {
-          toggles: { enableAutoExpenseAdd: true },
+          "toggles.enableAutoExpenseAdd": true,
         }
       );
 
-      if (!configs) {
+      if (!configs || !configs.length) {
+        this.logger.info(
+          "Didn't find any account configurations to add new expenses."
+        );
         return;
       }
 

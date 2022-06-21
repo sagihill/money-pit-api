@@ -1,4 +1,5 @@
 import { DomainTypes } from ".";
+import { ValidationError } from "../errors/service-error";
 
 // tslint:disable-next-line: no-namespace
 export namespace UserTypes {
@@ -9,6 +10,9 @@ export namespace UserTypes {
       Requests.UpdateRequest
     > {
     findOne(request: Requests.FindRequest): Promise<UserDetails | undefined>;
+    getUserInfo(
+      request: Requests.GetUserInfoRequest
+    ): Promise<UserInfo | undefined>;
   }
 
   export interface UserDetails extends DomainTypes.IEntityDetails {
@@ -19,6 +23,14 @@ export namespace UserTypes {
     email: string;
     password: string;
     role: UserRole;
+    status: UserStatus;
+  }
+  export interface UserInfo {
+    id: string;
+    accountId?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
   }
 
   export enum UserRole {
@@ -26,9 +38,20 @@ export namespace UserTypes {
     Admin = "admin",
   }
 
+  export enum UserStatus {
+    Authenticated = "authenticated",
+    PendingAuthentication = "pending_authentication",
+    Blocked = "blocked",
+  }
+
   export namespace Requests {
     export interface UpdateRequest {
       accountId?: string;
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+    }
+    export interface UpdateUserDetailsRequest {
       firstName?: string;
       lastName?: string;
       email?: string;
@@ -44,5 +67,15 @@ export namespace UserTypes {
     export type FindRequest = {
       email?: string;
     };
+
+    export type GetUserInfoRequest = {
+      id: string;
+    };
+  }
+
+  export class UserNotFound extends ValidationError {
+    constructor() {
+      super(`Can't finish operation, User not found.`);
+    }
   }
 }

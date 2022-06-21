@@ -121,8 +121,6 @@ export class CreditAccountService
       id: ID.get(),
     };
 
-    this.encryptCreditAccount(creditAccount);
-
     return creditAccount;
   }
 

@@ -7,17 +7,17 @@ export default async () => {
     {
       key: "EXPENSE_CATEGORY_NAME_MAP",
       value:
-        '{"ג\'ונגל":"mia","מרכז פירות וירקות":"groceries","כללית":"medical","סאבטרה":"fitness","שופרסל":"groceries","אקוביל":"home","רון ג\'מילי":"beauty_and_grooming","APPLE.COM/BILL":"internet_subscriptions","BUBBLE DAN":"transportation","מ.תחבורה רב- פס":"transportation"},',
+        '{"ג\'ונגל":"mia","מרכז פירות וירקות":"groceries","כללית":"medical","סאבטרה":"fitness","שופרסל":"groceries","אקוביל":"home","רון ג\'מילי":"beauty_and_grooming","APPLE.COM/BILL":"internet_subscriptions","BUBBLE DAN":"transportation","מ.תחבורה רב- פס":"transportation"}',
     },
     {
       key: "EXPENSE_CATEGORY_CATEGORY_MAP",
       value:
-        '{"ביטוח":"insurance","מזון וצריכה":"consumption","שרותי תקשורת":"communication_services","מחשבים, תוכנות וחשמל":"other","דלק חשמל וגז":"fuel_gas_and_electricity","עירייה וממשלה":"goverment_and_municipality","כלבו":"other","שונות":"other","רפואה וקוסמטיקה":"medical"},',
+        '{"ביטוח":"insurance","מזון וצריכה":"consumption","שרותי תקשורת":"communication_services","מחשבים, תוכנות וחשמל":"other","דלק חשמל וגז":"fuel_gas_and_electricity","עירייה וממשלה":"goverment_and_municipality","כלבו":"other","שונות":"other","רפואה וקוסמטיקה":"medical"}',
     },
     {
       key: "EXPENSE_NAME_FORMAT_CONFIG",
       value:
-        '{"ALEM":"mela","העברה ב BIT":"Bit - העברה ב","PAYBOX":"Paybox - העברה ב","בריאות כללית":"כללית","חברת פרטנר תקשורת בע\\"מ (ה":"פרטנר"},',
+        '{"ALEM":"mela","העברה ב BIT":"Bit - העברה ב","PAYBOX":"Paybox - העברה ב","בריאות כללית":"כללית","חברת פרטנר תקשורת בע\\"מ (ה":"פרטנר"}',
     },
     {
       key: "SKIP_ALLREADY_PROCESSED_SHEETS",
@@ -33,7 +33,7 @@ export default async () => {
     },
     {
       key: "CREDIT_PROVIDERS_URL_MAP",
-      value: '{"max":"https://www.max.co.il/homepage/welcome"},',
+      value: '{"max":"https://www.max.co.il/homepage/welcome"}',
     },
     {
       key: "ADD_MONTHLY_RECURRENT_EXPENSES_TASK_IS_ENABLED",

@@ -19,6 +19,26 @@ export class UserService
   ) {
     super(repository, logger);
   }
+  async getUserInfo(
+    request: UserTypes.Requests.GetUserInfoRequest
+  ): Promise<UserTypes.UserInfo | undefined> {
+    try {
+      this.logger.info(`Finding users by: ${{ request }}`);
+      const users = await this.repository.find(request, null, 1);
+      const user = users[0];
+      const { id, accountId, lastName, firstName, email } = user;
+      return {
+        id,
+        accountId,
+        firstName,
+        lastName,
+        email,
+      };
+    } catch (error: any) {
+      this.logger.error(`Can't find users: ${{ request, error }}`);
+      throw error;
+    }
+  }
 
   async findOne(
     request: UserTypes.Requests.FindRequest
@@ -52,6 +72,7 @@ export class UserService
     const userDetails: UserTypes.UserDetails = {
       ...request,
       role: UserTypes.UserRole.Regular,
+      status: UserTypes.UserStatus.PendingAuthentication,
       id: ID.get(),
       deleted: false,
       createdAt: now,

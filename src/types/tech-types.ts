@@ -45,4 +45,9 @@ export namespace TechTypes {
       super(`Can't finish operation, ${parameter} is a required parameter.`);
     }
   }
+  export class AuthTokenMissingError extends CriticalError {
+    constructor() {
+      super(`Can't finish operation, Authorization token is missing.`);
+    }
+  }
 }

@@ -4,6 +4,7 @@ import { RecurrentExpenseTypes } from "./recurrent-expense-types";
 export namespace TaskTypes {
   export interface ITaskService {
     run(): Promise<void>;
+    runTask(id: string): Promise<void>;
     addTask(task: ITask): Promise<void>;
   }
 
@@ -33,5 +34,11 @@ export namespace TaskTypes {
   }
   export interface AddRecurrentExpensesTaskOptions extends TaskOptions {
     recurrence: RecurrentExpenseTypes.Recurrence;
+  }
+
+  export namespace Requests {
+    export interface RunTaskRequest {
+      id: string;
+    }
   }
 }

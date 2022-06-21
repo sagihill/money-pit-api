@@ -11,11 +11,7 @@ export namespace FS {
     srcPath: fs.PathLike,
     newPath: fs.PathLike
   ): boolean {
-    // if (!fs.existsSync(srcPath)) {
-    //   console.log(srcPath);
-    //   console.log("Source file doesn't exists.");
-    //   return false;
-    // }
+
     if (!fs.existsSync(newPath)) {
       try {
         fs.copyFileSync(srcPath, newPath);

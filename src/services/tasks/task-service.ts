@@ -39,6 +39,11 @@ export class TaskService implements TaskTypes.ITaskService {
     }
   }
 
+  async runTask(id: string): Promise<void> {
+    const task = this.tasks.find((task) => task.getId() == id);
+    await task?.run();
+  }
+
   initTasks(): void {
     const addNewExpensesTask = new AddNewExpensesTask(
       this.creditAccountService,

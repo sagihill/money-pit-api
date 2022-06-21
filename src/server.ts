@@ -38,7 +38,7 @@ const serve = async () => {
   const PORT = (await config.get("PORT")) || 3000;
 
   const Task = await SP.Task();
-  // await Task.run();
+  await Task.run();
 
   await tests();
 

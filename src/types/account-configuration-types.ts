@@ -54,9 +54,7 @@ export namespace AccountConfigurationTypes {
     }
 
     export interface FindRequest {
-      toggles?: {
-        enableAutoExpenseAdd?: boolean;
-      };
+      [key: string]: boolean;
     }
   }
 }

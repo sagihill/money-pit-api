@@ -1,27 +1,36 @@
 import { Request, RequestHandler } from "express";
-import { Utils } from "../../../lib";
+import Joi from "joi";
 import requestMiddleware from "../../../middleware/request-middleware";
 import { ServicesProvider } from "../../../services/services-provider";
-import { TechTypes } from "../../../types";
+import { ConfigTypes, TechTypes } from "../../../types";
+import { TaskTypes } from "../../../types/task-types";
 
-const remove: RequestHandler = async (req: Request, res) => {
+export const runTaskRequestValidation = Joi.object().keys({
+  id: Joi.string().required(),
+});
+
+const add: RequestHandler = async (
+  req: Request<{}, {}, TaskTypes.Requests.RunTaskRequest>,
+  res
+) => {
   try {
     const SP = ServicesProvider.get();
-    const userService = await SP.User();
+    const task = await SP.Task();
 
-    const id = await Utils.getUserIdFromRequest(req);
-    await userService.remove(id);
+    const { id } = req.body;
+
+    await task.runTask(id);
 
     const response: TechTypes.ApiResponse = {
       status: TechTypes.ResponseStatus.success,
-      message: `User ${id} deleted successfully.`,
+      message: "Ran task.",
     };
 
     res.send(response);
   } catch (error: any) {
     const response: TechTypes.ApiResponse = {
       status: TechTypes.ResponseStatus.error,
-      message: `removing user had an error.`,
+      message: "Unable to run task",
       error: {
         name: error.constructor.name,
         message: error.message,
@@ -32,4 +41,6 @@ const remove: RequestHandler = async (req: Request, res) => {
   }
 };
 
-export default requestMiddleware(remove);
+export default requestMiddleware(add, {
+  validation: { body: runTaskRequestValidation },
+});

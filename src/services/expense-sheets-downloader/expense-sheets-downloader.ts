@@ -37,6 +37,7 @@ export class ExpenseSheetsDownloader
       await this.logger.error(
         "Somthing happend while downloading expense sheets"
       );
+      await this.hardClose();
       throw error;
     }
   }
@@ -60,7 +61,7 @@ export class ExpenseSheetsDownloader
 
     await element?.click();
     await page.click("#login-password-link");
-    // await page.waitForNavigation();
+    await Sync.sleep(2000);
 
     // Fillout login form
     const usernameElement = await page.waitForSelector('[id="user-name"]');
@@ -148,9 +149,15 @@ export class ExpenseSheetsDownloader
     this.browser = undefined;
   }
 
+  async hardClose(): Promise<void> {
+    await this.browser?.close();
+    this.browser = undefined;
+  }
+
   async logout(page: Page): Promise<void> {
     const personalAreaButton = await page.waitForXPath(
-      "//div[@class='go-to-personal-area log-in-status d-none d-sm-none d-md-block']"
+      "//div[@class='go-to-personal-area log-in-status d-none d-sm-none d-md-block']",
+      { timeout: 15000 }
     );
     await personalAreaButton?.click();
     await Sync.sleep(1000);

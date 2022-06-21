@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ServicesProvider } from "../services/services-provider";
+import { TechTypes } from "../types";
 
 const authorize = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,15 +17,15 @@ const authorize = async (req: Request, res: Response, next: NextFunction) => {
       if (response.isAuthorized) {
         next();
       } else {
-        res.send({
+        res.status(404).send({
+          status: TechTypes.ResponseStatus.failure,
           message: "Unauthorized",
-          responseCode: 404,
         });
       }
     } else {
-      res.send({
+      res.status(404).send({
+        status: TechTypes.ResponseStatus.failure,
         message: "Unauthorized",
-        responseCode: 404,
       });
     }
   } catch (err) {

@@ -31,6 +31,12 @@ const schema = new Schema<UserTypes.UserDetails>(
       required: true,
       default: UserTypes.UserRole.Regular,
     },
+    status: {
+      type: String,
+      index: false,
+      required: true,
+      default: UserTypes.UserStatus.PendingAuthentication,
+    },
     ...BaseEntitySchema,
   },
   { timestamps: true, collection: "User" }

@@ -1,5 +1,5 @@
 import { DomainTypes } from ".";
-import { CriticalError } from "../errors/service-error";
+import { CriticalError, ValidationError } from "../errors/service-error";
 import { MongoTypes } from "./mongo-types";
 
 // tslint:disable-next-line: no-namespace
@@ -130,6 +130,13 @@ export namespace AccountingTypes {
     constructor(private readonly type: ExpenseType) {
       super(
         `Can't finish operation. expense type ${type} is an invalid value.`
+      );
+    }
+  }
+  export class ExpenseSummeryEmpty extends ValidationError {
+    constructor(private readonly chargeMonth: DomainTypes.ChargeMonth) {
+      super(
+        `Can't get expense summery. there are no expenses for ${chargeMonth.month}/${chargeMonth.year} month.`
       );
     }
   }

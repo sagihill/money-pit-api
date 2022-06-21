@@ -45,10 +45,10 @@ export class AccountingRepository extends MongoRepository<
       await this.model
         .insertMany(data, { ordered: false })
         .then(() => {
-          this.logger.info(`Added ${data.length} data`);
+          this.logger.info(`Added ${data.length} expenses`);
         })
         .catch((err) => {
-          this.logger.info(`Added ${err.result.result.nInserted} data`);
+          this.logger.info(`Added ${err.result.result.nInserted} expenses`);
         });
     }
 

@@ -79,7 +79,7 @@ export class AccountingService
         );
       }
 
-      const dates = this.getDatesForAccountSummer(chargeMonth);
+      const dates = this.getDatesForAccountSummery(chargeMonth);
       const expenses = await this.repository.find({
         $or: [
           {
@@ -101,7 +101,7 @@ export class AccountingService
       });
 
       if (!expenses.length) {
-        throw new Error("No expenses for this charge month");
+        throw new AccountingTypes.ExpenseSummeryEmpty(chargeMonth);
       }
 
       const incomes = await this.salaryService.findSalaries({ accountId });
@@ -133,7 +133,7 @@ export class AccountingService
     }
   }
 
-  private getDatesForAccountSummer(chargeMonth: DomainTypes.ChargeMonth): {
+  private getDatesForAccountSummery(chargeMonth: DomainTypes.ChargeMonth): {
     chargeLowerBoundary: Date;
     chargeUpperBoundary: Date;
     timestampLowerBoundary: Date;
@@ -141,7 +141,7 @@ export class AccountingService
   } {
     const chargeLowerBoundary = new Date(
       Number(chargeMonth.year),
-      Number(chargeMonth.month) - 2,
+      Number(chargeMonth.month) - 1,
       this.config.accountingSummeryDatesWindow.lowerChargeDay + 1,
       0
     );

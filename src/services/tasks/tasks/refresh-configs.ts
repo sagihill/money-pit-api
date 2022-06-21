@@ -9,7 +9,7 @@ export class RefreshConfigsTask extends BaseTask implements TaskTypes.ITask {
     options: TaskTypes.TaskOptions,
     logger: LoggerTypes.ILogger
   ) {
-    super(ID.get(), options, logger);
+    super("RefreshConfigsTask", options, logger);
   }
 
   async run(): Promise<void> {

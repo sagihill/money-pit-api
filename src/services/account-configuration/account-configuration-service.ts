@@ -39,6 +39,7 @@ export class AccountConfigurationService
         ...request,
         deleted: false,
       });
+
       return configs;
     } catch (error: any) {
       this.logger.error(
