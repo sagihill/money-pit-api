@@ -7,12 +7,16 @@ import { TechTypes, UserTypes } from "../../../types";
 export const signUpRequestValidator = Joi.object().keys({
   firstName: Joi.string()
     .required()
-    .regex(/^[a-z ,.'-]+$/i),
+    .regex(/^[a-z ,.'-]+$/i)
+    .min(1)
+    .max(30),
   lastName: Joi.string()
     .required()
-    .regex(/^[a-z ,.'-]+$/i),
-  email: Joi.string().required().email(),
-  password: Joi.string().required().length(16),
+    .regex(/^[a-z ,.'-]+$/i)
+    .min(1)
+    .max(30),
+  email: Joi.string().required().email().max(100),
+  password: Joi.string().required().min(16).max(32),
 });
 
 const signUp: RequestHandler = async (

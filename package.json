@@ -25,7 +25,7 @@
     "test": "jest",
     "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix",
     "migration": "bash ./scripts/migration.sh",
-    "heroku-deploy": "heroku container:push web --app money-pit-api && $ heroku container:release web --app money-pit-api"
+    "heroku-deploy": "heroku container:push web --app money-pit-api && heroku container:release web --app money-pit-api"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
