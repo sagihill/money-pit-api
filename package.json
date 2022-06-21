@@ -24,7 +24,8 @@
     "start": "nodemon --watch ./**/*.ts --exec ts-node src/server.ts",
     "test": "jest",
     "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix",
-    "migration": "bash ./scripts/migration.sh"
+    "migration": "bash ./scripts/migration.sh",
+    "heroku-deploy": "heroku container:push web --app money-pit-api && $ heroku container:release web --app money-pit-api"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -32,12 +33,10 @@
     "compression": "1.7.4",
     "cron-parser": "^4.4.0",
     "crypto": "^1.0.1",
-    "csv-parser": "^3.0.0",
     "dotenv": "16.0.1",
     "express": "4.18.1",
     "joi": "17.6.0",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.29.3",
     "mongoose": "^6.3.1",
     "node-xlsx": "^0.21.0",
     "puppeteer": "^14.1.1",

@@ -40,7 +40,9 @@ const serve = async () => {
   const Task = await SP.Task();
   await Task.run();
 
-  await tests();
+  if ((await config.get("NODE_ENV")) === "development") {
+    await tests();
+  }
 
   return app.listen(PORT, async () => {
     logger.info(`🌏 Express server started at http://localhost:${PORT}`);
