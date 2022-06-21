@@ -15,8 +15,18 @@ const getMessageFromJoiError = (
     return error.message;
   }
   return error.details && error.details.length > 0 && error.details[0].message
-    ? `PATH: [${error.details[0].path}] ;; MESSAGE: ${error.details[0].message}`
-    : undefined;
+    ? parseJoiMessage(error)
+    : "Bad request.";
+};
+
+const parseJoiMessage = (error: Joi.ValidationError) => {
+  const field = error.details[0].path.toString();
+  const value = error._original[field];
+  if (error.details[0].message.includes("required pattern:")) {
+    return `Field '${field}' with value '${value}' fails to match requirements.`;
+  } else {
+    return error.details[0].message.replace(/\"/gi, "'") + ".";
+  }
 };
 
 interface HandlerOptions {

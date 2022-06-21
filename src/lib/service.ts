@@ -1,4 +1,5 @@
 import { DomainTypes, LoggerTypes, MongoTypes } from "../types";
+import { ErrorParser } from "./error-parser";
 
 /**
  * A generic base class for Service repositories.
@@ -8,11 +9,12 @@ export abstract class SimpleService<T, A, U>
     DomainTypes.ISimpleService<T, A, U>,
     DomainTypes.IAccountSimpleService<T, A, U>
 {
+  protected errorParser: ErrorParser;
   constructor(
     protected readonly repository: MongoTypes.Repository<T, U>,
     protected readonly logger: LoggerTypes.ILogger
   ) {
-    // /
+    this.errorParser = new ErrorParser(logger);
   }
 
   async add(request: A): Promise<T> {
@@ -23,7 +25,7 @@ export abstract class SimpleService<T, A, U>
       return await this.repository.add(details);
     } catch (error: any) {
       this.logger.error(`Error on create function of ${this.constructor.name}`);
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -34,7 +36,7 @@ export abstract class SimpleService<T, A, U>
       return result;
     } catch (error: any) {
       this.logger.error(`Error on get function of ${this.constructor.name}`);
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -48,7 +50,7 @@ export abstract class SimpleService<T, A, U>
       }
     } catch (error: any) {
       this.logger.error(`Error on update function of ${this.constructor.name}`);
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -61,7 +63,7 @@ export abstract class SimpleService<T, A, U>
       }
     } catch (error: any) {
       this.logger.error(`Error on remove function of ${this.constructor.name}`);
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -74,7 +76,7 @@ export abstract class SimpleService<T, A, U>
       this.logger.error(
         `Error on findAccountOne function of ${this.constructor.name}`
       );
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -94,7 +96,7 @@ export abstract class SimpleService<T, A, U>
       this.logger.error(
         `Error on updateAccountOne function of ${this.constructor.name}`
       );
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 
@@ -109,7 +111,7 @@ export abstract class SimpleService<T, A, U>
       this.logger.error(
         `Error on removeAccountOne function of ${this.constructor.name}`
       );
-      throw error;
+      throw await this.errorParser.parse(error);
     }
   }
 

@@ -8,6 +8,7 @@ import adminRouter from "./routes/admin/adminRouter";
 import { logResponseTime } from "./middleware/logResponseTime";
 import sanitize from "./middleware/santize";
 import devRouter from "./routes/dev/devRouter";
+import { getValidationErrorResponse } from "./errors/application-error-parser";
 
 const app = express();
 
@@ -30,9 +31,7 @@ app.use(
       return next(err);
     }
 
-    return res.status(err.status || 500).json({
-      error: err.message,
-    });
+    return res.status(err.status || 500).json(getValidationErrorResponse(err));
   }
 );
 

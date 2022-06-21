@@ -14,6 +14,11 @@ export namespace DomainTypes {
     findAccountOne(id: string, accountId: string): Promise<T | undefined>;
     updateAccountOne(id: string, accountId: string, request: E): Promise<void>;
   }
+
+  export interface ISimpleErrorParser {
+    parse(error: Error): Promise<Error>;
+  }
+
   export interface IEntityDetails {
     deleted: boolean;
     createdAt: Date;
@@ -56,6 +61,15 @@ export namespace DomainTypes {
   export class InvalidDay extends CriticalError {
     constructor(protected readonly day: number) {
       super(`Can't finish operation. day ${day} is an invalid value.`);
+    }
+  }
+  export class NonUniqueError extends CriticalError {
+    constructor(protected fields: string[]) {
+      super(
+        `The values for [${fields.join(
+          ","
+        )}] are allready used. please choose different values.`
+      );
     }
   }
 }

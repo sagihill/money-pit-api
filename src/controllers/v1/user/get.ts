@@ -11,7 +11,6 @@ const get: RequestHandler = async (req: Request, res) => {
     const userService = await SP.User();
     const id = await Utils.getUserIdFromRequest(req);
     const user = await userService.getUserInfo({ id });
-    console.log(user);
     let response: TechTypes.ApiResponse;
 
     if (!user) {

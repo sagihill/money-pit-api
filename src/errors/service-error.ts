@@ -17,3 +17,9 @@ export class ValidationError extends Error {
     super(msg);
   }
 }
+
+export class TechnicalError extends Error {
+  constructor() {
+    super("Service unavailable.");
+  }
+}
