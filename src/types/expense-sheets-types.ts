@@ -13,5 +13,6 @@ export namespace ExpenseSheetsDownloaderTypes {
 
   export type ExpenseSheetsOptions = {
     expenseSheetsPath: string;
+    isLocal: boolean;
   };
 }

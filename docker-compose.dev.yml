@@ -1,17 +1,28 @@
 version: "3"
 
 services:
-  mongo:
-    image: mongo:5.0.8
-    container_name: mongo-dev
-    restart: always
-    networks:
-      - dev-network
+  money-pit-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.Dev
+    container_name: money-pit-dev
+    image: money-pit-dev
+    env_file:
+      - ./.env
+    environment:
+      - MONGO_URL=mongodb://host.docker.internal:27017/MoneyPit
+      - LOCAL=false
     volumes:
-      - ./data/dev/mongo:/data/db
+      - ./src:/usr/app/src
+      - ./logs:/logs
+      - /usr/src/app/node_modules
+
+    networks:
+      - app-network
     ports:
+      - "3000:3000"
       - "27017:27017"
 
 networks:
-  dev-network:
+  app-network:
     driver: bridge

@@ -7,8 +7,11 @@ export default async function ExpenseSheetsDownloader(
   SP: ServicesProvider
 ): Promise<ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader> {
   const logger = await SP.Logger();
+  const config = await SP.Config();
   const configuration: ExpenseSheetsDownloaderTypes.ExpenseSheetsOptions = {
-    expenseSheetsPath: "../../expense-sheets",
+    isLocal: await config.getBool("LOCAL"),
+    expenseSheetsPath:
+      (await config.get("EXPENSE_SHEETS_PATH")) ?? "../../expense-sheets",
     ...options,
   };
   const expenseSheetsDownloader = new ExpenseSheetsDownloaderService(

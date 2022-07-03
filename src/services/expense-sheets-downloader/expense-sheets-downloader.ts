@@ -6,7 +6,6 @@ import {
   LoggerTypes,
   TechTypes,
 } from "../../types";
-
 type Page = puppeteer.Page;
 type Browser = puppeteer.Browser;
 
@@ -44,10 +43,17 @@ export class ExpenseSheetsDownloader
 
   async initPage(): Promise<Page> {
     if (!this.browser) {
-      this.browser = await puppeteer.launch({
+      let launchOptions: any = {
         headless: true,
         defaultViewport: { width: 1920, height: 1080 },
-      });
+        args: ["--no-sandbox"],
+      };
+
+      if (!this.options.isLocal) {
+        launchOptions.executablePath = "/usr/bin/google-chrome";
+      }
+
+      this.browser = await puppeteer.launch(launchOptions);
     }
     const page = await this.browser.newPage();
     return page;
@@ -114,7 +120,7 @@ export class ExpenseSheetsDownloader
 
     FS.createDirIfNotExists(downloadPath);
 
-    await page.client().send("Page.setDownloadBehavior", {
+    (await page.target().createCDPSession()).send("Page.setDownloadBehavior", {
       behavior: "allow",
       downloadPath,
     });
