@@ -1,12 +1,12 @@
 version: "3"
 
 services:
-  money-pit-api:
+  money-pit-api-project:
     build:
       context: .
-      dockerfile: Dockerfile.Build
-    container_name: money-pit
-    image: money-pit
+      dockerfile: Dockerfile
+    container_name: money-pit-api
+    image: money-pit-api
     env_file:
       - ./.env
     environment:
