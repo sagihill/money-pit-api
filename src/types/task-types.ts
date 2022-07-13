@@ -22,6 +22,7 @@ export namespace TaskTypes {
       medianly: AddRecurrentExpensesTaskOptions;
       semesterly: AddRecurrentExpensesTaskOptions;
     };
+    sendAccountSummeryTaskOptions: SendAccountSummeryTaskOptions;
   };
 
   export interface TaskOptions {
@@ -35,6 +36,7 @@ export namespace TaskTypes {
   export interface AddRecurrentExpensesTaskOptions extends TaskOptions {
     recurrence: RecurrentExpenseTypes.Recurrence;
   }
+  export interface SendAccountSummeryTaskOptions extends TaskOptions {}
 
   export namespace Requests {
     export interface RunTaskRequest {

@@ -15,3 +15,5 @@ export * from "./validation-types";
 export * from "./crypto-types";
 export * from "./domain-types";
 export * from "./tech-types";
+export * from "./notification-sender-types";
+export * from "./notification-types";

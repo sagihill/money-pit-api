@@ -8,6 +8,7 @@ import {
   RecurrentExpenseTypes,
   AccountConfigurationTypes,
   CreditAccountTypes,
+  NotificationTypes,
 } from "../../types";
 import { TaskTypes } from "../../types/task-types";
 import {
@@ -15,6 +16,7 @@ import {
   AddReccurentExpensesTask,
   RefreshConfigsTask,
 } from "./tasks";
+import { SendAccountSummeryTask } from "./tasks/send-account-summery";
 
 export class TaskService implements TaskTypes.ITaskService {
   private tasks: TaskTypes.ITask[] = [];
@@ -27,6 +29,7 @@ export class TaskService implements TaskTypes.ITaskService {
     private readonly expenseSheets: ExpenseSheetsDownloaderTypes.IExpenseSheetsDownloader,
     private readonly expenseProcessor: ExpenseProcessorTypes.IExpenseProcessor,
     private readonly configService: ConfigTypes.IConfigService,
+    private readonly notification: NotificationTypes.INotificationService,
     private readonly logger: LoggerTypes.ILogger,
     private readonly configuration: TaskTypes.TaskServiceConfiguration
   ) {
@@ -89,12 +92,20 @@ export class TaskService implements TaskTypes.ITaskService {
       this.logger
     );
 
+    const sendAccountSummeryTask = new SendAccountSummeryTask(
+      this.notification,
+      this.accountConfigurationService,
+      { ...this.configuration.sendAccountSummeryTaskOptions },
+      this.logger
+    );
+
     this.tasks.push(
       addNewExpensesTask,
       addMonthlyRecurrentExpensesTask,
       addMedianlyRecurrentExpensesTask,
       addSemesterlyRecurrentExpensesTask,
-      refreshConfig
+      refreshConfig,
+      sendAccountSummeryTask
     );
   }
 

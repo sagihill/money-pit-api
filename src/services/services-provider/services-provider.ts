@@ -15,6 +15,8 @@ import {
   ValidationTypes,
   CryptoTypes,
   TechTypes,
+  NotificationSenderTypes,
+  NotificationTypes,
 } from "../../types";
 
 import { TaskTypes } from "../../types/task-types";
@@ -258,6 +260,30 @@ export class ServicesProvider {
     try {
       return await this.getProvider<TechTypes.IMigrationService, {}>(
         "Migrate",
+        {},
+        CreationMode.singleton
+      );
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+
+  async NotificationSender(): Promise<NotificationSenderTypes.INotificationSender> {
+    try {
+      return await this.getProvider<
+        NotificationSenderTypes.INotificationSender,
+        {}
+      >("NotificationSender", {}, CreationMode.singleton);
+    } catch (error: any) {
+      await this.log(error);
+      throw error;
+    }
+  }
+  async Notification(): Promise<NotificationTypes.INotificationService> {
+    try {
+      return await this.getProvider<NotificationTypes.INotificationService, {}>(
+        "Notification",
         {},
         CreationMode.singleton
       );

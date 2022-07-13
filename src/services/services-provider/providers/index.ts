@@ -11,6 +11,8 @@ import ExpenseSheetsDownloader from "./ExpenseSheetsDownloader";
 import Logger from "./Logger";
 import Mongo from "./Mongo";
 import Migrate from "./Migrate";
+import NotificationSender from "./NotificationSender";
+import Notification from "./Notification";
 import RecurrentExpense from "./RecurrentExpense";
 import Task from "./Task";
 import Salary from "./Salary";
@@ -30,6 +32,8 @@ export const Providers: any = {
   ExpenseSheetsDownloader,
   Logger,
   Mongo,
+  Notification,
+  NotificationSender,
   Migrate,
   RecurrentExpense,
   Task,
