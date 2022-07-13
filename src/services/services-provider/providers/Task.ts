@@ -11,6 +11,7 @@ export default async function Task(
   const accounting = await SP.Accounting();
   const creditAccount = await SP.CreditAccount();
   const accountConfiguration = await SP.AccountConfiguration();
+  const notification = await SP.Notification();
   const recurrentExpenses = await SP.RecurrentExpense();
   const expenseSheets = await SP.ExpenseSheetsDownloader();
   const expenseProcessor = await SP.ExpenseProcessor();
@@ -65,6 +66,7 @@ export default async function Task(
     expenseSheets,
     expenseProcessor,
     config,
+    notification,
     logger,
     configuration
   );
