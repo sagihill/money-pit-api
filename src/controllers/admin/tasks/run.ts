@@ -14,19 +14,18 @@ const add: RequestHandler = async (
   res
 ) => {
   try {
+    const response: TechTypes.ApiResponse = {
+      status: TechTypes.ResponseStatus.success,
+      message: "Running Task.",
+    };
+
+    res.send(response);
     const SP = ServicesProvider.get();
     const task = await SP.Task();
 
     const { id } = req.body;
 
     await task.runTask(id);
-
-    const response: TechTypes.ApiResponse = {
-      status: TechTypes.ResponseStatus.success,
-      message: "Ran task.",
-    };
-
-    res.send(response);
   } catch (error: any) {
     const response: TechTypes.ApiResponse = {
       status: TechTypes.ResponseStatus.error,
