@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
 import { Request, RequestHandler } from "express";
 import Joi from "joi";
 import { Utils } from "../../../lib/utils";
@@ -23,6 +25,17 @@ const add: RequestHandler = async (
 ) => {
   try {
     const SP = ServicesProvider.get();
+    const config = await SP.Config();
+    const restricted = await config.getBool("ACCOUNT_SERVICE_RESTRICTED");
+    if (restricted) {
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.failure,
+        message:
+          "Can't create an account. this service is not available at the moment.",
+      };
+
+      res.send(response);
+    }
     const accountService = await SP.Account();
     const userService = await SP.User();
     const { type, configuration, salaries, creditAccounts, recurrentExpenses } =

@@ -25,6 +25,16 @@ const signUp: RequestHandler = async (
 ) => {
   try {
     const SP = ServicesProvider.get();
+    const config = await SP.Config();
+    const restricted = await config.getBool("AUTH_SERVICE_RESTRICTED");
+    if (restricted) {
+      const response: TechTypes.ApiResponse = {
+        status: TechTypes.ResponseStatus.failure,
+        message: "Can't sign up. this service is not available at the moment.",
+      };
+
+      res.send(response);
+    }
     const authService = await SP.Auth();
     const { firstName, lastName, email, password } = req.body;
     const result = await authService.signUp({
