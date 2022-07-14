@@ -16,6 +16,11 @@ const schema = new Schema<AccountConfigurationTypes.AccountConfiguration>(
     toggles: {
       type: {
         enableAutoExpenseAdd: { type: Boolean, index: true, required: false },
+        enableAccountSummeryEmail: {
+          type: Boolean,
+          index: true,
+          required: false,
+        },
       },
       index: true,
       required: false,

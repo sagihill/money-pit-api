@@ -1,4 +1,3 @@
-/* eslint-disable import/first */
 import app from "./app";
 import { Async } from "./lib";
 import { ServicesProvider } from "./services/services-provider";

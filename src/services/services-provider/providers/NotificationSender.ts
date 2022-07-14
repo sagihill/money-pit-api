@@ -1,23 +1,23 @@
+import * as NodeMailer from "nodemailer";
 import { NotificationSenderTypes } from "../../../types";
 import { ServicesProvider } from "../services-provider";
-import * as NodeMailer from "nodemailer";
 import { NotificationSender as Sender } from "../../notification-sender";
 
 export default async function NotificationSender(
   options: any,
   SP: ServicesProvider
 ): Promise<NotificationSenderTypes.INotificationSender> {
-  const testAccount = await NodeMailer.createTestAccount();
   const logger = await SP.Logger();
+  const config = await SP.Config();
   const mailer = NodeMailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
+      user: await config.get("EMAIL_SMTP_USERNAME"),
+      pass: await config.get("EMAIL_SMTP_PASSWORD"),
     },
-    from: "MoneyPit notfication@money-pit.io",
+    from: "MoneyPit moneypitapi@gmail.com",
   });
 
   return new Sender(mailer, logger);

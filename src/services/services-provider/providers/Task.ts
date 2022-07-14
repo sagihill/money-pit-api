@@ -27,6 +27,10 @@ export default async function Task(
       cronInterval: await config.get("REFRESH_CONFIGS_TASK_CRON_INTERVAL"),
       isEnabled: await config.getBool("REFRESH_CONFIGS_TASK_IS_ENABLED"),
     },
+    sendAccountSummeryTaskOptions: {
+      cronInterval: await config.get("SEND_ACCOUNT_SUMMERY_TASK_CRON_INTERVAL"),
+      isEnabled: await config.getBool("SEND_ACCOUNT_SUMMERY_TASK_IS_ENABLED"),
+    },
     addRecurrentExpensesOptions: {
       monthly: {
         recurrence: RecurrentExpenseTypes.Recurrence.Monthly,

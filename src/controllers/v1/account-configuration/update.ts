@@ -10,6 +10,7 @@ export const accountConfigurationRequestBody = {
   budget: { totalBudget: Joi.number(), categoriesBudget: Joi.object() },
   toggles: {
     enableAutoExpenseAdd: Joi.boolean(),
+    enableAccountSummeryEmail: Joi.boolean(),
   },
 };
 
