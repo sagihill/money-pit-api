@@ -6,6 +6,7 @@ import {
   LoggerTypes,
   TechTypes,
 } from "../../types";
+
 type Page = puppeteer.Page;
 type Browser = puppeteer.Browser;
 
@@ -43,10 +44,10 @@ export class ExpenseSheetsDownloader
 
   async initPage(): Promise<Page> {
     if (!this.browser) {
-      let launchOptions: any = {
+      const launchOptions: any = {
         headless: true,
         defaultViewport: { width: 1920, height: 1080 },
-        args: ["--no-sandbox"],
+        args: ["--no-sandbox", "--disable-dev-shm-usage"],
       };
 
       if (!this.options.isLocal) {
@@ -137,7 +138,7 @@ export class ExpenseSheetsDownloader
 
     let downloadTimeoutCounter = 0;
 
-    const downloadTimer = setTimeout(function () {
+    const downloadTimer = setTimeout(() => {
       currentNumberOfFiles = FS.countNumOfFiles(downloadPath);
       if (currentNumberOfFiles > numberOfFiles || downloadTimeoutCounter > 30) {
         clearInterval(downloadTimer);
@@ -145,8 +146,6 @@ export class ExpenseSheetsDownloader
 
       downloadTimeoutCounter++;
     }, 1000);
-
-    return;
   }
 
   async close(page: Page): Promise<void> {
