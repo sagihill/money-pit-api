@@ -34,7 +34,7 @@ export class AddReccurentExpensesTask
       const expenses = [];
       this.logger.info(`Adding ${options.recurrence} recurrent Expenses`);
       for await (const recurrentExpense of recurrentExpenses) {
-        const string = `${now.getFullYear()}-${now.getMonth() + 1}-${
+        const string = `${now.getFullYear()}-${now.getMonth() + 2}-${
           recurrentExpense.dueDay
         }`;
         const timestamp = Dates.toDate(string, "yyyy-mm-dd");
